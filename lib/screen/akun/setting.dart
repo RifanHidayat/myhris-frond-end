@@ -633,14 +633,15 @@ class _SettingState extends State<Setting> {
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                       ),
-                                      Text(
-                                        AppData.informasiUser![0].sisaKontrak,
-                                        style: GoogleFonts.inter(
-                                            color: Constanst.fgSecondary,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 7),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
+                                      Expanded(
+                                        child: Text(
+                                          AppData.informasiUser![0].sisaKontrak,
+                                          style: GoogleFonts.inter(
+                                              color: Constanst.fgSecondary,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 6),
+                                          
+                                        ),
                                       ),
                                     ],
                                   )

@@ -183,6 +183,25 @@ class Constanst {
   }
 
   static String convertDate6(String date) {
+    List<String> parts = date.split('-');
+  if (parts.length == 3) {
+    parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
+    parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
+  } else {
+    throw FormatException("Invalid date format: $date");
+  }
+  String fixedDate = parts.join('-');
+    DateTime convert = DateTime.parse(fixedDate);
+    var hari = DateFormat('EEEE');
+    var tanggal = DateFormat('dd MMM yyyy', 'id');
+    var convertHari = hari.format(convert);
+    var hasilConvertHari = hariIndo(convertHari);
+    var valid2 = tanggal.format(convert);
+    var validFinal = "$hasilConvertHari, $valid2";
+    return validFinal;
+  }
+
+  static String convertDateTgllembur(String date) {
     DateTime convert = DateTime.parse(date);
     var hari = DateFormat('EEEE');
     var tanggal = DateFormat('dd MMM yyyy', 'id');

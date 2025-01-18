@@ -259,7 +259,8 @@ class ApprovalController extends GetxController {
             'approve2_status': element['approve2_status'],
             'image': element['image'],
             'status': element['status'],
-            'em_ids': element['em_ids']
+            'em_ids': element['em_ids'],
+            'em_id_pengaju': element['em_id']
           };
           listData.value.sort(
               (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));

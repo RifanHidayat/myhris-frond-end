@@ -789,7 +789,9 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
     var image = controller.detailData[0]['image'];
     var typeAjuan = controller.detailData[0]['leave_status'];
     print('ini typeAjuan $typeAjuan');
-    var em_id = controller.detailData[0]['emId_pengaju'];
+    var em_id = controller.detailData[0]['em_id_pengaju'];
+    var em_id_user = AppData.informasiUser![0].em_id;
+    print('ini em id apa yak $em_id');
     return Scaffold(
       backgroundColor: Constanst.coloBackgroundScreen,
       appBar: PreferredSize(
@@ -870,8 +872,9 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
               padding: const EdgeInsets.all(16.0),
               child: Obx(
                 () => controller.showButton.value == true &&
-                            controller.detailData[0]['status'] == "Pending" ||
-                        controller.detailData[0]['approve_status'] == "Pending"
+                            (controller.detailData[0]['status'] == "Pending" ||
+                        controller.detailData[0]['approve_status'] == "Pending") 
+                        && controller.detailData[0]['delegasi'].toString().contains(em_id_user)
                     // controller.detailData[0]['approve2_status'] ==
                     //           "Pending" &&
                     //       controller.detailData[0]['approve_status'] !=
@@ -950,7 +953,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 controller.detailData[0]['approve2_status'] ==
                                     "Pending" &&
                                 controller.detailData[0]['approve_status'] ==
-                                    'Approve'
+                                    'Approve' && controller.detailData[0]['em_ids'].toString().contains(em_id_user)
                             ? SizedBox(
                               height: 40,
                               child: ElevatedButton(
@@ -1840,125 +1843,114 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
     }
     return Container(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            "Status Pengajuan",
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w400,
+              fontSize: 14,
+              color: Constanst.fgSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              data['approve_status'] == "Pending"
+                  ? Icon(
+                      Iconsax.timer,
+                      color: Constanst.warning,
+                      size: 22,
+                    )
+                  : data['approve_status'] == "Rejected"
+                      ? Icon(
+                          Iconsax.close_circle,
+                          color: Colors.red,
+                          size: 22,
+                        )
+                      : Icon(
+                          Iconsax.tick_circle,
+                          color: Colors.green,
+                          size: 22,
+                        ),
+              // Icon(
+              //   Iconsax.close_circle,
+              //   color: Constanst.color4,
+              //   size: 22,
+              // ),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Status Pengajuan",
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Constanst.fgSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      data['approve_status'] == "Pending"
-                          ? Icon(
-                              Iconsax.timer,
-                              color: Constanst.warning,
-                              size: 22,
-                            )
-                          : data['approve_status'] == "Rejected"
-                              ? Icon(
-                                  Iconsax.close_circle,
-                                  color: Colors.red,
-                                  size: 22,
-                                )
-                              : Icon(
-                                  Iconsax.tick_circle,
-                                  color: Colors.green,
-                                  size: 22,
-                                ),
-                      // Icon(
-                      //   Iconsax.close_circle,
-                      //   color: Constanst.color4,
-                      //   size: 22,
-                      // ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${text} ",
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  color: Constanst.fgPrimary,
-                                  fontSize: 14)),
-                          const SizedBox(height: 4),
-                        ],
-                      ),
-                    ],
-                  ),
-                  data['approve_status'] == "Approve"
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  EdgeInsets.only(left: 2.5, top: 2, bottom: 2),
-                              child: Container(
-                                height: 30,
-                                child: VerticalDivider(
-                                  color: Constanst.Secondary,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  data['approve2_status'] == "Pending"
-                                      ? Icon(
-                                          Iconsax.timer,
-                                          color: Constanst.warning,
-                                          size: 22,
-                                        )
-                                      : data['approve2_status'] == "Rejected"
-                                          ? Icon(
-                                              Iconsax.close_circle,
-                                              color: Colors.red,
-                                              size: 22,
-                                            )
-                                          : Icon(
-                                              Iconsax.tick_circle,
-                                              color: Colors.green,
-                                              size: 22,
-                                            ),
-                                  // Icon(
-                                  //   Iconsax.close_circle,
-                                  //   color: Constanst.color4,
-                                  //   size: 22,
-                                  // ),
-                                  const SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("${text2} ",
-                                          style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              color: Constanst.fgPrimary,
-                                              fontSize: 14)),
-                                      const SizedBox(height: 4),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      : SizedBox(),
+                  Text("${text} ",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14)),
+                  const SizedBox(height: 4),
                 ],
               ),
             ],
-          )
+          ),
+          data['approve_status'] == "Approve"
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 2.5, top: 2, bottom: 2),
+                      child: Container(
+                        height: 30,
+                        child: VerticalDivider(
+                          color: Constanst.Secondary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          data['approve2_status'] == "Pending"
+                              ? Icon(
+                                  Iconsax.timer,
+                                  color: Constanst.warning,
+                                  size: 22,
+                                )
+                              : data['approve2_status'] == "Rejected"
+                                  ? Icon(
+                                      Iconsax.close_circle,
+                                      color: Colors.red,
+                                      size: 22,
+                                    )
+                                  : Icon(
+                                      Iconsax.tick_circle,
+                                      color: Colors.green,
+                                      size: 22,
+                                    ),
+                          // Icon(
+                          //   Iconsax.close_circle,
+                          //   color: Constanst.color4,
+                          //   size: 22,
+                          // ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text("${text2} ",
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w500,
+                                    color: Constanst.fgPrimary,
+                                    fontSize: 14),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : SizedBox(),
         ],
       ),
     );

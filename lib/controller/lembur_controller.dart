@@ -183,7 +183,7 @@ class LemburController extends GetxController {
     var connect = Api.connectionApi(
       "post",
       body,
-      "cari_informasi_employee",
+      "berhubungan-dengan",
     );
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
@@ -1094,6 +1094,7 @@ class LemburController extends GetxController {
     var nomorAjuan = detailData['nomor_ajuan'];
     infoTask(nomorAjuan);
     var tanggalMasukAjuan = detailData['atten_date'];
+    var tanggalAjuan = detailData['tgl_ajuan'];
     var namaTypeAjuan = detailData['type'];
     var uraian = detailData['uraian'];
     var durasi = detailData['leave_duration'];
@@ -1166,7 +1167,7 @@ class LemburController extends GetxController {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  Constanst.convertDate6("$tanggalMasukAjuan"),
+                                  Constanst.convertDate6(tanggalAjuan),
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
@@ -1176,29 +1177,27 @@ class LemburController extends GetxController {
                               ],
                             ),
                           ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "No. Pengajuan",
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14,
-                                    color: Constanst.fgSecondary,
-                                  ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "No. Pengajuan",
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14,
+                                  color: Constanst.fgSecondary,
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  nomorAjuan,
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                    color: Constanst.fgPrimary,
-                                  ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                nomorAjuan,
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  color: Constanst.fgPrimary,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -1215,7 +1214,7 @@ class LemburController extends GetxController {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Nama Pengajuan",
+                            "Tipe lembur",
                             style: GoogleFonts.inter(
                               fontWeight: FontWeight.w400,
                               fontSize: 14,

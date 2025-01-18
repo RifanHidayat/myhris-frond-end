@@ -782,12 +782,16 @@ class _PersetujuanLemburState extends State<PersetujuanLembur>
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "rejected by  - $namaApprove1",
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        color: Constanst.fgPrimary,
-                        fontSize: 14),
+                  Expanded(
+                    child: Text(
+                      "rejected by  - $namaApprove1",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14),
+                          maxLines: 1, 
+                          overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
@@ -877,12 +881,16 @@ class _PersetujuanLemburState extends State<PersetujuanLembur>
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "Approved 2 by - $namaApprove2",
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        color: Constanst.fgPrimary,
-                        fontSize: 14),
+                  Expanded(
+                    child: Text(
+                      "Approved 2 by - $namaApprove2",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis
+                    ),
                   ),
                 ],
               ),

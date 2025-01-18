@@ -41,6 +41,7 @@ import 'package:siscom_operasional/screen/pesan/pesan.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
+import 'package:siscom_operasional/utils/custom_dialog.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
@@ -1813,7 +1814,7 @@ class _DashboardState extends State<Dashboard> {
                                       controllerAbsensi.titleAbsen.value =
                                           "Absen Keluar";
                                       controllerAbsensi.typeAbsen.value = 2;
-                                      String timeOutValue =
+                                      String timeOutValue = 
                                           controller.timeOut.value;
 
                                       try {
@@ -1836,16 +1837,50 @@ class _DashboardState extends State<Dashboard> {
 
                                         // Bandingkan waktu
                                         if (timeOutDate.isAfter(now)) {
-                                           if (controllerAbsensi.regType.value ==
-                                              1) {
-                                            Get.to(AbsensiLocation(
-                                              status: "keluar",
-                                            ));
-                                          } else {
-                                            Get.to(FaceDetectorView(
-                                              status: "keluar",
-                                            ));
-                                          }
+                                          showGeneralDialog(
+                                            barrierDismissible: false,
+                                            context: Get.context!,
+                                            barrierColor: Colors
+                                                .black54, // space around dialog
+                                            transitionDuration:
+                                                Duration(milliseconds: 200),
+                                            transitionBuilder:
+                                                (context, a1, a2, child) {
+                                              return ScaleTransition(
+                                                scale: CurvedAnimation(
+                                                    parent: a1,
+                                                    curve: Curves.elasticOut,
+                                                    reverseCurve:
+                                                        Curves.easeOutCubic),
+                                                child: CustomDialog(
+                                                  title: "Peringatan",
+                                                  content: "Anda yakin ingin pulang lebih cepat?",
+                                                  positiveBtnText: "Yah",
+                                                  negativeBtnText: "Kembali",
+                                                  style: 1,
+                                                  buttonStatus: 1,
+                                                  positiveBtnPressed: () async {
+                                                    if (controllerAbsensi
+                                                            .regType.value ==
+                                                        1) {
+                                                      Get.to(AbsensiLocation(
+                                                        status: "keluar",
+                                                      ));
+                                                    } else {
+                                                      Get.to(FaceDetectorView(
+                                                        status: "keluar",
+                                                      ));
+                                                    }
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                            pageBuilder: (BuildContext context,
+                                                Animation animation,
+                                                Animation secondaryAnimation) {
+                                              return null!;
+                                            },
+                                          );
                                         } else {
                                           if (controllerAbsensi.regType.value ==
                                               1) {
