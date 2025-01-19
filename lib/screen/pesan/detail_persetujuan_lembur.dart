@@ -877,12 +877,11 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
               child: Obx(
                 () => controller.showButton.value == true &&
                         (controller.detailData[0]['status'] == "Pending" ||
-                            controller.detailData[0]['status'] == "Approve" ||
+                            
                             controller.detailData[0]['approve_status'] ==
-                                "Pending" ||
-                            controller.detailData[0]['approve2_status'] ==
-                                "Pending") &&
-                        controller.detailData[0]['dinilai'] == "N" &&
+                                "Pending") ||
+                                (controller.detailData[0]['status'] == "Approve" && controller.detailData[0]['dinila'] == "N" ) &&
+                      
                         (controller.detailData[0]['delegasi']
                                 .toString()
                                 .contains(em_id_user) ||
@@ -972,8 +971,13 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 controller.detailData[0]['approve_status'] ==
                                     'Approve' &&
                                 controller.detailData[0]['em_ids']
+
                                     .toString()
                                     .contains(em_id_user)
+                                    &&
+                                controller.detailData[0]['dinilai']=='Y'
+
+                                    
                             ? SizedBox(
                                 height: 40,
                                 child: ElevatedButton(
@@ -998,7 +1002,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                   ),
                                 ),
                               )
-                            : SizedBox(
+                            :   controller.detailData[0]['dinilai']=='N'?SizedBox(): SizedBox(
                                 height: 40,
                                 child: ElevatedButton(
                                   onPressed: () {
@@ -1012,7 +1016,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                             width: 1.0)),
                                   ),
                                   child: Text(
-                                    'Hasil Lembur',
+                                    'Hasil Lembur ${controller.showButton.value }',
                                     style: GoogleFonts.inter(
                                         fontWeight: FontWeight.w500,
                                         color: Constanst.colorPrimary,
@@ -1468,30 +1472,43 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                   color: Constanst.border,
                                 ),
                               ),
-                              Text(
-                                "Peminta lembur",
-                                style: GoogleFonts.inter(
-                                    color: Constanst.fgSecondary,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                controller.fullNameApprove2.join(', '),
-                                style: GoogleFonts.inter(
-                                    color: Constanst.fgPrimary,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 12.0, bottom: 12.0),
-                                child: Divider(
-                                  thickness: 1,
-                                  height: 0,
-                                  color: Constanst.border,
-                                ),
-                              ),
+                              widget.dinilai == 'N'
+                                  ? SizedBox()
+                                  : Container(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Peminta lembur",
+                                            style: GoogleFonts.inter(
+                                                color: Constanst.fgSecondary,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            controller.fullNameApprove2
+                                                .join(', '),
+                                            style: GoogleFonts.inter(
+                                                color: Constanst.fgPrimary,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 12.0, bottom: 12.0),
+                                            child: Divider(
+                                              thickness: 1,
+                                              height: 0,
+                                              color: Constanst.border,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),  
 
                               widget.dinilai == "Y"
                                   ? SizedBox()

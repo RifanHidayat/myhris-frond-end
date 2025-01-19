@@ -259,8 +259,7 @@ class _FormLemburState extends State<FormLembur> {
               padding: EdgeInsets.zero,
               onTap: () {
                 var data = controller.allTypeLembur
-                    .where(
-                        (value) => value['name'].toString() == value.toString())
+                    .where((v) => v['name'].toString() == value.toString())
                     .toList();
                 if (data.length > 0) {
                   controller.dinilai.value == data[0]['dinilai'];
