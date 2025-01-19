@@ -356,6 +356,7 @@ class _PersetujuanLemburState extends State<PersetujuanLembur>
                 controller.listData.value[index]['nama_divisi'] ?? "";
             var image = controller.listData.value[index]['em_image'];
             var emIds = controller.listData.value[index]['em_ids'];
+            var dinilai = controller.listData.value[index]['dinilai'];
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,12 +370,12 @@ class _PersetujuanLemburState extends State<PersetujuanLembur>
                     print(
                         "wkwkw ini $emIdPengaju ,, $typeAjuan ,, $idx ,, $delegasi");
                     Get.to(DetailPersetujuanLembur(
-                      emId: nomor_ajuan,
-                      title: typeAjuan,
-                      idxDetail: "$idx",
-                      delegasi: delegasi,
-                      emIds: emIds,
-                    ));
+                        emId: nomor_ajuan,
+                        title: typeAjuan,
+                        idxDetail: "$idx",
+                        delegasi: delegasi,
+                        emIds: emIds,
+                        dinilai: dinilai));
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -789,8 +790,8 @@ class _PersetujuanLemburState extends State<PersetujuanLembur>
                           fontWeight: FontWeight.w500,
                           color: Constanst.fgPrimary,
                           fontSize: 14),
-                          maxLines: 1, 
-                          overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -882,15 +883,13 @@ class _PersetujuanLemburState extends State<PersetujuanLembur>
                     width: 8,
                   ),
                   Expanded(
-                    child: Text(
-                      "Approved 2 by - $namaApprove2",
-                      style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w500,
-                          color: Constanst.fgPrimary,
-                          fontSize: 14),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis
-                    ),
+                    child: Text("Approved 2 by - $namaApprove2",
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w500,
+                            color: Constanst.fgPrimary,
+                            fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
                   ),
                 ],
               ),

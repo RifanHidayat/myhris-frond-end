@@ -19,7 +19,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailPersetujuanLembur extends StatefulWidget {
-  String? title, idxDetail, emId, delegasi, emIds, emIdPengaju;
+  String? title, idxDetail, emId, delegasi, emIds, emIdPengaju, dinilai;
 
   DetailPersetujuanLembur(
       {Key? key,
@@ -27,7 +27,8 @@ class DetailPersetujuanLembur extends StatefulWidget {
       this.idxDetail,
       this.emId,
       this.delegasi,
-      this.emIds})
+      this.emIds,
+      this.dinilai})
       : super(key: key);
   @override
   _DetailPersetujuanLemburState createState() =>
@@ -191,7 +192,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                       Padding(
                         padding: EdgeInsets.only(left: 8, top: 2),
                         child: Text(
-                          "Alasan",
+                          "Catatan",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 14),
                         ),
@@ -215,8 +216,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                             maxLength: 225,
                             autofocus: true,
                             decoration: new InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Tulis alasan kamu disini"),
+                                border: InputBorder.none, hintText: ""),
                             keyboardType: TextInputType.multiline,
                             textInputAction: TextInputAction.done,
                             style: TextStyle(
@@ -284,27 +284,29 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 ),
                               ),
                               SizedBox(width: 10),
-                              SizedBox(
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    TextFormField(
-                                      controller:
-                                          controller.taskControllers[index],
-                                      decoration: InputDecoration(
-                                        hintText: '0%',
-                                        border: InputBorder.none,
+                              widget.dinilai == "N"
+                                  ? SizedBox()
+                                  : SizedBox(
+                                      width: 50,
+                                      child: Column(
+                                        children: [
+                                          TextFormField(
+                                            controller: controller
+                                                .taskControllers[index],
+                                            decoration: InputDecoration(
+                                              hintText: '0%',
+                                              border: InputBorder.none,
+                                            ),
+                                            keyboardType: TextInputType.number,
+                                          ),
+                                          Divider(
+                                            height: 0,
+                                            thickness: 1,
+                                            color: Constanst.fgBorder,
+                                          ),
+                                        ],
                                       ),
-                                      keyboardType: TextInputType.number,
                                     ),
-                                    Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                      color: Constanst.fgBorder,
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ],
                           ),
                         );
@@ -420,32 +422,34 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                             ),
                           ),
                           SizedBox(width: 10),
-                          SizedBox(
-                            width: 50,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 15.0),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "${task['persentase'].toString()}%",
-                                    style: GoogleFonts.inter(
-                                      color: Constanst.fgPrimary,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
+                          widget.dinilai == 'N'
+                              ? SizedBox()
+                              : SizedBox(
+                                  width: 50,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 15.0),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "${task['persentase'].toString()}%",
+                                          style: GoogleFonts.inter(
+                                            color: Constanst.fgPrimary,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Divider(
+                                          height: 0,
+                                          thickness: 1,
+                                          color: Constanst.fgBorder,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Divider(
-                                    height: 0,
-                                    thickness: 1,
-                                    color: Constanst.fgBorder,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                ),
                         ],
                       ),
                     );
@@ -842,7 +846,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
           ),
         ),
       ),
-      bottomNavigationBar: typeAjuan == "Approve2"
+      bottomNavigationBar: typeAjuan == "Approve2" && widget.dinilai == "Y"
           ? Padding(
               padding: const EdgeInsets.all(16.0),
               child: SizedBox(
@@ -872,9 +876,22 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
               padding: const EdgeInsets.all(16.0),
               child: Obx(
                 () => controller.showButton.value == true &&
-                            (controller.detailData[0]['status'] == "Pending" ||
-                        controller.detailData[0]['approve_status'] == "Pending") 
-                        && controller.detailData[0]['delegasi'].toString().contains(em_id_user)
+                        (controller.detailData[0]['status'] == "Pending" ||
+                            controller.detailData[0]['status'] == "Approve" ||
+                            controller.detailData[0]['approve_status'] ==
+                                "Pending" ||
+                            controller.detailData[0]['approve2_status'] ==
+                                "Pending") &&
+                        controller.detailData[0]['dinilai'] == "N" &&
+                        (controller.detailData[0]['delegasi']
+                                .toString()
+                                .contains(em_id_user) ||
+                            controller.detailData[0]['em_report_to']
+                                .toString()
+                                .contains(em_id_user) ||
+                            controller.detailData[0]['em_report2_to']
+                                .toString()
+                                .contains(em_id_user))
                     // controller.detailData[0]['approve2_status'] ==
                     //           "Pending" &&
                     //       controller.detailData[0]['approve_status'] !=
@@ -953,54 +970,56 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 controller.detailData[0]['approve2_status'] ==
                                     "Pending" &&
                                 controller.detailData[0]['approve_status'] ==
-                                    'Approve' && controller.detailData[0]['em_ids'].toString().contains(em_id_user)
+                                    'Approve' &&
+                                controller.detailData[0]['em_ids']
+                                    .toString()
+                                    .contains(em_id_user)
                             ? SizedBox(
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  showBottomHasilLembur(em_id);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Constanst.colorWhite,
-                                  backgroundColor: Constanst.colorPrimary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                height: 40,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    showBottomHasilLembur(em_id);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Constanst.colorWhite,
+                                    backgroundColor: Constanst.colorPrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    elevation: 0,
+                                    // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
                                   ),
-                                  elevation: 0,
-                                  // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
+                                  child: Text(
+                                    'Hasil Lembur',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.colorWhite,
+                                        fontSize: 14),
+                                  ),
                                 ),
-                                child: Text(
-                                  'Hasil Lembur',
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      color: Constanst.colorWhite,
-                                      fontSize: 14),
-                                ),
-                              ),
-                            )
+                              )
                             : SizedBox(
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  showBottomHasilLemburDisable(em_id);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(8),
-                                      side: BorderSide(
-                                          color: Constanst.colorPrimary,
-                                          width: 1.0)),
+                                height: 40,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    showBottomHasilLemburDisable(em_id);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        side: BorderSide(
+                                            color: Constanst.colorPrimary,
+                                            width: 1.0)),
+                                  ),
+                                  child: Text(
+                                    'Hasil Lembur',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.colorPrimary,
+                                        fontSize: 14),
+                                  ),
                                 ),
-                                child: Text(
-                                  'Hasil Lembur',
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      color: Constanst.colorPrimary,
-                                      fontSize: 14),
-                                ),
-                              ),
-                            );
+                              );
                       }),
               )),
       body: WillPopScope(
@@ -1474,6 +1493,42 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 ),
                               ),
 
+                              widget.dinilai == "Y"
+                                  ? SizedBox()
+                                  : InkWell(
+                                      onTap: () {
+                                        showBottomHasilLemburDisable(em_id);
+                                      },
+                                      child: Container(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "List Task",
+                                              style: GoogleFonts.inter(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 15),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 12.0, bottom: 12.0),
+                                              child: Divider(
+                                                thickness: 1,
+                                                height: 0,
+                                                color: Constanst.border,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
                               //singgle approval
                               controller.valuePolaPersetujuan == 1 ||
                                       controller.valuePolaPersetujuan == "1"
@@ -1898,8 +1953,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding:
-                          EdgeInsets.only(left: 2.5, top: 2, bottom: 2),
+                      padding: EdgeInsets.only(left: 2.5, top: 2, bottom: 2),
                       child: Container(
                         height: 30,
                         child: VerticalDivider(
@@ -1936,14 +1990,15 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                           // ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text("${text2} ",
-                                style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w500,
-                                    color: Constanst.fgPrimary,
-                                    fontSize: 14),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            child: Text(
+                              "${text2} ",
+                              style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w500,
+                                  color: Constanst.fgPrimary,
+                                  fontSize: 14),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),

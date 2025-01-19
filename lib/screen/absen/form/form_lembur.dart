@@ -32,6 +32,7 @@ class _FormLemburState extends State<FormLembur> {
       if (widget.dataForm![1] == true) {
         controller.nomorAjuan.value.text =
             "${widget.dataForm![0]['nomor_ajuan']}";
+        controller.dinilai.value = "${widget.dataForm![0]['dinilai']}";
         controller.tanggalLembur.value.text =
             Constanst.convertDate("${widget.dataForm![0]['atten_date']}");
         var convertDariJam = widget.dataForm![0]['dari_jam'].split(":");
@@ -121,7 +122,11 @@ class _FormLemburState extends State<FormLembur> {
                               formHariDanTanggal(),
                               formJam(),
                               formDelegasiKepada(),
-                              formTugasKepada(),
+                              Obx(() {
+                                return controller.dinilai.value == 'Y'
+                                    ? formTugasKepada()
+                                    : SizedBox();
+                              }),
                               formCatatan(),
                             ],
                           ),
@@ -253,6 +258,13 @@ class _FormLemburState extends State<FormLembur> {
               value: value,
               padding: EdgeInsets.zero,
               onTap: () {
+                var data = controller.allTypeLembur
+                    .where(
+                        (value) => value['name'].toString() == value.toString())
+                    .toList();
+                if (data.length > 0) {
+                  controller.dinilai.value == data[0]['dinilai'];
+                }
                 print('ini value $value');
                 controller.selectedTypeLembur.value = value;
                 print('ini value ${controller.selectedTypeLembur.value}');
@@ -824,7 +836,7 @@ class _FormLemburState extends State<FormLembur> {
       onTap: () {
         // controller.loadAllEmployeeDelegasi();
         // controller.cariAtas.value.clear;
-              bottomSheetPengajuanAbsen();
+        bottomSheetPengajuanAbsen();
       },
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -876,7 +888,7 @@ class _FormLemburState extends State<FormLembur> {
 
   Widget formTugasKepada() {
     return InkWell(
-      onTap: (){
+      onTap: () {
         // controller.cariBerhubungan.value.clear;
         bottomSheetEmploy();
       },
@@ -960,100 +972,100 @@ class _FormLemburState extends State<FormLembur> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Obx(() {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      controller.statusFormPencarianAtas.value
-                      ?SizedBox(
-                      height: 40,
-                      width: MediaQuery.of(context).size.width - 40,
-                      child: TextFormField(
-                        // controller: controller.searchController,
-                        controller: controller.cariAtas.value,
-                        onChanged: (value){
-                          controller.stringCariAtas.value = value;
-                        },
-                        textAlignVertical: TextAlignVertical.center,
-                        style: GoogleFonts.inter(
-                            height: 1.5,
-                            fontWeight: FontWeight.w400,
-                            color: Constanst.fgPrimary,
-                            fontSize: 15),
-                        cursorColor: Constanst.onPrimary,
-                        decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Constanst.colorNeutralBgSecondary,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              borderSide: const BorderSide(
-                                color: Colors.transparent,
-                              ),
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    controller.statusFormPencarianAtas.value
+                        ? SizedBox(
+                            height: 40,
+                            width: MediaQuery.of(context).size.width - 40,
+                            child: TextFormField(
+                              // controller: controller.searchController,
+                              controller: controller.cariAtas.value,
+                              onChanged: (value) {
+                                controller.stringCariAtas.value = value;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              style: GoogleFonts.inter(
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w400,
+                                  color: Constanst.fgPrimary,
+                                  fontSize: 15),
+                              cursorColor: Constanst.onPrimary,
+                              decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Constanst.colorNeutralBgSecondary,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.only(
+                                      left: 20, right: 20),
+                                  hintText: "Cari data...",
+                                  hintStyle: GoogleFonts.inter(
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w400,
+                                      color: Constanst.fgSecondary,
+                                      fontSize: 14),
+                                  prefixIconConstraints:
+                                      BoxConstraints.tight(const Size(46, 46)),
+                                  suffixIconConstraints:
+                                      BoxConstraints.tight(const Size(46, 46)),
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16.0, right: 8),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Iconsax.close_circle5,
+                                        color: Constanst.fgSecondary,
+                                        size: 24,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        controller.stringCariAtas.value = '';
+                                        controller.showInputCariAtasPerintah();
+                                      },
+                                    ),
+                                  )),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              borderSide: const BorderSide(
-                                color: Colors.transparent,
-                              ),
-                            ),
-                            contentPadding:
-                                const EdgeInsets.only(left: 20, right: 20),
-                            hintText: "Cari data...",
-                            hintStyle: GoogleFonts.inter(
-                                height: 1.5,
-                                fontWeight: FontWeight.w400,
-                                color: Constanst.fgSecondary,
-                                fontSize: 14),
-                            prefixIconConstraints:
-                                BoxConstraints.tight(const Size(46, 46)),
-                            suffixIconConstraints:
-                                BoxConstraints.tight(const Size(46, 46)),
-                            suffixIcon: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 16.0, right: 8),
-                              child: IconButton(
-                                icon: Icon(
-                                  Iconsax.close_circle5,
-                                  color: Constanst.fgSecondary,
-                                  size: 24,
-                                ),
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  controller.stringCariAtas.value = '';
-                                  controller.showInputCariAtasPerintah();
-                                },
-                              ),
-                            )),
-                      ),
-                    )
-                      :Text(
-                        "Peminta kerja lembur",
-                        style: GoogleFonts.inter(
-                            color: Constanst.fgPrimary,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20),
-                      ),
-                      controller.statusFormPencarianAtas.value
-                      ?Container()
-                      :InkWell(
-                          customBorder: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(8))),
-                          onTap: () {
-                            controller.stringCariAtas.value = '';
-                            controller.showInputCariAtasPerintah();
-                          },
-                          child: Icon(
-                            Icons.search,
-                            opticalSize: 24,
-                            color: Constanst.fgSecondary,
-                          ))
-                    ],
-                  ),
-                );
-              }
-            ),
+                          )
+                        : Text(
+                            "Peminta kerja lembur",
+                            style: GoogleFonts.inter(
+                                color: Constanst.fgPrimary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20),
+                          ),
+                    controller.statusFormPencarianAtas.value
+                        ? Container()
+                        : InkWell(
+                            customBorder: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8))),
+                            onTap: () {
+                              controller.stringCariAtas.value = '';
+                              controller.showInputCariAtasPerintah();
+                            },
+                            child: Icon(
+                              Icons.search,
+                              opticalSize: 24,
+                              color: Constanst.fgSecondary,
+                            ))
+                  ],
+                ),
+              );
+            }),
             Padding(
               padding: const EdgeInsets.only(left: 16.0, right: 16.0),
               child: Divider(
@@ -1064,11 +1076,13 @@ class _FormLemburState extends State<FormLembur> {
             ),
             Expanded(
               child: Obx(() {
-                var filterDelegasi = controller.allEmployeeDelegasi.value.where((delegasi){
-                  return delegasi.toLowerCase().contains(
-                    controller.stringCariAtas.value.toLowerCase());
+                var filterDelegasi =
+                    controller.allEmployeeDelegasi.value.where((delegasi) {
+                  return delegasi
+                      .toLowerCase()
+                      .contains(controller.stringCariAtas.value.toLowerCase());
                 }).toList();
-                  return SingleChildScrollView(
+                return SingleChildScrollView(
                     child: ListView.builder(
                         itemCount: filterDelegasi.length,
                         physics: const BouncingScrollPhysics(),
@@ -1077,8 +1091,8 @@ class _FormLemburState extends State<FormLembur> {
                         itemBuilder: (context, index) {
                           var data = filterDelegasi[index];
                           return Obx(() {
-                            var isSelected =
-                                controller.selectedDropdownDelegasi.contains(data);
+                            var isSelected = controller.selectedDropdownDelegasi
+                                .contains(data);
                             return Column(
                               children: [
                                 InkWell(
@@ -1088,8 +1102,8 @@ class _FormLemburState extends State<FormLembur> {
                                     Get.back();
                                   },
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        16, 16, 16, 16),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -1108,8 +1122,8 @@ class _FormLemburState extends State<FormLembur> {
                                                   decoration: BoxDecoration(
                                                       border: Border.all(
                                                           width: 2,
-                                                          color:
-                                                              Constanst.onPrimary),
+                                                          color: Constanst
+                                                              .onPrimary),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               10)),
@@ -1118,11 +1132,12 @@ class _FormLemburState extends State<FormLembur> {
                                                         const EdgeInsets.all(3),
                                                     child: Container(
                                                       decoration: BoxDecoration(
-                                                          color:
-                                                              Constanst.onPrimary,
+                                                          color: Constanst
+                                                              .onPrimary,
                                                           borderRadius:
-                                                              BorderRadius.circular(
-                                                                  10)),
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10)),
                                                     ),
                                                   ),
                                                 ),
@@ -1140,8 +1155,8 @@ class _FormLemburState extends State<FormLembur> {
                                                   decoration: BoxDecoration(
                                                       border: Border.all(
                                                           width: 1,
-                                                          color:
-                                                              Constanst.onPrimary),
+                                                          color: Constanst
+                                                              .onPrimary),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               10)),
@@ -1151,8 +1166,9 @@ class _FormLemburState extends State<FormLembur> {
                                                     child: Container(
                                                       decoration: BoxDecoration(
                                                           borderRadius:
-                                                              BorderRadius.circular(
-                                                                  10)),
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10)),
                                                     ),
                                                   ),
                                                 ),
@@ -1165,10 +1181,8 @@ class _FormLemburState extends State<FormLembur> {
                             );
                           });
                         }));
-                }
-              ),
-              ),
-    
+              }),
+            ),
           ],
         );
       },
@@ -1190,101 +1204,101 @@ class _FormLemburState extends State<FormLembur> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Obx(() {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      controller.statusFormPencarianBerhubungan.value
-                      ?SizedBox(
-                      height: 40,
-                      width: MediaQuery.of(context).size.width - 40,
-                      child: TextFormField(
-                        // controller: controller.searchController,
-                        controller: controller.cariBerhubungan.value,
-                        onChanged: (value){
-                          controller.stringCari.value = value;
-                        },
-                        textAlignVertical: TextAlignVertical.center,
-                        style: GoogleFonts.inter(
-                            height: 1.5,
-                            fontWeight: FontWeight.w400,
-                            color: Constanst.fgPrimary,
-                            fontSize: 15),
-                        cursorColor: Constanst.onPrimary,
-                        decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Constanst.colorNeutralBgSecondary,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              borderSide: const BorderSide(
-                                color: Colors.transparent,
-                              ),
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    controller.statusFormPencarianBerhubungan.value
+                        ? SizedBox(
+                            height: 40,
+                            width: MediaQuery.of(context).size.width - 40,
+                            child: TextFormField(
+                              // controller: controller.searchController,
+                              controller: controller.cariBerhubungan.value,
+                              onChanged: (value) {
+                                controller.stringCari.value = value;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              style: GoogleFonts.inter(
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w400,
+                                  color: Constanst.fgPrimary,
+                                  fontSize: 15),
+                              cursorColor: Constanst.onPrimary,
+                              decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Constanst.colorNeutralBgSecondary,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.only(
+                                      left: 20, right: 20),
+                                  hintText: "Cari data...",
+                                  hintStyle: GoogleFonts.inter(
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w400,
+                                      color: Constanst.fgSecondary,
+                                      fontSize: 14),
+                                  prefixIconConstraints:
+                                      BoxConstraints.tight(const Size(46, 46)),
+                                  suffixIconConstraints:
+                                      BoxConstraints.tight(const Size(46, 46)),
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16.0, right: 8),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Iconsax.close_circle5,
+                                        color: Constanst.fgSecondary,
+                                        size: 24,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        controller.stringCari.value = '';
+                                        // controller.cariBerhubungan.value.clear();
+                                        controller.showInputCariBerhubungan();
+                                      },
+                                    ),
+                                  )),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              borderSide: const BorderSide(
-                                color: Colors.transparent,
-                              ),
-                            ),
-                            contentPadding:
-                                const EdgeInsets.only(left: 20, right: 20),
-                            hintText: "Cari data...",
-                            hintStyle: GoogleFonts.inter(
-                                height: 1.5,
-                                fontWeight: FontWeight.w400,
-                                color: Constanst.fgSecondary,
-                                fontSize: 14),
-                            prefixIconConstraints:
-                                BoxConstraints.tight(const Size(46, 46)),
-                            suffixIconConstraints:
-                                BoxConstraints.tight(const Size(46, 46)),
-                            suffixIcon: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 16.0, right: 8),
-                              child: IconButton(
-                                icon: Icon(
-                                  Iconsax.close_circle5,
-                                  color: Constanst.fgSecondary,
-                                  size: 24,
-                                ),
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  controller.stringCari.value = '';
-                                  // controller.cariBerhubungan.value.clear();
-                                  controller.showInputCariBerhubungan();
-                                },
-                              ),
-                            )),
-                      ),
-                    )
-                      :Text(
-                        "Peminta lembur",
-                        style: GoogleFonts.inter(
-                            color: Constanst.fgPrimary,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20),
-                      ),
-                      controller.statusFormPencarianBerhubungan.value
-                      ?Container()
-                      :InkWell(
-                          customBorder: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(8))),
-                          onTap: () {
-                            controller.stringCari.value = '';
-                            controller.showInputCariBerhubungan();
-                          },
-                          child: Icon(
-                            Icons.search,
-                            opticalSize: 24,
-                            color: Constanst.fgSecondary,
-                          ))
-                    ],
-                  ),
-                );
-              }
-            ),
+                          )
+                        : Text(
+                            "Peminta lembur",
+                            style: GoogleFonts.inter(
+                                color: Constanst.fgPrimary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20),
+                          ),
+                    controller.statusFormPencarianBerhubungan.value
+                        ? Container()
+                        : InkWell(
+                            customBorder: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8))),
+                            onTap: () {
+                              controller.stringCari.value = '';
+                              controller.showInputCariBerhubungan();
+                            },
+                            child: Icon(
+                              Icons.search,
+                              opticalSize: 24,
+                              color: Constanst.fgSecondary,
+                            ))
+                  ],
+                ),
+              );
+            }),
             Padding(
               padding: const EdgeInsets.only(left: 16.0, right: 16.0),
               child: Divider(
@@ -1297,12 +1311,14 @@ class _FormLemburState extends State<FormLembur> {
               var filteredEmployees =
                   controller.infoEmployeeAll.where((employee) {
                 var fullName = employee['full_name'] ?? '';
-                return fullName.toLowerCase().contains(
-                    controller.stringCari.value.toLowerCase()) || controller.selectedDropdownEmploy.contains(fullName);
+                return fullName
+                        .toLowerCase()
+                        .contains(controller.stringCari.value.toLowerCase()) ||
+                    controller.selectedDropdownEmploy.contains(fullName);
               }).toList();
 
               return SingleChildScrollView(
-                child:  ListView.builder(
+                child: ListView.builder(
                     itemCount: filteredEmployees.length,
                     physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
@@ -1320,7 +1336,8 @@ class _FormLemburState extends State<FormLembur> {
                                   if (controller
                                           .selectedDropdownEmploy.length ==
                                       1) {
-                                    UtilsAlert.showToast('Pastikan anda mengisi minimal 1 tugas');
+                                    UtilsAlert.showToast(
+                                        'Pastikan anda mengisi minimal 1 tugas');
                                   } else {
                                     controller.selectedDropdownEmploy
                                         .remove(data);

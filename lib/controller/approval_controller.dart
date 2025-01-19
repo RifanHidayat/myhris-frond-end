@@ -221,8 +221,7 @@ class ApprovalController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        debugPrint("data lembur value ${valueBody['data']}",
-            wrapWidth: 1000);
+        debugPrint("data lembur value ${valueBody['data']}", wrapWidth: 1000);
         if (valueBody['data'].length == 0) {
           loadingString.value = 'Tidak ada pengajuan';
         }
@@ -260,7 +259,8 @@ class ApprovalController extends GetxController {
             'image': element['image'],
             'status': element['status'],
             'em_ids': element['em_ids'],
-            'em_id_pengaju': element['em_id']
+            'em_id_pengaju': element['em_id'],
+            'dinilai': element['dinilai']
           };
           listData.value.sort(
               (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
@@ -269,7 +269,7 @@ class ApprovalController extends GetxController {
         }
         this.listData.refresh();
         this.listNotModif.refresh();
-      } else{
+      } else {
         print('ini error lembur appooval ${res.statusCode} : ${res.body}');
       }
     });

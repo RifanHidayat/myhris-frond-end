@@ -29,6 +29,7 @@ class LemburController extends GetxController {
   var stringCari = ''.obs;
   var cariAtas = TextEditingController().obs;
   var stringCariAtas = ''.obs;
+  var dinilai = 'N'.obs;
 
   Rx<List<String>> typeLembur = Rx<List<String>>([]);
   Rx<List<String>> allEmployeeDelegasi = Rx<List<String>>([]);
@@ -101,14 +102,13 @@ class LemburController extends GetxController {
   }
 
   void showInputCariBerhubungan() {
-    statusFormPencarianBerhubungan.value = !statusFormPencarianBerhubungan.value;
+    statusFormPencarianBerhubungan.value =
+        !statusFormPencarianBerhubungan.value;
   }
 
-   void showInputCariAtasPerintah() {
+  void showInputCariAtasPerintah() {
     statusFormPencarianAtas.value = !statusFormPencarianAtas.value;
   }
-
-  
 
   void removeAll() {
     listTask.clear();
@@ -177,9 +177,7 @@ class LemburController extends GetxController {
     var getDepGroup = dataUser![0].dep_group;
     var full_name = dataUser[0].full_name;
     var emid = dataUser[0].em_id;
-    Map<String, dynamic> body = {
-      'dep_id': 0
-    };
+    Map<String, dynamic> body = {'dep_id': 0};
     var connect = Api.connectionApi(
       "post",
       body,
@@ -191,7 +189,8 @@ class LemburController extends GetxController {
         var data = valueBody['data'];
         infoEmployeeAll.clear();
         for (var element in data) {
-          if (element['status'] == 'ACTIVE' && element['em_id'] != AppData.informasiUser![0].em_id) {
+          if (element['status'] == 'ACTIVE' &&
+              element['em_id'] != AppData.informasiUser![0].em_id) {
             var fullName = element['full_name'] ?? "";
             infoEmployeeAll.value.add(element);
             print(fullName);
@@ -302,11 +301,13 @@ class LemburController extends GetxController {
             var data = {
               'id': element['id'],
               'name': element['name'],
+              'dinilai': element['dinilai']
             };
             allTypeLembur.value.add(data);
           }
           var getFirst = tampung.first;
           selectedTypeLembur.value = getFirst['name'];
+          dinilai.value = getFirst['dinilai'];
           this.viewTypeLembur.refresh();
           this.typeLembur.refresh();
           this.allTypeLembur.refresh();
@@ -346,7 +347,8 @@ class LemburController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        debugPrint("ini history lembur ${jsonEncode(valueBody['data'])}", wrapWidth: 1000);
+        debugPrint("ini history lembur ${jsonEncode(valueBody['data'])}",
+            wrapWidth: 1000);
         if (valueBody['status'] == false) {
           loadingString.value = "Anda tidak memiliki\nRiwayat Pengajuan Lembur";
           this.loadingString.refresh();
@@ -453,7 +455,7 @@ class LemburController extends GetxController {
           this.allEmployee.refresh();
           this.allEmployeeDelegasi.refresh();
           this.selectedDropdownDelegasi.refresh();
-        }else{
+        } else {
           print('ini error ${res.statusCode} ${res.body}');
         }
       }
@@ -536,8 +538,8 @@ class LemburController extends GetxController {
         catatan.value.text == "" ||
         selectedDropdownDelegasi.value == "" ||
         selectedDropdownEmploy.isEmpty ||
-        listTask.isEmpty) {
-          print('ini kepangil');
+        (listTask.isEmpty && dinilai.value == 'N')) {
+      print('ini kepangil');
       UtilsAlert.showToast("Lengkapi form *");
     } else {
       if (statusForm.value == false) {
@@ -1092,6 +1094,7 @@ class LemburController extends GetxController {
   void showDetailLembur(detailData, approve, alasanReject) {
     print('ini showDetailDataLembur $detailData');
     var nomorAjuan = detailData['nomor_ajuan'];
+    var dinalai = detailData['dinalai'];
     infoTask(nomorAjuan);
     var tanggalMasukAjuan = detailData['atten_date'];
     var tanggalAjuan = detailData['tgl_ajuan'];
@@ -1381,14 +1384,16 @@ class LemburController extends GetxController {
                                             ),
                                           ),
                                         ),
-                                        Text(
-                                          '${task['persentase'].toString()}%',
-                                          style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16,
-                                            color: Constanst.fgPrimary,
-                                          ),
-                                        ),
+                                        dinilai == "Y"
+                                            ? Text(
+                                                '${task['persentase'].toString()}%',
+                                                style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16,
+                                                  color: Constanst.fgPrimary,
+                                                ),
+                                              )
+                                            : SizedBox(),
                                       ],
                                     ),
                                   );
@@ -1514,8 +1519,10 @@ class LemburController extends GetxController {
                                             InkWell(
                                                 onTap: () {
                                                   var dataEmployee = {
-                                                    'nameType': '$namaTypeAjuan',
-                                                    'nomor_ajuan': '$nomorAjuan',
+                                                    'nameType':
+                                                        '$namaTypeAjuan',
+                                                    'nomor_ajuan':
+                                                        '$nomorAjuan',
                                                   };
                                                   globalCt.showDataPilihAtasan(
                                                       dataEmployee);
@@ -1540,83 +1547,90 @@ class LemburController extends GetxController {
                           status == "Approve 1" ||
                           status == "Approve 2"
                       ? Container()
-                      :
-                  status == "Rejected" 
-                      ? Container()
-                      : Padding(
-                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                        child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 40,
-                                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Constanst
-                                          .border, // Set the desired border color
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      // Get.back();
-                                      batalkanPengajuan(detailData);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        foregroundColor: Constanst.color4,
-                                        backgroundColor: Constanst.colorWhite,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                      : status == "Rejected"
+                          ? Container()
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      height: 40,
+                                      padding:
+                                          const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      margin:
+                                          const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Constanst
+                                              .border, // Set the desired border color
+                                          width: 1.0,
                                         ),
-                                        elevation: 0,
-                                        // padding: EdgeInsets.zero,
-                                        padding:
-                                            const EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                                    child: Text(
-                                      'Batalkan',
-                                      style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w500,
-                                          color: Constanst.color4,
-                                          fontSize: 14),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: SizedBox(
-                                  height: 40,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Get.to(FormLembur(
-                                        dataForm: [detailData, true],
-                                      ));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Constanst.colorWhite,
-                                      backgroundColor: Constanst.colorPrimary,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
-                                      elevation: 0,
-                                      // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
-                                    ),
-                                    child: Text(
-                                      'Edit',
-                                      style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w500,
-                                          color: Constanst.colorWhite,
-                                          fontSize: 14),
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          // Get.back();
+                                          batalkanPengajuan(detailData);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            foregroundColor: Constanst.color4,
+                                            backgroundColor:
+                                                Constanst.colorWhite,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            elevation: 0,
+                                            // padding: EdgeInsets.zero,
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 0, 0, 0)),
+                                        child: Text(
+                                          'Batalkan',
+                                          style: GoogleFonts.inter(
+                                              fontWeight: FontWeight.w500,
+                                              color: Constanst.color4,
+                                              fontSize: 14),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 40,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Get.to(FormLembur(
+                                            dataForm: [detailData, true],
+                                          ));
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: Constanst.colorWhite,
+                                          backgroundColor:
+                                              Constanst.colorPrimary,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          elevation: 0,
+                                          // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
+                                        ),
+                                        child: Text(
+                                          'Edit',
+                                          style: GoogleFonts.inter(
+                                              fontWeight: FontWeight.w500,
+                                              color: Constanst.colorWhite,
+                                              fontSize: 14),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                      )
+                            )
                 ],
               ),
             ),
