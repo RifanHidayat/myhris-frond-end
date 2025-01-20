@@ -262,8 +262,9 @@ class _FormLemburState extends State<FormLembur> {
                     .where((v) => v['name'].toString() == value.toString())
                     .toList();
                 if (data.length > 0) {
-                  controller.dinilai.value == data[0]['dinilai'];
+                  controller.dinilai.value = data[0]['dinilai'];
                 }
+                print('ini nilai ${controller.dinilai.value}');
                 print('ini value $value');
                 controller.selectedTypeLembur.value = value;
                 print('ini value ${controller.selectedTypeLembur.value}');
@@ -1336,7 +1337,7 @@ class _FormLemburState extends State<FormLembur> {
                                           .selectedDropdownEmploy.length ==
                                       1) {
                                     UtilsAlert.showToast(
-                                        'Pastikan anda mengisi minimal 1 tugas');
+                                        'Pastikan anda mengisi minimal 1 peminta lembur');
                                   } else {
                                     controller.selectedDropdownEmploy
                                         .remove(data);
@@ -1541,7 +1542,7 @@ class _FormLemburState extends State<FormLembur> {
                             onTap: () {
                               if (controller.listTask.length == 1) {
                                 UtilsAlert.showToast(
-                                    "Gak bisa dihapus semuanya kawan");
+                                    "Pastikan anda mengisi minimal 1 tugas");
                               } else {
                                 controller.listTask.removeAt(index);
                               }

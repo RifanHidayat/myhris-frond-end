@@ -359,132 +359,134 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
         ),
       ),
       builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              height: 15,
-            ),
-            Text(
-              'List Task',
-              style: GoogleFonts.inter(
-                color: Constanst.fgPrimary,
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(
+                height: 15,
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                left: 16,
-                right: 16,
+              Text(
+                'List Task',
+                style: GoogleFonts.inter(
+                  color: Constanst.fgPrimary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ...controller.listTask.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var task = entry.value;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 15.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Text(
-                                      "${index + 1}. ${task['task']}",
-                                      style: GoogleFonts.inter(
-                                        color: Constanst.fgPrimary,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...controller.listTask.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      var task = entry.value;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 15.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Text(
+                                        "${index + 1}. ${task['task']}",
+                                        style: GoogleFonts.inter(
+                                          color: Constanst.fgPrimary,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                        ),
+                                        maxLines: 1,
                                       ),
-                                      maxLines: 1,
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Divider(
-                                    height: 0,
-                                    thickness: 1,
-                                    color: Constanst.fgBorder,
-                                  ),
-                                ],
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Divider(
+                                      height: 0,
+                                      thickness: 1,
+                                      color: Constanst.fgBorder,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 10),
-                          widget.dinilai == 'N'
-                              ? SizedBox()
-                              : SizedBox(
-                                  width: 50,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 15.0),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          "${task['persentase'].toString()}%",
-                                          style: GoogleFonts.inter(
-                                            color: Constanst.fgPrimary,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16,
+                            SizedBox(width: 10),
+                            widget.dinilai == 'N'
+                                ? SizedBox()
+                                : SizedBox(
+                                    width: 50,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 15.0),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "${task['persentase'].toString()}%",
+                                            style: GoogleFonts.inter(
+                                              color: Constanst.fgPrimary,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 16,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Divider(
-                                          height: 0,
-                                          thickness: 1,
-                                          color: Constanst.fgBorder,
-                                        ),
-                                      ],
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Divider(
+                                            height: 0,
+                                            thickness: 1,
+                                            color: Constanst.fgBorder,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                        ],
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Text(
+                      'Total persentase',
+                      style: GoogleFonts.inter(
+                        color: Constanst.fgPrimary,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
                       ),
-                    );
-                  }).toList(),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Text(
-                    'Total persentase',
-                    style: GoogleFonts.inter(
-                      color: Constanst.fgPrimary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
+                    )),
+                    Spacer(),
+                    Text(
+                      '${controller.totalPercent}%',
+                      style: GoogleFonts.inter(
+                        color: controller.totalPercent.value <= 60
+                            ? Colors.red
+                            : Colors.green,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
                     ),
-                  )),
-                  Spacer(),
-                  Text(
-                    '${controller.totalPercent}%',
-                    style: GoogleFonts.inter(
-                      color: controller.totalPercent.value <= 60
-                          ? Colors.red
-                          : Colors.green,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -880,7 +882,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                             
                             controller.detailData[0]['approve_status'] ==
                                 "Pending") ||
-                                (controller.detailData[0]['status'] == "Approve" && controller.detailData[0]['dinila'] == "N" ) &&
+                                (controller.detailData[0]['status'] == "Approve" && controller.detailData[0]['dinilai'] == "N" ) &&
                       
                         (controller.detailData[0]['delegasi']
                                 .toString()
@@ -913,6 +915,8 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                               ),
                               child: ElevatedButton(
                                 onPressed: () {
+                                  controller.alasan2.value.clear();
+                                    controller.alasan1.value.clear();
                                   showBottomAlasanReject(em_id);
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -941,6 +945,8 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                               height: 40,
                               child: ElevatedButton(
                                 onPressed: () {
+                                  controller.alasan2.value.clear();
+                                    controller.alasan1.value.clear();
                                   showBottomAlasanApprove(em_id);
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -982,6 +988,8 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 height: 40,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    controller.alasan2.value.clear();
+                                    controller.alasan1.value.clear();
                                     showBottomHasilLembur(em_id);
                                   },
                                   style: ElevatedButton.styleFrom(

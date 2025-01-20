@@ -24,6 +24,7 @@ import 'package:siscom_operasional/controller/dashboard_controller.dart';
 import 'package:siscom_operasional/controller/global_controller.dart';
 import 'package:siscom_operasional/controller/peraturan_perusahaan_controller.dart';
 import 'package:siscom_operasional/controller/pesan_controller.dart';
+import 'package:siscom_operasional/controller/setting_controller.dart';
 import 'package:siscom_operasional/controller/tab_controller.dart';
 import 'package:siscom_operasional/controller/tracking_controller.dart';
 import 'package:siscom_operasional/database/sqlite/sqlite_database_helper.dart';
@@ -68,6 +69,7 @@ class _DashboardState extends State<Dashboard> {
   final controllerAbsensi = Get.put(AbsenController());
   final controllerTracking = Get.put(TrackingController());
   final controllerPeraturan = Get.put(PeraturanPerusahaanController());
+  final settingController = Get.put(SettingController());
   // final controllerIzin = Get.put(IzinController());
   // var controllerLembur = Get.put(LemburController());
   // var controllerCuti = Get.put(CutiController());
@@ -1332,6 +1334,69 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                                 ),
                                 onTap: () {
+                                  if (AppData.informasiUser![0].sisaKontrak
+                                              .toString() ==
+                                          'null' ||
+                                      AppData.informasiUser![0].sisaKontrak ==
+                                          '') {
+                                  } else {
+                                    if (double.tryParse(AppData
+                                                .informasiUser![0].sisaKontrak
+                                                .toString())! <=
+                                            0 &&
+                                        AppData.informasiUser![0].em_status! !=
+                                            "PERMANENT") {
+                                      showGeneralDialog(
+                                        barrierDismissible: false,
+                                        context: Get.context!,
+                                        barrierColor: Colors
+                                            .black54, // space around dialog
+                                        transitionDuration:
+                                            const Duration(milliseconds: 200),
+                                        transitionBuilder:
+                                            (context, a1, a2, child) {
+                                          return ScaleTransition(
+                                            scale: CurvedAnimation(
+                                                parent: a1,
+                                                curve: Curves.elasticOut,
+                                                reverseCurve:
+                                                    Curves.easeOutCubic),
+                                            child: CustomDialog(
+                                              title: "Informasi",
+                                              content: controller
+                                                  .informasiHabisKontrak,
+                                              positiveBtnText: "Refresh",
+                                              negativeBtnText: "Kembali",
+                                              style: 1,
+                                              buttonStatus: 1,
+                                              positiveBtnPressed: () async {
+                                                print("logout");
+                                                UtilsAlert.loadingSimpanData(
+                                                    context,
+                                                    "Tunggu Sebentar...");
+
+                                                AppData.isLogin = false;
+                                                settingController
+                                                    .aksiEditLastLogin();
+                                                controllerTracking
+                                                    .stopService();
+                                                controllerTracking
+                                                    .isTrackingLokasi
+                                                    .value = false;
+                                                // refreshData();
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        pageBuilder: (BuildContext context,
+                                            Animation animation,
+                                            Animation secondaryAnimation) {
+                                          return null!;
+                                        },
+                                      );
+                                      return;
+                                    }
+                                  }
                                   if (controllerAbsensi.absenStatus.value ==
                                       true) {
                                     if (controller.wfhstatus.value) {

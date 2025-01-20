@@ -373,6 +373,7 @@ class _LemburState extends State<Lembur> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Constanst.colorPrimary,
         onPressed: () {
+          // controller.getTypeLembur();
           Get.to(FormLembur(
             dataForm: const [[], false],
           ));

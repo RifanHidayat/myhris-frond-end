@@ -279,10 +279,11 @@ class LemburController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        print(valueBody);
+        print('ini load data tipe overtime ${valueBody}');
 
         var data = valueBody['data'];
         List overtimeUser = overtimeData.split(',');
+        print(overtimeUser);
         List tampung = [];
         for (var element in data) {
           for (var element1 in overtimeUser) {
@@ -291,6 +292,7 @@ class LemburController extends GetxController {
             }
           }
         }
+        print(tampung);
         if (tampung.isEmpty) {
           viewTypeLembur.value = false;
           this.viewTypeLembur.refresh();
@@ -304,6 +306,7 @@ class LemburController extends GetxController {
               'dinilai': element['dinilai']
             };
             allTypeLembur.value.add(data);
+            print('ini gak kepangil');
           }
           var getFirst = tampung.first;
           selectedTypeLembur.value = getFirst['name'];
@@ -1125,7 +1128,7 @@ class LemburController extends GetxController {
       ),
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.75,
+          // height: MediaQuery.of(context).size.height * 0.75,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(

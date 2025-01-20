@@ -162,6 +162,12 @@ class DashboardController extends GetxController {
 
   var title = ''.obs;
   var keterangan = ''.obs;
+  var informasiHabisKontrak =
+      AppData.informasiUser![0].tanggalBerakhirKontrak == null ? "KONTRAK ANDA SUDAH BERAKHIR SILAHKAN HUBUNGI HRD,TERKAIT STATUS KONTRAK ANDA" : "KONTRAK ANDA SUDAH BERAKHIR pada ${
+        // Constanst.convertDate
+          AppData.informasiUser![0].tanggalBerakhirKontrak
+        // 
+      } SILAHKAN HUBUNGI HRD,TERKAIT STATUS KONTRAK ANDA";
 
   GoogleMapController? mapController;
 
