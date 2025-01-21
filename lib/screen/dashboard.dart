@@ -1334,6 +1334,7 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                                 ),
                                 onTap: () {
+                                  print('ini sisa kontrak ${AppData.informasiUser![0].sisaKontrak}');
                                   if (AppData.informasiUser![0].sisaKontrak
                                               .toString() ==
                                           'null' ||

@@ -704,7 +704,7 @@ class IzinController extends GetxController {
 
   void validasiKirimPengajuan(status) {
     if (uploadFile.value == false && isRequiredFile.value == "1") {
-      UtilsAlert.showToast("Form * harus diisi");
+      UtilsAlert.showToast("Form unggah file harus diisi");
       return;
     }
     print("tanggal selecetd ${tanggalSelected.value.isEmpty}");

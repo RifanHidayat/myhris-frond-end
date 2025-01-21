@@ -545,11 +545,12 @@ class CutiController extends GetxController {
   }
 
   void validasiKirimPengajuan() async {
-    if (selectedTypeCuti == "" ||
-        alasan.value.text == "" ||
-        (isRequiredFile.value == "1" && uploadFile.value == false)) {
-      UtilsAlert.showToast("Form * harus di isi");
-    } else {
+    if (isRequiredFile.value == "1" && uploadFile.value == false) {
+      UtilsAlert.showToast("Form unggah file harus di isi");
+    } else if (alasan.value.text == ""){
+      UtilsAlert.showToast("Form Catatan Harus di isi");
+    }
+    else {
       var hitung = jumlahCuti.value - cutiTerpakai.value;
 
       if (hitung <= 0 || hitung == 0) {

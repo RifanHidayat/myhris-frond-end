@@ -110,8 +110,9 @@ class LemburController extends GetxController {
     statusFormPencarianAtas.value = !statusFormPencarianAtas.value;
   }
 
-  void removeAll() {
+  void removeAll() async {
     listTask.clear();
+    idpengajuanLembur.value = "";
     tanggalLembur.value.text = "";
     dariJam.value.text = "";
     sampaiJam.value.text = "";
@@ -1458,24 +1459,29 @@ class LemburController extends GetxController {
                                       size: 22,
                                     ),
                                     const SizedBox(width: 8),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Rejected by $approve",
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Rejected by $approve",
+                                              style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Constanst.fgPrimary,
+                                                  fontSize: 14),
+                                                  maxLines: 1, 
+                                                  overflow: TextOverflow.ellipsis,
+                                              ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            alasanReject,
                                             style: GoogleFonts.inter(
-                                                fontWeight: FontWeight.w500,
-                                                color: Constanst.fgPrimary,
-                                                fontSize: 14)),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          alasanReject,
-                                          style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w400,
-                                              color: Constanst.fgSecondary,
-                                              fontSize: 14),
-                                        )
-                                      ],
+                                                fontWeight: FontWeight.w400,
+                                                color: Constanst.fgSecondary,
+                                                fontSize: 14),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 )

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -259,18 +260,12 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Text(
-                                          "${index + 1}. ${task['task']}",
+                                      Text("${index + 1}. ${task['task']}",
                                           style: GoogleFonts.inter(
                                             color: Constanst.fgPrimary,
                                             fontWeight: FontWeight.w500,
                                             fontSize: 16,
-                                          ),
-                                          maxLines: 1,
-                                        ),
-                                      ),
+                                          )),
                                       SizedBox(
                                         height: 10,
                                       ),
@@ -298,6 +293,51 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                               border: InputBorder.none,
                                             ),
                                             keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly, // Hanya angka
+                                              LengthLimitingTextInputFormatter(
+                                                  3),
+                                            ],
+                                            onChanged: (value) {
+                                              if (value.isNotEmpty) {
+                                                int input = int.parse(value);
+                                                // if (input < 1) {
+                                                //   controller
+                                                //       .taskControllers[index]
+                                                //       .text = '1';
+                                                //   controller
+                                                //           .taskControllers[index]
+                                                //           .selection =
+                                                //       TextSelection
+                                                //           .fromPosition(
+                                                //     TextPosition(
+                                                //         offset: controller
+                                                //             .taskControllers[
+                                                //                 index]
+                                                //             .text
+                                                //             .length),
+                                                //   );
+                                                // } else 
+                                                if (input > 100) {
+                                                  controller
+                                                      .taskControllers[index]
+                                                      .text = '100';
+                                                  controller
+                                                          .taskControllers[index]
+                                                          .selection =
+                                                      TextSelection
+                                                          .fromPosition(
+                                                    TextPosition(
+                                                        offset: controller
+                                                            .taskControllers[
+                                                                index]
+                                                            .text
+                                                            .length),
+                                                  );
+                                                }
+                                              }
+                                            },
                                           ),
                                           Divider(
                                             height: 0,
@@ -319,18 +359,24 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                   child: TextButtonWidget(
                     title: "Kirim Persentase task",
                     onTap: () {
-                      if (controller.alasan2.value.text != "" &&
-                          controller.taskControllers.isNotEmpty) {
-                        for (int i = 0;
-                            i < controller.taskControllers.length;
-                            i++) {
-                          controller.listTask[i]['persentase'] =
-                              controller.taskControllers[i].text;
+                      if (controller.alasan2.value.text.isNotEmpty) {
+                        if (controller.taskControllers.any(
+                            (taskController) => taskController.text.isEmpty)) {
+                          UtilsAlert.showToast(
+                              "Harap isi semua nilai presentase terlebih dahulu");
+                        } else {
+                          for (int i = 0;
+                              i < controller.taskControllers.length;
+                              i++) {
+                            controller.listTask[i]['persentase'] =
+                                controller.taskControllers[i].text;
+                          }
+                          print(
+                              "ini listTask setelah di edit ${controller.listTask}");
+
+                          Navigator.pop(Get.context!);
+                          validasiMenyetujui(true, em_id);
                         }
-                        print(
-                            "ini listTask setelah di edit ${controller.listTask}");
-                        Navigator.pop(Get.context!);
-                        validasiMenyetujui(true, em_id);
                       } else {
                         UtilsAlert.showToast(
                             "Harap isi alasan terlebih dahulu");
@@ -398,16 +444,12 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Text(
-                                        "${index + 1}. ${task['task']}",
-                                        style: GoogleFonts.inter(
-                                          color: Constanst.fgPrimary,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16,
-                                        ),
-                                        maxLines: 1,
+                                    Text(
+                                      "${index + 1}. ${task['task']}",
+                                      style: GoogleFonts.inter(
+                                        color: Constanst.fgPrimary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
                                       ),
                                     ),
                                     SizedBox(
@@ -878,21 +920,20 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
               padding: const EdgeInsets.all(16.0),
               child: Obx(
                 () => controller.showButton.value == true &&
-                        (controller.detailData[0]['status'] == "Pending" ||
-                            
-                            controller.detailData[0]['approve_status'] ==
-                                "Pending") ||
-                                (controller.detailData[0]['status'] == "Approve" && controller.detailData[0]['dinilai'] == "N" ) &&
-                      
-                        (controller.detailData[0]['delegasi']
-                                .toString()
-                                .contains(em_id_user) ||
-                            controller.detailData[0]['em_report_to']
-                                .toString()
-                                .contains(em_id_user) ||
-                            controller.detailData[0]['em_report2_to']
-                                .toString()
-                                .contains(em_id_user))
+                            (controller.detailData[0]['status'] == "Pending" ||
+                                controller.detailData[0]['approve_status'] ==
+                                    "Pending") ||
+                        (controller.detailData[0]['status'] == "Approve" &&
+                                controller.detailData[0]['dinilai'] == "N") &&
+                            (controller.detailData[0]['delegasi']
+                                    .toString()
+                                    .contains(em_id_user) ||
+                                controller.detailData[0]['em_report_to']
+                                    .toString()
+                                    .contains(em_id_user) ||
+                                controller.detailData[0]['em_report2_to']
+                                    .toString()
+                                    .contains(em_id_user))
                     // controller.detailData[0]['approve2_status'] ==
                     //           "Pending" &&
                     //       controller.detailData[0]['approve_status'] !=
@@ -916,7 +957,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   controller.alasan2.value.clear();
-                                    controller.alasan1.value.clear();
+                                  controller.alasan1.value.clear();
                                   showBottomAlasanReject(em_id);
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -946,7 +987,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   controller.alasan2.value.clear();
-                                    controller.alasan1.value.clear();
+                                  controller.alasan1.value.clear();
                                   showBottomAlasanApprove(em_id);
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -977,13 +1018,9 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 controller.detailData[0]['approve_status'] ==
                                     'Approve' &&
                                 controller.detailData[0]['em_ids']
-
                                     .toString()
-                                    .contains(em_id_user)
-                                    &&
-                                controller.detailData[0]['dinilai']=='Y'
-
-                                    
+                                    .contains(em_id_user) &&
+                                controller.detailData[0]['dinilai'] == 'Y'
                             ? SizedBox(
                                 height: 40,
                                 child: ElevatedButton(
@@ -1010,28 +1047,31 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                   ),
                                 ),
                               )
-                            :   controller.detailData[0]['dinilai']=='N'?SizedBox(): SizedBox(
-                                height: 40,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    showBottomHasilLemburDisable(em_id);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        side: BorderSide(
+                            : controller.detailData[0]['dinilai'] == 'N'
+                                ? SizedBox()
+                                : SizedBox(
+                                    height: 40,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        showBottomHasilLemburDisable(em_id);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            side: BorderSide(
+                                                color: Constanst.colorPrimary,
+                                                width: 1.0)),
+                                      ),
+                                      child: Text(
+                                        'Hasil Lembur ${controller.showButton.value}',
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w500,
                                             color: Constanst.colorPrimary,
-                                            width: 1.0)),
-                                  ),
-                                  child: Text(
-                                    'Hasil Lembur ${controller.showButton.value }',
-                                    style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        color: Constanst.colorPrimary,
-                                        fontSize: 14),
-                                  ),
-                                ),
-                              );
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  );
                       }),
               )),
       body: WillPopScope(
@@ -1234,7 +1274,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Nama Pengajuan",
+                                "Tipe Lembur",
                                 style: GoogleFonts.inter(
                                     color: Constanst.fgSecondary,
                                     fontWeight: FontWeight.w400,
@@ -1516,7 +1556,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                           ),
                                         ],
                                       ),
-                                    ),  
+                                    ),
 
                               widget.dinilai == "Y"
                                   ? SizedBox()
@@ -1914,7 +1954,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
         text2 = "Pending Approval 2";
       }
       if (data['approve2_status'] == "Rejected") {
-        text2 = "Rejected 2 By - ${data['nama_approve1']}";
+        text2 = "Rejected 2 By - ${data['nama_approve2']}";
       }
 
       if (data['approve2_status'] == "Approve") {

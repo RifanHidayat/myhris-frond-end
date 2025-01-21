@@ -43,6 +43,8 @@ class _FormLemburState extends State<FormLembur> {
         controller.dariJam.value.text = hasilDarijam;
         controller.sampaiJam.value.text = hasilSampaijam;
         controller.catatan.value.text = widget.dataForm![0]['uraian'];
+        controller.selectedTypeLembur.value = widget.dataForm![0]['type'];
+        print('ini type lembur ${widget.dataForm![0]['type']}');
         controller.statusForm.value = true;
         controller.idpengajuanLembur.value = "${widget.dataForm![0]['id']}";
         controller.emIdDelegasi.value =
@@ -52,6 +54,9 @@ class _FormLemburState extends State<FormLembur> {
       } else {
         controller.statusForm.value = false;
         controller.removeAll();
+        controller.getTypeLembur();
+        controller.loadAllEmployeeDelegasi();
+        controller.getUserInfo();
         addNewTask();
       }
     });

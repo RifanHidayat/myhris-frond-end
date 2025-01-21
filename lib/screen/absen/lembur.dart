@@ -988,8 +988,7 @@ class _LemburState extends State<Lembur> {
                         //     ),
                         //   ),
                         // ),
-                        status == 'Rejected'
-                            ? Row(
+                        if (status == 'Rejected') Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Icon(
@@ -998,28 +997,32 @@ class _LemburState extends State<Lembur> {
                                     size: 22,
                                   ),
                                   const SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Rejected by $approve",
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Rejected by $approve",
+                                            style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                color: Constanst.fgPrimary,
+                                                fontSize: 14),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          alasan1.toString(),
                                           style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              color: Constanst.fgPrimary,
-                                              fontSize: 14)),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        alasan1.toString(),
-                                        style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w400,
-                                            color: Constanst.fgSecondary,
-                                            fontSize: 14),
-                                      )
-                                    ],
+                                              fontWeight: FontWeight.w400,
+                                              color: Constanst.fgSecondary,
+                                              fontSize: 14),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ],
-                              )
-                            : status == "Approve" ||
+                              ) else status == "Approve" ||
                                     status == "Approve 1" ||
                                     status == "Approve 2"
                                 ? Row(
@@ -1032,24 +1035,29 @@ class _LemburState extends State<Lembur> {
                                         size: 22,
                                       ),
                                       const SizedBox(width: 8),
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Approved by $approve",
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text("Approved by $approve",
+                                                style: GoogleFonts.inter(
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Constanst.fgPrimary,
+                                                    fontSize: 14),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                  ),
+                                            const SizedBox(height: 6),
+                                            Text(
+                                              alasan1.toString(),
                                               style: GoogleFonts.inter(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Constanst.fgPrimary,
-                                                  fontSize: 14)),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            alasan1.toString(),
-                                            style: GoogleFonts.inter(
-                                                fontWeight: FontWeight.w400,
-                                                color: Constanst.fgSecondary,
-                                                fontSize: 14),
-                                          )
-                                        ],
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Constanst.fgSecondary,
+                                                  fontSize: 14),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   )

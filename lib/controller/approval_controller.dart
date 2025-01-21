@@ -1279,7 +1279,7 @@ class ApprovalController extends GetxController {
     var dt = DateTime.now();
     var dateString = "${dt.day}-${dt.month}-${dt.year}";
     var tanggalNow = Constanst.convertDateSimpan(dateString);
-
+    print(dataEditFinal);
     print("type ${detailData[0]['type']}");
     var url_tujuan;
 
@@ -1287,7 +1287,7 @@ class ApprovalController extends GetxController {
       url_tujuan = 'edit-emp_claim';
     } else {
       url_tujuan = detailData[0]['type'] == 'Tugas Luar' ||
-              detailData[0]['type'] == 'Lembur'
+              detailData[0]['type'] == 'Lembur' && detailData[0]['dinilai'] == 'Y'
           ? 'edit-emp_labor-approval'
           : detailData[0]['type'] == 'wfh'
               ? 'wfh-approval'
@@ -1337,7 +1337,6 @@ class ApprovalController extends GetxController {
       if (url_tujuan == "edit-emp_leave-approval") {
         print("tes wfh ${tanggalNow}");
         if (dataEditFinal[0]['leave_status'] == "Pending") {
-          print("tes wfh ${tanggalNow}");
           statusPengajuan = pilihan == true ? 'Approve' : 'Rejected';
           applyDate1 = tanggalNow;
           applyBy1 = namaAtasanApprove;
@@ -1348,7 +1347,7 @@ class ApprovalController extends GetxController {
           applyId2 = "";
           apply2Status = "Pending";
         } else if (dataEditFinal[0]['leave_status'] == "Approve") {
-          print("tes wfh ${tanggalNow}");
+          // print("tes wfh ${tanggalNow}");
           statusPengajuan = pilihan == true ? 'Approve2' : 'Rejected';
           applyDate1 = dataEditFinal[0]['apply_date'];
           applyBy1 = dataEditFinal[0]['apply_by'];
@@ -1431,9 +1430,10 @@ class ApprovalController extends GetxController {
         'apply_status': applyStatus,
         'apply2_status': apply2Status
       };
-      print("body approval ${body.toString()}");
+      print("body approval $body");
       var connect = Api.connectionApi("post", body, "edit-emp_leave-approval");
       connect.then((dynamic res) {
+        print('kesini gak sih lu');
         if (res.statusCode == 200) {
           if (pilihan == true) {
             if (valuePolaPersetujuan.value == '1') {
@@ -1452,8 +1452,11 @@ class ApprovalController extends GetxController {
           print('status pengajuan $statusPengajuan');
           insertNotifikasi(dataEditFinal, statusPengajuan, tanggalNow, dt,
               pilihan, namaAtasanApprove, url_tujuan, alasanRejectShow);
+        } else{
+          print('gagal appproveeeee');
         }
       });
+    
     } else if (url_tujuan == 'edit-emp_labor-approval') {
       Map<String, dynamic> body = {
         'em_id': dataEditFinal[0]['em_id'],

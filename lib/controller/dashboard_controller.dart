@@ -2478,7 +2478,6 @@ class DashboardController extends GetxController {
     connect.then((dynamic res) async {
       var valueBody = jsonDecode(res.body);
       print("data refresh employee ${valueBody}");
-
       if (valueBody['status'] == false) {
         UtilsAlert.showToast(valueBody['message']);
         Navigator.pop(Get.context!);
