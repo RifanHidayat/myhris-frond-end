@@ -82,6 +82,7 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
       controller.startDate.value = "";
       controller.endDate.value = "";
       controller.alasan.value.text = "";
+      controller.namaFileUpload.value = "";
     }
     super.initState();
   }
@@ -203,7 +204,11 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                   if (controller.dateSelected.value == 2 ||
                       controller.dateSelected.value.toString() == "2") {
                     //--------------------menggunakan range---------------------------
-
+                    if(controller.startDate.value.isEmpty){
+                      UtilsAlert.showToast("Tanggal mulai harus disi");
+                    }else if(controller.endDate.value.isEmpty){
+                      UtilsAlert.showToast("Tanggal selesai harus disi");
+                    }
                     DateTime tempStartDate = DateTime.parse(
                         DateFormat('yyyy-MM-dd')
                             .format(DateFormat('yyyy-MM-dd')
@@ -220,7 +225,6 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                           "Tanggal mulai lebih besar dari tanggal selesai");
                       return;
                     }
-
                     // Define two DateTime objects representing the two dates
                     DateTime date1 = DateTime(tempStartDate.year,
                         tempStartDate.month, tempStartDate.day);

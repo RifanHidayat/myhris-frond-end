@@ -110,8 +110,9 @@ class LemburController extends GetxController {
     statusFormPencarianAtas.value = !statusFormPencarianAtas.value;
   }
 
-  void removeAll() {
+  void removeAll() async {
     listTask.clear();
+    idpengajuanLembur.value = "";
     tanggalLembur.value.text = "";
     dariJam.value.text = "";
     sampaiJam.value.text = "";
@@ -279,10 +280,11 @@ class LemburController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        print(valueBody);
+        print('ini load data tipe overtime ${valueBody}');
 
         var data = valueBody['data'];
         List overtimeUser = overtimeData.split(',');
+        print(overtimeUser);
         List tampung = [];
         for (var element in data) {
           for (var element1 in overtimeUser) {
@@ -291,6 +293,7 @@ class LemburController extends GetxController {
             }
           }
         }
+        print(tampung);
         if (tampung.isEmpty) {
           viewTypeLembur.value = false;
           this.viewTypeLembur.refresh();
@@ -304,6 +307,7 @@ class LemburController extends GetxController {
               'dinilai': element['dinilai']
             };
             allTypeLembur.value.add(data);
+            print('ini gak kepangil');
           }
           var getFirst = tampung.first;
           selectedTypeLembur.value = getFirst['name'];
@@ -1125,7 +1129,7 @@ class LemburController extends GetxController {
       ),
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.75,
+          // height: MediaQuery.of(context).size.height * 0.75,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(
@@ -1455,24 +1459,29 @@ class LemburController extends GetxController {
                                       size: 22,
                                     ),
                                     const SizedBox(width: 8),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Rejected by $approve",
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Rejected by $approve",
+                                              style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Constanst.fgPrimary,
+                                                  fontSize: 14),
+                                                  maxLines: 1, 
+                                                  overflow: TextOverflow.ellipsis,
+                                              ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            alasanReject,
                                             style: GoogleFonts.inter(
-                                                fontWeight: FontWeight.w500,
-                                                color: Constanst.fgPrimary,
-                                                fontSize: 14)),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          alasanReject,
-                                          style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w400,
-                                              color: Constanst.fgSecondary,
-                                              fontSize: 14),
-                                        )
-                                      ],
+                                                fontWeight: FontWeight.w400,
+                                                color: Constanst.fgSecondary,
+                                                fontSize: 14),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 )

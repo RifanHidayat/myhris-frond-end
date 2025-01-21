@@ -390,48 +390,49 @@ class AuthController extends GetxController {
             print("6 ${isBackDates[5].toString()}");
           }
           var data = UserModel(
-              isBackDateSakit: isBackDateSakit,
-              isBackDateIzin: isBackDateIzin,
-              isBackDateCuti: isBackDateCuti,
-              isBackDateTugasLuar: isBackDateTugasLuar,
-              isBackDateDinasLuar: isBackDateDinasLuar,
-              isBackDateLembur: isBackDateLembur,
-              em_id: element['em_id'] ?? "",
-              des_id: element['des_id'] ?? 0,
-              dep_id: element['dep_id'] ?? 0,
-              dep_group: element['dep_group'] ?? 0,
-              full_name: element['full_name'] ?? "",
-              em_email: element['em_email'] ?? "",
-              em_phone: element['em_phone'] ?? "",
-              em_birthday: element['em_birthday'] ?? "1999-09-09",
-              em_gender: element['em_gender'] ?? "",
-              em_image: element['em_image'] ?? "",
-              em_joining_date: element['em_joining_date'] ?? "1999-09-09",
-              em_status: element['em_status'] ?? "",
-              em_blood_group: element['em_blood_group'] ?? "",
-              posisi: element['posisi'] ?? "",
-              emp_jobTitle: element['emp_jobTitle'] ?? "",
-              emp_departmen: element['emp_departmen'] ?? "",
-              em_control: element['em_control'] ?? 0,
-              em_control_acess: element['em_control_access'] ?? 0,
-              emp_att_working: element['emp_att_working'] ?? 0,
-              em_hak_akses: element['em_hak_akses'] ?? "",
-              beginPayroll: element['begin_payroll'] ?? 1,
-              endPayroll: element['end_payroll'] ?? 31,
-              branchName: element['branch_name'] ?? "",
-              startTime: element['time_attendance'].toString().split(',')[0],
-              endTime: element['time_attendance'].toString().split(',')[1],
-              nomorBpjsKesehatan: element['nomor_bpjs_kesehatan'] ?? 0,
-              nomorBpjsTenagakerja: element['nomor_bpjs_tenagakerja'] ?? 0,
-              timeIn: element['time_in'] ?? "",
-              timeOut: element['time_out'] ?? "",
-              interval: element['interval'],
-              interval_tracking: element['interval_tracking'],
-              isViewTracking: element['is_view_tracking'],
-              is_tracking: element['is_tracking']
-              //   startTime: "00:01",
-              // endTime: "23:59",
-              );
+            isBackDateSakit: isBackDateSakit,
+            isBackDateIzin: isBackDateIzin,
+            isBackDateCuti: isBackDateCuti,
+            isBackDateTugasLuar: isBackDateTugasLuar,
+            isBackDateDinasLuar: isBackDateDinasLuar,
+            isBackDateLembur: isBackDateLembur,
+            em_id: element['em_id'] ?? "",
+            des_id: element['des_id'] ?? 0,
+            dep_id: element['dep_id'] ?? 0,
+            dep_group: element['dep_group'] ?? 0,
+            full_name: element['full_name'] ?? "",
+            em_email: element['em_email'] ?? "",
+            em_phone: element['em_phone'] ?? "",
+            em_birthday: element['em_birthday'] ?? "1999-09-09",
+            em_gender: element['em_gender'] ?? "",
+            em_image: element['em_image'] ?? "",
+            em_joining_date: element['em_joining_date'] ?? "1999-09-09",
+            em_status: element['em_status'] ?? "",
+            em_blood_group: element['em_blood_group'] ?? "",
+            posisi: element['posisi'] ?? "",
+            emp_jobTitle: element['emp_jobTitle'] ?? "",
+            emp_departmen: element['emp_departmen'] ?? "",
+            em_control: element['em_control'] ?? 0,
+            em_control_acess: element['em_control_access'] ?? 0,
+            emp_att_working: element['emp_att_working'] ?? 0,
+            em_hak_akses: element['em_hak_akses'] ?? "",
+            beginPayroll: element['begin_payroll'] ?? 1,
+            endPayroll: element['end_payroll'] ?? 31,
+            branchName: element['branch_name'] ?? "",
+            startTime: element['time_attendance'].toString().split(',')[0],
+            endTime: element['time_attendance'].toString().split(',')[1],
+            nomorBpjsKesehatan: element['nomor_bpjs_kesehatan'] ?? 0,
+            nomorBpjsTenagakerja: element['nomor_bpjs_tenagakerja'] ?? 0,
+            timeIn: element['time_in'] ?? "",
+            timeOut: element['time_out'] ?? "",
+            interval: element['interval'],
+            interval_tracking: element['interval_tracking'],
+            isViewTracking: element['is_view_tracking'],
+            is_tracking: element['is_tracking'],
+            tanggalBerakhirKontrak: element['tanggal_berakhir_kontrak'],
+            //   startTime: "00:01",
+            // endTime: "23:59",
+          );
 
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString(
@@ -482,32 +483,77 @@ class AuthController extends GetxController {
                 "stopTracking is_tracking ${AppData.informasiUser![0].is_tracking.toString()}");
           }
         }
-
+        if (AppData.informasiUser![0].tanggalBerakhirKontrak == null) {
+          print('ini keluar gak');
+        }
         if (getAktif == "ACTIVE") {
-          if (lastLoginUser == "" ||
-              lastLoginUser == "null" ||
-              lastLoginUser == null ||
-              lastLoginUser == "0000-00-00 00:00:00") {
-            fillLastLoginUserNew(getEmId, getData);
-            checkAbsenUser(DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                AppData.informasiUser![0].em_id);
-          } else {
-            AppData.emailUser = email.value.text;
-            AppData.passwordUser = password.value.text;
-
-            var filterLastLogin = Constanst.convertDate1("$lastLoginUser");
-            var dateNow = DateTime.now();
-            var convert = DateFormat('dd-MM-yyyy').format(dateNow);
-
-            if (convert != filterLastLogin) {
+          if (AppData.informasiUser![0].tanggalBerakhirKontrak == "") {
+            if (lastLoginUser == "" ||
+                lastLoginUser == "null" ||
+                lastLoginUser == null ||
+                lastLoginUser == "0000-00-00 00:00:00") {
               fillLastLoginUserNew(getEmId, getData);
               checkAbsenUser(DateFormat('yyyy-MM-dd').format(DateTime.now()),
                   AppData.informasiUser![0].em_id);
             } else {
-              //  UtilsAlert.showToast("Anda telah masuk di perangkat lain");
-              Navigator.pop(Get.context!);
-              validasiLogin();
+              AppData.emailUser = email.value.text;
+              AppData.passwordUser = password.value.text;
+
+              var filterLastLogin = Constanst.convertDate1("$lastLoginUser");
+              var dateNow = DateTime.now();
+              var convert = DateFormat('dd-MM-yyyy').format(dateNow);
+
+              if (convert != filterLastLogin) {
+                fillLastLoginUserNew(getEmId, getData);
+                checkAbsenUser(DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                    AppData.informasiUser![0].em_id);
+              } else {
+                //  UtilsAlert.showToast("Anda telah masuk di perangkat lain");
+                Navigator.pop(Get.context!);
+                validasiLogin();
+              }
             }
+          }else{
+            print(AppData.informasiUser![0].tanggalBerakhirKontrak);
+          print(AppData.informasiUser![0].em_status);
+          String tanggalBerakhirKontrak =
+              AppData.informasiUser![0].tanggalBerakhirKontrak;
+
+          DateTime tanggalBerakhir =
+              DateFormat('yyyy-MM-dd').parse(tanggalBerakhirKontrak);
+          DateTime tanggalSekarang = DateTime.now();
+          if (tanggalBerakhir.isBefore(tanggalSekarang) &&
+              AppData.informasiUser![0].em_status! != "PERMANENT") {
+                 UtilsAlert.showToast("Maaf Kontrak anda sudah habis");
+                 Get.back();
+                 Get.back();
+          } else {
+            if (lastLoginUser == "" ||
+                lastLoginUser == "null" ||
+                lastLoginUser == null ||
+                lastLoginUser == "0000-00-00 00:00:00") {
+              fillLastLoginUserNew(getEmId, getData);
+              checkAbsenUser(DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                  AppData.informasiUser![0].em_id);
+            } else {
+              AppData.emailUser = email.value.text;
+              AppData.passwordUser = password.value.text;
+
+              var filterLastLogin = Constanst.convertDate1("$lastLoginUser");
+              var dateNow = DateTime.now();
+              var convert = DateFormat('dd-MM-yyyy').format(dateNow);
+
+              if (convert != filterLastLogin) {
+                fillLastLoginUserNew(getEmId, getData);
+                checkAbsenUser(DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                    AppData.informasiUser![0].em_id);
+              } else {
+                //  UtilsAlert.showToast("Anda telah masuk di perangkat lain");
+                Navigator.pop(Get.context!);
+                validasiLogin();
+              }
+            }
+          }
           }
         } else {
           UtilsAlert.showToast("Maaf status anda sudah tidak aktif");
