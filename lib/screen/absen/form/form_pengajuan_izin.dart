@@ -1,13 +1,17 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:siscom_operasional/controller/izin_controller.dart';
 import 'package:siscom_operasional/utils/constans.dart';
+import 'package:siscom_operasional/utils/date_picker.dart';
+import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -30,13 +34,23 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
   @override
   void initState() {
     controller.percentIzin.value = 0.0;
+    // UtilsAlert.showToast(
+    //                       "datea detail  ${widget.dataForm![0][0]['id']}");
     if (widget.dataForm![1] == true) {
+    //  controller.loaDataTipe(durasi: 2.toString());
+    // print("datea detail  ${widget.dataForm![0]['start_date']}")
+       
       var convertDariTanggal = widget.dataForm![0]['start_date'];
       var convertSampaiTanggal = widget.dataForm![0]['end_date'];
       controller.isBackdate.value = widget.dataForm![0]['back_date'].toString();
 
       controller.dariTanggal.value.text = "$convertDariTanggal";
       controller.sampaiTanggal.value.text = "$convertSampaiTanggal";
+          //  controller.startdate.value = "$convertDariTanggal";
+      controller.endDate.value = "$convertSampaiTanggal";
+       controller.startDate.value = "$convertDariTanggal";
+
+
       controller.jamAjuan.value.text = widget.dataForm![0]['time_plan'];
       controller.sampaiJamAjuan.value.text =
           widget.dataForm![0]['time_plan_to'].toString();
@@ -80,8 +94,58 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
         controller.inputTime.value =
             int.parse(widget.dataForm![0]['input_time'].toString());
       }
+
+
+         
+
+                controller.percentIzin.value = 0;
+                controller.gantiTypeAjuan(controller.selectedDropdownFormTidakMasukKerjaTipe.value);
+
+                var data = controller.allTipe.value
+                    .where((element) =>controller.selectedDropdownFormTidakMasukKerjaTipe.value
+                        .toString()
+                        .toLowerCase()
+                        .trim()
+                        .contains("${element['name']} - ${element['category']}"
+                            .toString()
+                            .toLowerCase()
+                            .trim()))
+                    .toList();
+                // controller.loadTypeSakit();
+                if (data[0]['input_time'] == null) {
+                } else {
+                  controller.inputTime.value =
+                      int.parse(data[0]['input_time'].toString());
+                }
+                print(data[0]['back_date'].toString());
+                controller.isBackdate.value = data[0]['back_date'].toString();
+                print("new data upload file ${data[0]['input_time']}");
+                controller.isRequiredFile.value =
+                    data[0]['upload_file'].toString();
+
+                if (data[0]['leave_day'] > 0) {
+                  print("new data ${data[0]['id']}");
+
+                  controller
+                      .loadDataAjuanIzinCategori(id: data[0]['type_id'])
+                      .then((value) {
+                    if (value == true) {
+                      controller.showDurationIzin.value = true;
+                      controller.jumlahIzin.value = data[0]['leave_day'];
+                      controller.percentIzin.value = double.parse(((int.parse(
+                                  controller.izinTerpakai.value.toString()) /
+                              int.parse(
+                                  controller.jumlahIzin.value.toString())))
+                          .toString());
+                    }
+                  });
+                } else {
+                  controller.showDurationIzin.value = false;
+                }
     } else {
       //controller.loadTypeSakit();
+      controller.startDate.value = '';
+      controller.endDate.value = '';
     }
 
     super.initState();
@@ -148,60 +212,54 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
               padding: const EdgeInsets.only(left: 16, right: 16),
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                child: !controller.showTipe.value
-                    ? const Center(
-                        child: LinearProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Colors.blue),
-                          minHeight: 3,
-                        ),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16),
-                          // Obx(() => controller.showDurationIzin.value == true?
-                          Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    // Obx(() => controller.showDurationIzin.value == true?
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
+                          border: Border.all(color: Constanst.fgBorder)),
+                      child: controller.showDurationIzin.value
+                          ? informasiSisaCuti()
+                          : SizedBox(),
+                    ),
+                    // : const SizedBox()),
+                    const SizedBox(height: 16),
+                    Obx(() => controller.isLoadingzin.value == true
+                        ? SizedBox()
+                        : Container(
                             decoration: BoxDecoration(
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(12)),
                                 border: Border.all(color: Constanst.fgBorder)),
-                            child: controller.showDurationIzin.value
-                                ? informasiSisaCuti()
-                                : SizedBox(),
-                          ),
-                          // : const SizedBox()),
-                          const SizedBox(height: 16),
-                          Obx(() => controller.isLoadingzin.value == true
-                              ? SizedBox()
-                              : Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(12)),
-                                      border: Border.all(
-                                          color: Constanst.fgBorder)),
-                                  child: Column(
-                                    children: [
-                                      controller.inputTime.value == 0
-                                          ? formAjuanTanggal()
-                                          : formAjuanTanggal1(),
-                                      Obx(() => controller.tanggalSelected.value.isEmpty 
-                                      ? SizedBox()
-                                      :formTipe()),
-                                      // Text(AppData.informasiUser![0].dep_group.toString()),
-                                      controller.inputTime.value == 0
-                                          ? const SizedBox()
-                                          : controller.inputTime.value == 1
-                                              ? formJam()
-                                              : controller.inputTime.value == 2
-                                                  ? formJam2Waktu()
-                                                  : SizedBox(),
-                                      formDelegasiKepada(),
-                                      formUploadFile(),
-                                      formAlasan(),
-                                    ],
-                                  ))),
-                        ],
-                      ),
+                            child: Column(
+                              children: [
+                                // formAjuanTanggal(),
+                                formTanggalCutiMelahirkan(),
+                                // controller.inputTime.value == 0
+                                //     ? formAjuanTanggal()
+                                //     : formAjuanTanggal1(),
+                                Obx(() => controller.showTipe.value == false
+                                    ? SizedBox()
+                                    : formTipe()),
+                                // Text(AppData.informasiUser![0].dep_group.toString()),
+                                controller.inputTime.value == 0
+                                    ? const SizedBox()
+                                    : controller.inputTime.value == 1
+                                        ? formJam()
+                                        : controller.inputTime.value == 2
+                                            ? formJam2Waktu()
+                                            : SizedBox(),
+                                formDelegasiKepada(),
+                                formUploadFile(),
+                                formAlasan(),
+                              ],
+                            ))),
+                  ],
+                ),
               ),
             ),
           )),
@@ -481,6 +539,261 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
     );
   }
 
+  Widget formTanggalCutiMelahirkan() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Text("Tanggal*", style: TextStyle(fontWeight: FontWeight.bold)),
+        // widget.dataForm![1] == true
+        //     ? controller.selectedTypeCuti.value
+        //             .toString()
+        //             .toLowerCase()
+        //             .toLowerCase()
+        //             .contains("Cuti Melahirkan".toLowerCase())
+        //         ? SizedBox()
+        //         : customTanggalDariSampaiDari()
+        //     : SizedBox(),
+
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 50,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: InkWell(
+                  onTap: () {
+                    DatePicker.showPicker(
+                      context,
+                      pickerModel: CustomDatePicker(
+                          currentTime: DateTime.now(), minTime: DateTime(2000)),
+                      onConfirm: (time) {
+                        if (time != null) {
+                        
+                          controller.startDate.value =
+                              DateFormat('yyyy-MM-dd').format(time).toString();
+                              controller.dariTanggal.value.text =
+                              DateFormat('yyyy-MM-dd').format(time).toString();
+
+                          if (controller.startDate.value != '' &&
+                              controller.endDate.value != '') {
+                            controller.loaDataTipe(
+                                durasi: controller.durasiIzin.value.toString());
+                          } else {
+
+
+                          }
+                          print("$time");
+                        }
+                      },
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 0.0, 16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                            flex: 15, child: const Icon(Iconsax.calendar_2)),
+                        Expanded(
+                          flex: 80,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextLabell(
+                                text: "Tanggal Mulai *",
+                                color: Constanst.fgPrimary,
+                                size: 14,
+                                weight: FontWeight.w400,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextLabell(
+                                    text: controller.startDate.value == ""
+                                        ? controller.startDate.value
+                                        : DateFormat('dd MMM yyyy', 'id')
+                                            .format(DateTime.parse(controller
+                                                .startDate.value
+                                                .toString())),
+                                    color: Constanst.fgPrimary,
+                                    weight: FontWeight.w500,
+                                    size: 16,
+                                  ),
+                                  Icon(Iconsax.arrow_down_1,
+                                      size: 20, color: Constanst.fgPrimary),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 50,
+              child: InkWell(
+                onTap: () {
+                  if (controller.startDate.value == "") {
+                    UtilsAlert.showToast("Tanggal Mulai belum diisi");
+                    return;
+                  }
+                  print("kesini");
+                  DatePicker.showPicker(
+                    context,
+                    pickerModel: CustomDatePicker(
+                      // minTime: DateTime(
+                      //     DateTime.now().year,
+                      //     DateTime.now().month - 1,
+                      //     int.parse(
+                      //         AppData.informasiUser![0].beginPayroll.toString())),
+                      // maxTime: DateTime(DateTime.now().year, DateTime.now().month,
+                      //     DateTime.now().day),
+                      currentTime: DateTime.now(),
+                      minTime: DateTime(2000),
+                    ),
+                    onConfirm: (time) {
+                      if (time != null) {
+                        controller.endDate.value = DateFormat('yyyy-MM-dd')
+                            .format(
+                                DateFormat('yyyy-MM-dd').parse(time.toString()))
+                            .toString();
+
+controller.sampaiTanggal.value.text = DateFormat('yyyy-MM-dd')
+                            .format(
+                                DateFormat('yyyy-MM-dd').parse(time.toString()))
+                            .toString();
+
+                        DateTime tempStartDate = DateTime.parse(
+                            DateFormat('yyyy-MM-dd')
+                                .format(DateFormat('yyyy-MM-dd')
+                                    .parse(controller.startDate.value))
+                                .toString());
+                        DateTime tempEndDate = DateTime.parse(
+                            DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(
+                                    controller.endDate.value.toString()))
+                                .toString());
+                        // Define two DateTime objects representing the two dates
+                        DateTime date1 = DateTime(tempStartDate.year,
+                            tempStartDate.month, tempStartDate.day);
+                        DateTime date2 = DateTime(tempEndDate.year,
+                            tempEndDate.month, tempEndDate.day);
+
+                        // Calculate the difference between the two dates
+                        Duration difference = date2.difference(date1);
+                        controller.durasiIzin.value = difference.inDays + 1;
+
+                        print("durasi izin  ${controller.durasiIzin.value}");
+                        for (var i = tempStartDate;
+                            i.isBefore(tempEndDate) ||
+                                i.isAtSameMomentAs(tempEndDate);
+                            i = i.add(Duration(days: 1))) {
+                          controller.tanggalSelected.value.add(i);
+                        }
+                        if (controller.startDate.value ==
+                            controller.endDate.value) {
+                          controller.tanggalSelected.value = [];
+                          controller.tanggalSelected.value
+                              .add(controller.startDate.value);
+                        }
+                        print("tanggal teralkhir ${controller.tanggalSelected.value}");
+                        controller.jumlahIzin.value =
+                            controller.durasiIzin.value;
+                        controller.loaDataTipe(
+                            durasi: controller.durasiIzin.value.toString());
+
+                        // controller.durasi.value =
+                        //     difference.inDays + 1;
+
+                        // absenController.tglAjunan.value =
+                        //     DateFormat('yyyy-MM-dd').format(time).toString();
+                        // absenController.checkAbsensi();
+
+                        // absenController.getPlaceCoordinateCheckin();
+                        // absenController.getPlaceCoordinateCheckout();
+
+                        // var filter = DateFormat('yyyy-MM').format(time);
+                        // var array = filter.split('-');
+                        // var bulan = array[1];
+                        // var tahun = array[0];
+                        // controller.bulanSelectedSearchHistory.value = bulan;
+                        // controller.tahunSelectedSearchHistory.value = tahun;
+                        // controller.bulanDanTahunNow.value = "$bulan-$tahun";
+                        // this.controller.bulanSelectedSearchHistory.refresh();
+                        // this.controller.tahunSelectedSearchHistory.refresh();
+                        // this.controller.bulanDanTahunNow.refresh();
+                        // controller.loadHistoryAbsenUser();
+                      }
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 16.0, 16.0, 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(flex: 15, child: Icon(Iconsax.calendar_2)),
+                      Expanded(
+                        flex: 80,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextLabell(
+                              text: "Tanggal Selesai *",
+                              color: Constanst.fgPrimary,
+                              size: 14,
+                              weight: FontWeight.w400,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: TextLabell(
+                                    text: controller.endDate.value == ""
+                                        ? controller.endDate.value
+                                        : DateFormat('dd MMM yyyy', 'id')
+                                            .format(DateTime.parse(controller
+                                                .endDate.value
+                                                .toString())),
+                                    color: Constanst.fgPrimary,
+                                    weight: FontWeight.w500,
+                                    size: 16,
+                                  ),
+                                ),
+                                Icon(Iconsax.arrow_down_1,
+                                    size: 20, color: Constanst.fgPrimary),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: Divider(
+            height: 0,
+            thickness: 1,
+            color: Constanst.fgBorder,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget formAjuanTanggal() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
@@ -545,6 +858,8 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                             args.value.startDate ?? args.value.endDate;
                         DateTime endDate =
                             args.value.endDate ?? args.value.startDate;
+
+                        print("tanggall terpilih ${startDate}");
 
                         // Tambahkan rentang tanggal ke dalam daftar
                         for (DateTime date = startDate;
