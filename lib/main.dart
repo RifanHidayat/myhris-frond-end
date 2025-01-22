@@ -142,6 +142,15 @@ Future<void> main() async {
   //   ),
   // );
 
+  
+
+
+  
+
+
+
+
+
   if (Platform.isIOS) {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.ios);
   } else {
