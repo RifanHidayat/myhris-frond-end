@@ -55,6 +55,7 @@ class PeraturanPerusahaanController extends GetxController {
         if (response.statusCode == 200) {
           List data = jsonDecode(response.body)['data'];
           var resultGet = data.map((item) => Peraturan.fromMap(item)).toList();
+          print(data);
           peraturanList.value = resultGet;
           isLoading.value = false;
         } else {
