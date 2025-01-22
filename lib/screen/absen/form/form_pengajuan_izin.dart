@@ -34,13 +34,23 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
   @override
   void initState() {
     controller.percentIzin.value = 0.0;
+    // UtilsAlert.showToast(
+    //                       "datea detail  ${widget.dataForm![0][0]['id']}");
     if (widget.dataForm![1] == true) {
+    //  controller.loaDataTipe(durasi: 2.toString());
+    // print("datea detail  ${widget.dataForm![0]['start_date']}")
+       
       var convertDariTanggal = widget.dataForm![0]['start_date'];
       var convertSampaiTanggal = widget.dataForm![0]['end_date'];
       controller.isBackdate.value = widget.dataForm![0]['back_date'].toString();
 
       controller.dariTanggal.value.text = "$convertDariTanggal";
       controller.sampaiTanggal.value.text = "$convertSampaiTanggal";
+          //  controller.startdate.value = "$convertDariTanggal";
+      controller.endDate.value = "$convertSampaiTanggal";
+       controller.startDate.value = "$convertDariTanggal";
+
+
       controller.jamAjuan.value.text = widget.dataForm![0]['time_plan'];
       controller.sampaiJamAjuan.value.text =
           widget.dataForm![0]['time_plan_to'].toString();
@@ -84,6 +94,54 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
         controller.inputTime.value =
             int.parse(widget.dataForm![0]['input_time'].toString());
       }
+
+
+         
+
+                controller.percentIzin.value = 0;
+                controller.gantiTypeAjuan(controller.selectedDropdownFormTidakMasukKerjaTipe.value);
+
+                var data = controller.allTipe.value
+                    .where((element) =>controller.selectedDropdownFormTidakMasukKerjaTipe.value
+                        .toString()
+                        .toLowerCase()
+                        .trim()
+                        .contains("${element['name']} - ${element['category']}"
+                            .toString()
+                            .toLowerCase()
+                            .trim()))
+                    .toList();
+                // controller.loadTypeSakit();
+                if (data[0]['input_time'] == null) {
+                } else {
+                  controller.inputTime.value =
+                      int.parse(data[0]['input_time'].toString());
+                }
+                print(data[0]['back_date'].toString());
+                controller.isBackdate.value = data[0]['back_date'].toString();
+                print("new data upload file ${data[0]['input_time']}");
+                controller.isRequiredFile.value =
+                    data[0]['upload_file'].toString();
+
+                if (data[0]['leave_day'] > 0) {
+                  print("new data ${data[0]['id']}");
+
+                  controller
+                      .loadDataAjuanIzinCategori(id: data[0]['type_id'])
+                      .then((value) {
+                    if (value == true) {
+                      controller.showDurationIzin.value = true;
+                      controller.jumlahIzin.value = data[0]['leave_day'];
+                      controller.percentIzin.value = double.parse(((int.parse(
+                                  controller.izinTerpakai.value.toString()) /
+                              int.parse(
+                                  controller.jumlahIzin.value.toString())))
+                          .toString());
+                    }
+                  });
+                } else {
+                  controller.showDurationIzin.value = false;
+                }
     } else {
       //controller.loadTypeSakit();
       controller.startDate.value = '';
@@ -511,15 +569,20 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                           currentTime: DateTime.now(), minTime: DateTime(2000)),
                       onConfirm: (time) {
                         if (time != null) {
+                        
                           controller.startDate.value =
+                              DateFormat('yyyy-MM-dd').format(time).toString();
+                              controller.dariTanggal.value.text =
                               DateFormat('yyyy-MM-dd').format(time).toString();
 
                           if (controller.startDate.value != '' &&
                               controller.endDate.value != '') {
                             controller.loaDataTipe(
                                 durasi: controller.durasiIzin.value.toString());
-                          } else {}
+                          } else {
 
+
+                          }
                           print("$time");
                         }
                       },
@@ -601,6 +664,11 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                                 DateFormat('yyyy-MM-dd').parse(time.toString()))
                             .toString();
 
+controller.sampaiTanggal.value.text = DateFormat('yyyy-MM-dd')
+                            .format(
+                                DateFormat('yyyy-MM-dd').parse(time.toString()))
+                            .toString();
+
                         DateTime tempStartDate = DateTime.parse(
                             DateFormat('yyyy-MM-dd')
                                 .format(DateFormat('yyyy-MM-dd')
@@ -634,6 +702,7 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                           controller.tanggalSelected.value
                               .add(controller.startDate.value);
                         }
+                        print("tanggal teralkhir ${controller.tanggalSelected.value}");
                         controller.jumlahIzin.value =
                             controller.durasiIzin.value;
                         controller.loaDataTipe(

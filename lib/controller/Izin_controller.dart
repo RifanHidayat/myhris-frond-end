@@ -419,12 +419,14 @@ class IzinController extends GetxController {
     }
   }
 
-  void loaDataTipe({durasi}) {
+void loaDataTipe({durasi}) {
     allTipeFormTidakMasukKerja1.value.clear();
     allTipeFormTidakMasukKerja.value.clear();
     isLoadingzin.value = false;
     showTipe.value = false;
-
+   selectedDropdownFormTidakMasukKerjaTipe.value = '';
+  
+  showDurationIzin.value=false;
     UtilsAlert.showLoadingIndicator(Get.context!);
     allTipe.value.clear();
     Map<String, dynamic> body = {
@@ -466,7 +468,7 @@ class IzinController extends GetxController {
           showTipe.value = true;
           if (idEditFormTidakMasukKerja == "") {
             var listFirst = allTipeFormTidakMasukKerja.value.first;
-            selectedDropdownFormTidakMasukKerjaTipe.value = listFirst;
+            selectedDropdownFormTidakMasukKerjaTipe.value = '';
 
             if (allTipe[0]['input_time'] == null) {
             } else {
@@ -480,6 +482,85 @@ class IzinController extends GetxController {
           selectedDropdownFormTidakMasukKerjaTipe.value = '';
           Get.back();
           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+        }
+
+        // loadTypeIzin();
+      }
+    });
+  }
+
+ loaDataTipeEdit({durasi,data}) {
+  var datum=data;
+
+  //  UtilsAlert.showToast(data['name'].toString());
+    allTipeFormTidakMasukKerja1.value.clear();
+    allTipeFormTidakMasukKerja.value.clear();
+    isLoadingzin.value = false;
+    showTipe.value = false;
+
+    UtilsAlert.showLoadingIndicator(Get.context!);
+    allTipe.value.clear();
+    Map<String, dynamic> body = {
+      'durasi': durasi.toString(),
+    };
+    var connect = Api.connectionApi("post", body, "cuti/type");
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        var data = valueBody['data'];
+
+        print("data type sakit new  ${data}");
+        for (var element in data) {
+          allTipeFormTidakMasukKerja1.value
+              .add("${element['name']} - ${element['category']}");
+
+          allTipeFormTidakMasukKerja.value
+              .add("${element['name']} - ${element['category']}");
+
+          var data = {
+            'type_id': element['id'],
+            'name': element['name'],
+            'status': element['status'],
+            'category': element['category'],
+            'leave_day': element['leave_day'],
+            'cut_leave': element['cut_leave'],
+            'upload_file': element['upload_file'],
+            'input_time': element['input_time'],
+            'back_date': element['backdate'] ?? "0",
+            'ajuan': 2,
+            'active': false,
+          };
+          allTipe.value.add(data);
+
+          print(data);
+        }
+        // var dataChecked=llTipeFormTidakMasukKerja.foreach((v)=>{
+        //   if (v.toString().toLowerCase().contains(data['name']toString().toLowerCase();)
+        // })
+
+        if (allTipeFormTidakMasukKerja.value.length > 0) {
+          showTipe.value = true;
+          if (idEditFormTidakMasukKerja == "") {
+            var listFirst = allTipeFormTidakMasukKerja.value.first;
+            selectedDropdownFormTidakMasukKerjaTipe.value = '';
+
+            if (allTipe[0]['input_time'] == null) {
+            } else {
+
+              inputTime.value = int.parse(allTipe[0]['input_time'].toString());
+              isBackdate.value = allTipe[0]['back_date'].toString();
+            }
+          }
+          Get.back();
+         Get.to(FormPengajuanIzin(dataForm: [datum, true],));
+         
+        
+        } else {
+          showTipe.value = false;
+          selectedDropdownFormTidakMasukKerjaTipe.value = '';
+         
+          UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+          
         }
 
         // loadTypeIzin();
@@ -1024,10 +1105,11 @@ class IzinController extends GetxController {
         this.stringSelectedTanggal.refresh();
       }
     } else {
+      print('data selectedd ${tanggalSelected.value}');
       if (tanggalSelected.value.isNotEmpty) {
         tanggalSelected.value.forEach((element) {
           var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(element);
+          String formatted = inputFormat.format(DateTime.parse(element.toString()));
           hasilConvert.add(formatted);
         });
         hasilConvert.sort((a, b) {
@@ -2157,10 +2239,9 @@ class IzinController extends GetxController {
                                 height: 40,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    print(detailData.toString());
-                                    Get.to(FormPengajuanIzin(
-                                      dataForm: [detailData, true],
-                                    ));
+                                    loaDataTipeEdit(durasi:detailData['leave_duration'].toString(),data:detailData);
+                                   // print(detailData['']);
+                                    
                                   },
                                   style: ElevatedButton.styleFrom(
                                     foregroundColor: Constanst.colorWhite,

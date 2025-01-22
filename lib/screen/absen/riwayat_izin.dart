@@ -146,6 +146,8 @@ class _RiwayatIzinState extends State<RiwayatIzin> {
                             )),
                       ),
                     )
+
+                    
                   : Text(
                       "Riwayat Izin",
                       style: GoogleFonts.inter(
