@@ -5,6 +5,7 @@ class Peringatan {
   var posisi;
   var nama;
   var sp;
+  var hal;
   var nomor;
   var tanggalSuratDiberikan;
   var title;
@@ -33,6 +34,9 @@ class Peringatan {
   var nomorPasal;
   var lokasi;
   var isView;
+  var pelanggaran;
+  var nomor_surat;
+  var diterbitkan_oleh;
 
   Peringatan(
       {this.id,
@@ -63,9 +67,13 @@ class Peringatan {
       this.modified_by,
       this.modified_on,
       this.bab,
+      this.hal,
       this.pasal,
       this.lokasi,
       this.isView,
+      this.pelanggaran,
+      this.diterbitkan_oleh,
+      this.nomor_surat,
       this.nomorPasal});
   Map<String, dynamic> toMap() {
     return {
@@ -96,7 +104,10 @@ class Peringatan {
       'modified _on': modified_on,
       'sp': sp,
       'posisi': posisi,
-      'is_view': isView
+      'is_view': isView,
+      'hal':hal,
+      'pelanggaran': pelanggaran,
+      'nomor_surat': nomor_surat
     };
   }
 
@@ -133,7 +144,11 @@ class Peringatan {
         nomorPasal: map['nomor_pasal'],
         lokasi: map['lokasi'],
         nama: map['nama'],
-        isView: map['is_view']
+        isView: map['is_view'],
+        hal: map['hal'],
+        pelanggaran: map['pelanggaran'],
+        diterbitkan_oleh: map['diterbitkan_oleh'],
+        nomor_surat: map['nomor_surat']
         );
   }
   String toJson() => json.encode(toMap());

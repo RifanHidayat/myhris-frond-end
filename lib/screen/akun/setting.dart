@@ -1282,7 +1282,7 @@ class _SettingState extends State<Setting> {
                         Padding(
                           padding: const EdgeInsets.only(left: 12),
                           child: Text(
-                            "Surat Teguran Lisan",
+                            "Surat Peringatan",
                             style: GoogleFonts.inter(
                                 color: Constanst.fgPrimary,
                                 fontWeight: FontWeight.w500,

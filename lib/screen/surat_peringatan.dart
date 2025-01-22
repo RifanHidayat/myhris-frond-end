@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -35,7 +34,8 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
 
   @override
   Widget build(BuildContext context) {
-    print('ini surat peringatan lenght : ${controller.peringatanlist.value.length}');
+    print(
+        'ini surat peringatan lenght : ${controller.peringatanlist.value.length}');
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -53,7 +53,8 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(() => Text(
+            Obx(
+              () => Text(
                 "${controller.peringatanlist.value.length} surat peringatan",
                 style: TextStyle(
                   color: Colors.grey[600],
@@ -72,7 +73,9 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                     itemBuilder: (context, index) {
                       var list = controller.peringatanlist[index];
                       return ListTile(
-                        tileColor: list.isView == 0 ? Constanst.colorButton2 : Colors.transparent,
+                        tileColor: list.isView == 0
+                            ? Constanst.colorButton2
+                            : Colors.transparent,
                         leading: Icon(
                           Iconsax.sms_notification,
                           color: Colors.red,
@@ -86,21 +89,21 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                             controller.getPeringatan();
                           }
                           controller.getDetail(list.id);
+                          var bulanIndo =
+                              Constanst.convertGetMonth(list.tgl_surat);
+                          controller.bulan.value = bulanIndo;
+                          controller.infoIds(list.diterbitkan_oleh);
                           // UtilsAlert.showToast(list.id);
                           Get.to(() => SuratPeringatanDetail(
-                                warningTitle: list.title.toString(),
-                                nomor: list.nomor.toString(),
-                                sp: list.sp.toString(),
-                                alasan: list.alasan.toString(),
-                                posisi: list.posisi.toString(),
-                                nama: list.nama.toString(),
-                                approve_date: list.approve_date.toString(),
-                                approve_by: list.approve_by ?? '',
-                                eff_date: list.eff_date.toString(),
-                                file_esign: list.file_esign.toString(),
-                                bab: list.bab.toString(),
-                                pasal: list.pasal.toString(),
-                                nomorPasal: list.nomorPasal.toString(),
+                                sp: list.sp,
+                                nama: list.nama,
+                                posisi: list.posisi,
+                                nomor: list.nomor_surat,
+                                hal: list.hal,
+                                tglSrt: list.tgl_surat,
+                                pelanggaran: list.title.toString(),
+                                alasan: list.alasan,
+                                diterbitkan: list.diterbitkan_oleh,
                               ));
                         },
                       );
@@ -123,38 +126,32 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
 }
 
 class SuratPeringatanDetail extends StatelessWidget {
-  final String warningTitle;
-  final String nomor;
   final String sp;
-  final String alasan;
-  final String posisi;
   final String nama;
-  final String file_esign;
-  final String approve_date;
-  final String eff_date;
-  final String approve_by;
-  var pasal, bab, nomorPasal;
+  final String posisi;
+  final String nomor;
+  final String hal;
+  final String tglSrt;
+  final String diterbitkan;
+  final String alasan;
+  final String pelanggaran;
 
-  SuratPeringatanDetail(
-      {required this.warningTitle,
-      required this.nomor,
-      required this.sp,
-      required this.alasan,
-      required this.posisi,
-      required this.nama,
-      required this.file_esign,
-      required this.approve_date,
-      required this.approve_by,
-      required this.eff_date,
-      this.bab,
-      this.pasal,
-      this.nomorPasal});
+  SuratPeringatanDetail({
+    required this.nomor,
+    required this.hal,
+    required this.tglSrt,
+    required this.sp,
+    required this.posisi,
+    required this.nama,
+    required this.diterbitkan,
+    required this.alasan,
+    required this.pelanggaran,
+  });
   final SuratPeringatanController controller =
       Get.put(SuratPeringatanController());
 
   @override
   Widget build(BuildContext context) {
-    print("${Api.fileDoc}$file_esign");
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -173,172 +170,125 @@ class SuratPeringatanDetail extends StatelessWidget {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Text(
-                      //   'Nomor: $nomor',
-                      //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      // ),
                       Center(
-                        child: Text(
-                          'SURAT PERINGATAN DAN PEMBERIAN\n     TINDAKAN ATAS PELANGGARAN',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                        child: Column(
+                          children: [
+                            Text(
+                              'SURAT PERINGATAN',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'NO : ${nomor}',
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(height: 30),
-                      // Text(
-                      //   '$sp ditujukan kepada:',
-                      //   style: TextStyle(fontWeight: FontWeight.bold),
-                      // ),
                       Text(
-                        'Karyawan PT. Sinar Arta Mulia yang namanya\ntertera di bawah ini :',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        'Hal: ${hal}',
                       ),
-                      SizedBox(height: 4),
-                      Text('Nama : $nama'),
-                      Text('Posisi : $posisi'),
                       SizedBox(height: 20),
                       Text(
-                        'Ditemukan telah melakukan hal - hal di bawah\nini:',
-                        textAlign: TextAlign.justify,
+                        'Melalui surat ini, kami memberitahukan kepada :',
                       ),
+                      SizedBox(height: 8),
+                      Text('Nama  : $nama'),
+                      Text('Divisi    : $posisi'),
                       SizedBox(height: 20),
-                      Column(
-                        children: List.generate(controller.listAlasan.length,
-                            (index) {
-                          var data = controller.listAlasan[index];
-                          return Row(
-                            children: [
-                              Expanded(
-                                flex: 5,
-                                child: Text(
-                                  (index + 1).toString(),
-                                  textAlign: TextAlign.justify,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 99,
-                                child: Text(
-                                  '${data['name']}',
-                                  textAlign: TextAlign.justify,
-                                ),
-                              ),
-                            ],
-                          );
-                        }),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      // Text(
-                      //   'Dengan hormat,\n\nBerdasarkan peraturan yang berlaku di perusahaan, pelanggaran tersebut merupakan pelanggaran kategori $alasan dan dikenakan tindakan peringatan tertulis.\n\nDengan surat ini, kami memberikan $sp kepada saudara/i $nama, agar tidak mengulangi pelanggaran tersebut. Jika pelanggaran serupa terulang kembali, maka tindakan yang lebih tegas akan diambil sesuai dengan ketentuan yang berlaku.\n\nDemikian surat peringatan ini dibuat untuk dapat dipergunakan sebagaimana mestinya.\n\nHormat kami,\nNama Perusahaan - ${AppData.selectedPerusahan}\nNama Atasan/HRD - $approve_by',
-                      //   textAlign: TextAlign.justify,
-                      // ),
                       Text(
-                        'Yang bertentangan dengan Buku Peraturan\nperusahaan Bab ${bab} pasal ${pasal} nomor ${nomorPasal} mengenai tindakan-tindakan\nyang Dianggap Sebagai Pelanggaran\n$sp',
-                        textAlign: TextAlign.start,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        'Pelanggaran di anggap telah memenuhi kriteria\nsehingga atas pelanggaran yang telah\ndilakukan, Perusahaan memberikan tindakan\nberupa:',
+                        'Telah melakukan Pelanggaran yaitu terlambat lebih dari 3 (Tiga) kali pada bulan ${controller.bulan.value}, dimana hal tersebut sudah menjadi Peraturan Perusahaan yang harus di taati bersama. Oleh karena itu kami memberikan $sp kepada saudara $nama, dengan ketentuan sebagai berikut : ',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
                         height: 30,
                       ),
                       Text(
-                        '1. Pemberian ${sp}',
-                        textAlign: TextAlign.start,
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      alasan.toString().isEmpty || alasan.toString() == 'null'
-                          ? sp.contains("Surat Peringatan 3")
-                              ? Text(
-                                  '2. Pemberhentiaan Secara Tidak Hormat dan Pemutusan Hubungan Kerja',
-                                  textAlign: TextAlign.start,
-                                )
-                              : SizedBox()
-                          : Text(
-                              '2.${alasan}',
-                              textAlign: TextAlign.start,
-                            ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      sp.contains("Surat Peringatan 3")
-                          ? Text(
-                              '3. Pemberhentiaan Secara Tidak Hormat dan Pemutusan Hubungan Kerja',
-                              textAlign: TextAlign.start,
-                            )
-                          : SizedBox(),
-
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Text(
-                        'Demiian surat ini dibuat untuk disetujui berdasarkan peraturan perusahaan yang berlaku yang telah di sepakati.',
+                        sp == 'Surat Peringatan 3'
+                            ? '1. Surat ini sekaligus sebagai surat Pemutusan Hubungan Kerja (PHK)'
+                            : '1. $sp  ini berlaku 3 (Tiga) bulan sejak surat ini di keluarkan.',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
                         height: 15,
                       ),
                       Text(
-                        'Jakarta, ${DateFormat('dd MMMM yyyy').format(DateTime.parse(eff_date.toString()))}',
+                        sp == 'Surat Peringatan 3'
+                            ? '2. Hak-hak Saudara akan diberikan sesuai dengan proporsi, dihitung sampai dengan tanggal surat ini dikeluarkan. Serta Perusahaan tidak akan memberikan referensi kerja sesuai dengan ketentuan perusahaan yang berlaku.'
+                            : sp == 'Surat Peringatan 1'
+                                ? '2. Jika dalam kurun waktu 3 (Tiga) bulan kedepan sejak surat peringatan pertama di terbitkan saudara didapati kembali melakukan tindakan pelanggaran, maka perusahaan akan memberikan Surat Peringatan ke 2 (Dua) untuk saudara. '
+                                : '2. Jika dalam kurun waktu 3 (Tiga) bulan kedepan sejak surat peringatan pertama di terbitkan saudara didapati kembali melakukan tindakan pelanggaran, maka perusahaan akan memberikan Surat Peringatan ke 3 (Dua) untuk saudara.',
                         textAlign: TextAlign.start,
                       ),
-                      Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        sp == 'Surat Peringatan 3'
+                        ? '3. Saudara wajib mengembalikan seluruh barang-barang milik perusahaan yang Saudara gunakan selama bekerja di perusahaan.  '
+                        : sp == 'Surat Peringatan 2'
+                        ? '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 3 (Tiga) hari.'
+                        : '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 1 (Satu) hari.',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        '4. ${controller.listAlasan[0]['name']}',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        'Demikian surat peringatan ini dibuat agar dapat diperhatikan dan ditaati sebaik mungkin oleh yang bersangkutan.',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column( crossAxisAlignment: CrossAxisAlignment.start,
+                          Column(
                             children: [
-                              SizedBox(height: 30),
+                              SizedBox(height: 20),
                               Text(
-                                "Validasi tanpa tanda tangan",
+                                "HRD,",
                                 style: TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    color: Colors.red,
-                                    fontSize: 11),
+                                    fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               SizedBox(
                                 height: 35,
                               ),
-                              TextLabell(
-                                text: "PT SINAR ARTA MULIA",
-                                weight: FontWeight.bold,
-                                size: 14,
-                              ),
-                              TextLabell(
-                                text:
-                                    "Tanggal Validasi : ${DateFormat('dd MMMM yyyy').format(DateTime.parse(eff_date.toString()))}",
-                                size: 9.0,
+                              Text(
+                                controller.diterbitkan.value,
+                                style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),
                           Column(
-                        children: [
-                          Image.network(
-                            "${Api.fileDoc}$file_esign",
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.fill,
-                          ),
-                          Text(
-                            'Yang Bersangkutan',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.0
+                            children: [
+                              SizedBox(height: 20),
+                              Text(
+                                'Jakarta, ${DateFormat('dd MMMM yyyy').format(DateTime.parse(tglSrt.toString()))}',
+                                style: TextStyle(fontSize: 12.0),
                               ),
-                            
+                              Text(
+                                'Yang Bersangkutan',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.0),
+                              ),
+                              SizedBox(height: 25),
+                              Text('$nama'),
+                            ],
                           ),
-                          SizedBox(height: 4),
-                          Text('$nama'),
                         ],
                       ),
-                        ],
-                      ),
-                      
                     ],
                   );
           })),

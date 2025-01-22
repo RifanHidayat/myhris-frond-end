@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
@@ -36,7 +35,8 @@ class _TeguranLisanState extends State<TeguranLisan> {
 
   @override
   Widget build(BuildContext context) {
-    print('ini surat peringatan lenght : ${controller.peringatanlist.value.length}');
+    print(
+        'ini surat peringatan lenght : ${controller.peringatanlist.value.length}');
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -54,7 +54,8 @@ class _TeguranLisanState extends State<TeguranLisan> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(() => Text(
+            Obx(
+              () => Text(
                 "${controller.teguranList.value.length} surat teguran",
                 style: TextStyle(
                   color: Colors.grey[600],
@@ -73,7 +74,9 @@ class _TeguranLisanState extends State<TeguranLisan> {
                     itemBuilder: (context, index) {
                       var list = controller.teguranList[index];
                       return ListTile(
-                        tileColor: list.isView == 0 ? Constanst.colorButton2 : Colors.transparent,
+                        tileColor: list.isView == 0
+                            ? Constanst.colorButton2
+                            : Colors.transparent,
                         leading: Icon(
                           Iconsax.sms_notification,
                           color: Colors.red,
@@ -82,27 +85,25 @@ class _TeguranLisanState extends State<TeguranLisan> {
                         trailing: Icon(Icons.arrow_forward_ios),
                         // subtitle: Text(formatDate(list.approve_date)),
                         onTap: () {
-                          if (list.isView == 0) {
-                            controller.updateDataNotif(list.id);
-                            controller.getPeringatan();
-                          }
+                          // if (list.isView == 0) {
+                          //   controller.updateDataNotif(list.id);
+                          //   controller.getPeringatan();
+                          // }
+
+                          print('ini teguran list data : ${list}');
+                          controller.infoIds(list.diterbitkan_oleh);
                           controller.getDetailTeguran(list.id);
                           // UtilsAlert.showToast(list.id);
-                          // Get.to(() => SuratTeguranDetail(
-                          //       warningTitle: list.title.toString(),
-                          //       nomor: list.nomor.toString(),
-                          //       sp: list.sp.toString(),
-                          //       alasan: list.alasan.toString(),
-                          //       posisi: list.posisi.toString(),
-                          //       nama: list.nama.toString(),
-                          //       approve_date: list.approve_date.toString(),
-                          //       approve_by: list.approve_by ?? '',
-                          //       eff_date: list.eff_date.toString(),
-                          //       file_esign: list.file_esign.toString(),
-                          //       bab: list.bab.toString(),
-                          //       pasal: list.pasal.toString(),
-                          //       nomorPasal: list.nomorPasal.toString(),
-                          //     ));
+                          Get.to(() => SuratTeguranDetail(
+                                sp: list.sp,
+                                nama: list.nama,
+                                posisi: list.posisi,
+                                nomor: list.nomor_surat,
+                                hal: list.hal,
+                                tglSrt: list.tgl_surat,
+                                pelanggaran: list.pelanggaran,
+                                diterbitkan: list.diterbitkan_oleh,
+                              ));
                         },
                       );
                     },
@@ -124,32 +125,25 @@ class _TeguranLisanState extends State<TeguranLisan> {
 }
 
 class SuratTeguranDetail extends StatelessWidget {
-  final String warningTitle;
-  final String nomor;
   final String sp;
-  final String alasan;
-  final String posisi;
   final String nama;
-  final String file_esign;
-  final String approve_date;
-  final String eff_date;
-  final String approve_by;
-  var pasal, bab, nomorPasal;
+  final String posisi;
+  final String nomor;
+  final String hal;
+  final String tglSrt;
+  final String diterbitkan;
+  final String pelanggaran;
 
-  SuratTeguranDetail(
-      {required this.warningTitle,
-      required this.nomor,
-      required this.sp,
-      required this.alasan,
-      required this.posisi,
-      required this.nama,
-      required this.file_esign,
-      required this.approve_date,
-      required this.approve_by,
-      required this.eff_date,
-      this.bab,
-      this.pasal,
-      this.nomorPasal});
+  SuratTeguranDetail({
+    required this.nomor,
+    required this.hal,
+    required this.tglSrt,
+    required this.sp,
+    required this.posisi,
+    required this.nama,
+    required this.diterbitkan,
+    required this.pelanggaran,
+  });
   final SuratPeringatanController controller =
       Get.put(SuratPeringatanController());
 
@@ -163,20 +157,124 @@ class SuratTeguranDetail extends StatelessWidget {
             Get.back();
           },
         ),
-        title: Text('Detail Surat Peringatan'),
+        title: Text('Detail Teguran Lisan'),
       ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        child: ListView(children: [
-          HtmlWidget(
-            """
-                <p style='font-size: 16px; text-align: center;'>
-                  ${nama}
-                  </p>
-                  """,
-          ),
-        ]),
-      ),
+      body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Obx(() {
+            return controller.isLoading.value == true
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'SURAT TEGURAN LISAN',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'NO : 004/ HRD /${nomor}/ 2025',
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Text(
+                        'Hal: ${hal}',
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Melalui surat ini, kami memberitahukan kepada :',
+                      ),
+                      SizedBox(height: 8),
+                      Text('Nama  : $nama'),
+                      Text('Divisi    : $posisi'),
+                      SizedBox(height: 20),
+                      Text(
+                        'Telah melakukan Pelanggaran  ${pelanggaran} dimana hal tersebut sudah menjadi Peraturan Perusahaan yang harus di taati bersama. Oleh karena itu kami memberikan Teguran Lisan kepada saudara ${nama}, dengan ketentuan sebagai berikut',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text(
+                        '1. Surat Teguran Lisan ini berlaku 3 (Tiga) bulan sejak surat ini di keluarkan',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        '2. Jika dalam kurun waktu 3 (Tiga) bulan kedepan sejak surat teguran lisan di terbitkan saudara didapati kembali melakukan tindakan pelanggaran, maka perusahaan akan memberikan Surat Peringatan ke 1 (Satu) untuk saudara. ',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ), 
+                      Text(
+                        '3. ${controller.listAlasan[0]['name']}',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ), 
+                      Text(
+                        'Demikian surat peringatan ini dibuat agar dapat diperhatikan dan ditaati sebaik mungkin oleh yang bersangkutan.',
+                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              SizedBox(height: 20),
+                              Text(
+                                "HRD,",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                    fontSize: 16),
+                              ),
+                              SizedBox(
+                                height: 35,
+                              ),
+                              Text(
+                                controller.diterbitkan.value,
+                                style: TextStyle(
+                                    fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(height: 20),
+                              Text(
+                                'Jakarta, ${DateFormat('dd MMMM yyyy').format(DateTime.parse(tglSrt.toString()))}',
+                                style: TextStyle(
+                                    fontSize: 12.0),
+                              ),
+                              Text(
+                                'Yang Bersangkutan',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.0),
+                              ),
+                              SizedBox(height: 25),
+                              Text('$nama'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+          })),
     );
   }
 
