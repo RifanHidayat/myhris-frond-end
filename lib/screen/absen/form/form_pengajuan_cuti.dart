@@ -32,7 +32,7 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
   @override
   void initState() {
     controller.loadCutiUser();
-    controller.loadDataTypeCuti();
+   // controller.loadDataTypeCuti();
     print("data biaya ${widget.dataForm![0]}");
     if (widget.dataForm![1] == true) {
       controller.dariTanggal.value.text = widget.dataForm![0]['start_date'];
@@ -83,6 +83,9 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
       controller.endDate.value = "";
       controller.alasan.value.text = "";
       controller.namaFileUpload.value = "";
+    
+     controller.selectedTypeCuti.value = "";
+       
     }
     super.initState();
   }
@@ -151,10 +154,10 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(12)),
                             border: Border.all(color: Constanst.fgBorder)),
-                        child: controller.cutLeave.value == 0 ||
+                        child: controller.showStatus==true?controller.cutLeave.value == 0 ||
                                 controller.cutLeave.value.toString() == "0"
                             ? informasiSisaCutiMelahirkan()
-                            : informasiSisaCuti(),
+                            : informasiSisaCuti():SizedBox(),
                       ),
                       const SizedBox(height: 16),
                       Container(
@@ -164,12 +167,18 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                             border: Border.all(color: Constanst.fgBorder)),
                         child: Column(
                           children: [
-                            formTipe(),
-                            controller.dateSelected.value == 2 ||
-                                    controller.dateSelected.value.toString() ==
-                                        '2'
-                                ? formTanggalCutiMelahirkan()
-                                : formTanggalCuti(),
+                             formTanggalCutiMelahirkan(),
+                             
+                            Obx(() => controller.showTipe.value == false
+                                    ? SizedBox()
+                                    : formTipe()),
+                            // controller.dateSelected.value == 2 ||
+                            //         controller.dateSelected.value.toString() ==
+                            //             '2'
+                                // ? formTanggalCutiMelahirkan()
+                                
+                                // : formTanggalCuti(),
+                               
                             formDelegasiKepada(),
                             formUploadFile(),
                             formAlasan(),
@@ -823,6 +832,21 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                         controller.durasiIzin.value = difference.inDays + 1;
                         controller.durasiCutiMelahirkan.value =
                             difference.inDays + 1;
+
+                             for (var i = tempStartDate;
+                            i.isBefore(tempEndDate) ||
+                                i.isAtSameMomentAs(tempEndDate);
+                            i = i.add(Duration(days: 1))) {
+                          controller.tanggalSelected.value.add(i);
+                        }
+                        if (controller.startDate.value ==
+                            controller.endDate.value) {
+                          controller.tanggalSelected.value = [];
+                          controller.tanggalSelected.value
+                              .add(controller.startDate.value);
+                        }
+
+                           controller.loadDataTypeCuti(durasi:controller.durasiCutiMelahirkan.value.toString() );
 
                         // absenController.tglAjunan.value =
                         //     DateFormat('yyyy-MM-dd').format(time).toString();
