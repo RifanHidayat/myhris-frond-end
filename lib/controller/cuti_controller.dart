@@ -28,6 +28,7 @@ class CutiController extends GetxController {
   var alasan = TextEditingController().obs;
   var cari = TextEditingController().obs;
   var departemen = TextEditingController().obs;
+   var showTipe = false.obs;
 
   var filePengajuan = File("").obs;
   var startDate = "".obs;
@@ -45,7 +46,7 @@ class CutiController extends GetxController {
   var durasiCutiMelahirkan = 0.obs;
   Rx<List<String>> allEmployeeDelegasi = Rx<List<String>>([]);
   Rx<List<String>> allTipeFormCutiDropdown = Rx<List<String>>([]);
-
+  var showStatus=false.obs;
   var isRequiredFile = '0'.obs;
 
   var limitCuti = 0.obs;
@@ -110,7 +111,7 @@ class CutiController extends GetxController {
     loadCutiUser();
     getLoadsysData();
     loadAllEmployeeDelegasi();
-    loadDataTypeCuti();
+    //loadDataTypeCuti();
     loadDataAjuanCuti();
     getDepartemen(1, "");
     super.onReady();
@@ -230,13 +231,16 @@ class CutiController extends GetxController {
     }
   }
 
-  void loadDataTypeCuti() {
+  void loadDataTypeCuti({durasi}) {
+    UtilsAlert.showLoadingIndicator(Get.context!);
     print("load data cuti");
     allTipeFormCutiDropdown.value.clear();
     allTipe.value.clear();
+    //  UtilsAlert.showLoadingIndicator(Get.context!);
 
-    Map<String, dynamic> body = {'val': 'status', 'cari': '1'};
-    var connect = Api.connectionApi("post", body, "whereOnce-leave_types");
+
+  var body = {'durasi': '${durasi}'};
+    var connect = Api.connectionApi("post", body, "cuti-tipe");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
@@ -259,13 +263,15 @@ class CutiController extends GetxController {
 
           allTipe.value.add(data);
         }
-        if (statusForm.value == false) {
+        if (allTipe.value.length>0){
+           if (statusForm.value == false) {
           var getFirst = allTipe.value.first;
           selectedTypeCuti.value = getFirst['name'];
           dateSelected.value = getFirst['select_date'];
           allowMinus.value = getFirst['allow_minus'];
           isRequiredFile.value = getFirst['upload_file'].toString();
           isBackDate.value = getFirst['back_date'].toString();
+          Get.back();
         } else {
           var getFirst = allTipe.value
               .firstWhere((element) => element['id'] == typeIdEdit.value);
@@ -275,7 +281,19 @@ class CutiController extends GetxController {
           allowMinus.value = getFirst['allow_minus'];
           isRequiredFile.value = getFirst['upload_file'].toString();
           isBackDate.value = getFirst['back_date'].toString();
+            Get.back();
         }
+
+ showStatus.value=true;
+  showTipe.value = true;
+
+        }else{
+          showStatus.value=false;
+           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+             showTipe.value = false;
+             Get.back();
+        }
+       
 
         this.allTipe.refresh();
         this.selectedTypeCuti.refresh();
@@ -285,7 +303,174 @@ class CutiController extends GetxController {
     });
   }
 
+
+  void loadDataTypeCutiEdit({durasi,detailData}) {
+    UtilsAlert.showLoadingIndicator(Get.context!);
+    print("load data cuti");
+    allTipeFormCutiDropdown.value.clear();
+    allTipe.value.clear();
+    //  UtilsAlert.showLoadingIndicator(Get.context!);
+
+
+  var body = {'durasi': '${durasi}'};
+    var connect = Api.connectionApi("post", body, "cuti-tipe");
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        var data = valueBody['data'];
+        print("data tipe cuti ${data}");
+        for (var element in data) {
+          allTipeFormCutiDropdown.value.add(element['name']);
+          var data = {
+            'id': element['id'],
+            'name': element['name'],
+            'status': element['status'],
+            'leave_day': element['leave_day'],
+            'select_date': element['select_date'],
+            'allow_minus': element['allow_minus'],
+            'cut_leave': element['cut_leave'],
+            'upload_file': element['upload_file'],
+            'back_date': element['backdate'],
+            'active': false,
+          };
+
+          allTipe.value.add(data);
+        }
+        if (allTipe.value.length>0){
+           if (statusForm.value == false) {
+          var getFirst = allTipe.value.first;
+          selectedTypeCuti.value = getFirst['name'];
+          dateSelected.value = getFirst['select_date'];
+          allowMinus.value = getFirst['allow_minus'];
+          isRequiredFile.value = getFirst['upload_file'].toString();
+          isBackDate.value = getFirst['back_date'].toString();
+          Get.back();
+        } else {
+          var getFirst = allTipe.value
+              .firstWhere((element) => element['id'] == typeIdEdit.value);
+          selectedTypeCuti.value = getFirst['name'];
+
+          dateSelected.value = getFirst['select_date'];
+          allowMinus.value = getFirst['allow_minus'];
+          isRequiredFile.value = getFirst['upload_file'].toString();
+          isBackDate.value = getFirst['back_date'].toString();
+            Get.back();
+        }
+
+ showStatus.value=true;
+  showTipe.value = true;
+    Get.to(FormPengajuanCuti(
+                                    dataForm: [detailData, true],
+                                  ));
+                                  // Get.back();
+        }else{
+          showStatus.value=false;
+           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+             showTipe.value = false;
+             Get.back();
+        }
+       
+
+        this.allTipe.refresh();
+        this.selectedTypeCuti.refresh();
+        this.allTipeFormCutiDropdown.refresh();
+        this.allowMinus.refresh();
+      }
+    });
+  }
+
+
+
+  void loadDataTypeCuti1() {
+    // print("load data cuti");
+    // allTipeFormCutiDropdown.value.clear();
+    // allTipe.value.clear();
+
+    // Map<String, dynamic> body = {'val': 'status', 'cari': '1'};
+    // var connect = Api.connectionApi("post", body, "whereOnce-leave_types");
+    // connect.then((dynamic res) {
+    //   if (res.statusCode == 200) {
+    //     var valueBody = jsonDecode(res.body);
+    //     var data = valueBody['data'];
+    //     print("data tipe cuti ${data}");
+    //     for (var element in data) {
+    //       allTipeFormCutiDropdown.value.add(element['name']);
+    //       var data = {
+    //         'id': element['id'],
+    //         'name': element['name'],
+    //         'status': element['status'],
+    //         'leave_day': element['leave_day'],
+    //         'select_date': element['select_date'],
+    //         'allow_minus': element['allow_minus'],
+    //         'cut_leave': element['cut_leave'],
+    //         'upload_file': element['upload_file'],
+    //         'back_date': element['backdate'],
+    //         'active': false,
+    //       };
+
+    //       allTipe.value.add(data);
+    //     }
+    //     if (statusForm.value == false) {
+    //       var getFirst = allTipe.value.first;
+    //       selectedTypeCuti.value = getFirst['name'];
+    //       dateSelected.value = getFirst['select_date'];
+    //       allowMinus.value = getFirst['allow_minus'];
+    //       isRequiredFile.value = getFirst['upload_file'].toString();
+    //       isBackDate.value = getFirst['back_date'].toString();
+    //     } else {
+    //       var getFirst = allTipe.value
+    //           .firstWhere((element) => element['id'] == typeIdEdit.value);
+    //       selectedTypeCuti.value = getFirst['name'];
+
+    //       dateSelected.value = getFirst['select_date'];
+    //       allowMinus.value = getFirst['allow_minus'];
+    //       isRequiredFile.value = getFirst['upload_file'].toString();
+    //       isBackDate.value = getFirst['back_date'].toString();
+    //     }
+
+    //     this.allTipe.refresh();
+    //     this.selectedTypeCuti.refresh();
+    //     this.allTipeFormCutiDropdown.refresh();
+    //     this.allowMinus.refresh();
+    //   }
+    // });
+  }
   void loadDataAjuanCuti() {
+    AlllistHistoryAjuan.value.clear();
+    listHistoryAjuan.value.clear();
+    stringLoading.value = "Memuat Data...";
+    var dataUser = AppData.informasiUser;
+    var getEmid = dataUser![0].em_id;
+    Map<String, dynamic> body = {
+      'em_id': getEmid,
+      'bulan': bulanSelectedSearchHistory.value,
+      'tahun': tahunSelectedSearchHistory.value,
+      'ajuan': '1',
+    };
+    var connect = Api.connectionApi("post", body, "history-emp_leave");
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        if (valueBody['status'] == false) {
+          stringLoading.value = "Tidak ada pengajuan";
+          this.stringLoading.refresh();
+        } else {
+          AlllistHistoryAjuan.value = valueBody['data'];
+          listHistoryAjuan.value = valueBody['data'];
+          if (listHistoryAjuan.value.isEmpty) {
+            stringLoading.value = "Tidak ada pengajuan";
+          } else {
+            stringLoading.value = "Memuat Data...";
+          }
+          this.listHistoryAjuan.refresh();
+          this.AlllistHistoryAjuan.refresh();
+          this.stringLoading.refresh();
+        }
+      }
+    });
+  }
+
+   void loadDataAjuanCutiEdit({durasi,data}) {
     AlllistHistoryAjuan.value.clear();
     listHistoryAjuan.value.clear();
     stringLoading.value = "Memuat Data...";
@@ -430,16 +615,22 @@ class CutiController extends GetxController {
   }
 
   void checkingDelegation(em_id) {
-    print(em_id);
+    print('delegasi em id ${em_id}');
 
     // if (em_id=="null" || em_id == "" || em_id==null){
 
     // }else{
 
-    var getData =
+    if (em_id=="" ){
+
+    }else{
+       var getData =
         allEmployee.value.firstWhere((element) => element["em_id"] == em_id);
     selectedDelegasi.value = getData["full_name"];
     this.selectedDelegasi.refresh();
+
+    }
+   
 
     //}
     print("data employee ${em_id},${allEmployee.value}");
@@ -651,7 +842,7 @@ class CutiController extends GetxController {
       if (tanggalSelectedEdit.value.isNotEmpty) {
         tanggalSelectedEdit.value.forEach((element) {
           var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(element);
+          String formatted = inputFormat.format(DateTime.parse(element.toString()));
           hasilConvert.add(formatted);
         });
         hasilConvert.sort((a, b) {
@@ -679,7 +870,7 @@ class CutiController extends GetxController {
       if (tanggalSelected.value.isNotEmpty) {
         tanggalSelected.value.forEach((element) {
           var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(element);
+          String formatted = inputFormat.format(DateTime.parse(element));
           hasilConvert.add(formatted);
         });
         hasilConvert.sort((a, b) {
@@ -1781,9 +1972,10 @@ class CutiController extends GetxController {
                               child: ElevatedButton(
                                 onPressed: () {
                                   print(detailData.toString());
-                                  Get.to(FormPengajuanCuti(
-                                    dataForm: [detailData, true],
-                                  ));
+                                  loadDataTypeCutiEdit(durasi:durasi,detailData:detailData);
+                                  // Get.to(FormPengajuanCuti(
+                                  //   dataForm: [detailData, true],
+                                  // ));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Constanst.colorWhite,
