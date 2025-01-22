@@ -318,7 +318,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                                 //             .text
                                                 //             .length),
                                                 //   );
-                                                // } else 
+                                                // } else
                                                 if (input > 100) {
                                                   controller
                                                       .taskControllers[index]
@@ -765,25 +765,54 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
       if (controller.detailData[0]['nama_approve1'] == "" ||
           controller.detailData[0]['nama_approve1'] == "null" ||
           controller.detailData[0]['nama_approve1'] == null) {
-        if (controller.detailData[0]['delegasi'].toString().contains(emId)) {
-          print('kodisi 3 terpenuhi');
-          controller.showButton.value = true;
+        if (controller.detailData[0]['dinilai'] == 'Y') {
+          if (controller.detailData[0]['delegasi'].toString().contains(emId)) {
+            print('kodisi 3 terpenuhi');
+            controller.showButton.value = true;
+          } else {
+            print('kodisi 3 gagal');
+            controller.showButton.value = false;
+          }
         } else {
-          print('kodisi 3 gagal');
-          controller.showButton.value = false;
+          if (controller.detailData[0]['em_report_to']
+              .toString()
+              .contains(emId)) {
+            print('kodisi 3 terpenuhi');
+            controller.showButton.value = true;
+          } else {
+            print('kodisi 3 gagal');
+            controller.showButton.value = false;
+          }
         }
       } else {
         if (controller.detailData[0]['em_ids'] == "" ||
             controller.detailData[0]['em_ids'] == "null" ||
             controller.detailData[0]['em_ids'] == null) {
-          if (controller.detailData[0]['delegasi'].contains(emId)) {
-            print('kodisi 4 terpnuhi');
-            controller.showButton.value = true;
+          if (controller.detailData[0]['dinilai'] == 'Y') {
+            if (controller.detailData[0]['delegasi'].contains(emId)) {
+              print('kodisi 4 terpnuhi');
+              controller.showButton.value = true;
+            } else {
+              print('kondisi 4 gagal');
+              controller.showButton.value = false;
+            }
           } else {
-            print('kondisi 4 gagal');
-            controller.showButton.value = false;
+            if (controller.detailData[0]['em_report_to'].contains(emId)) {
+              print('kodisi 4 terpnuhi');
+              controller.showButton.value = true;
+            } else {
+              print('kondisi 4 gagal');
+              controller.showButton.value = false;
+            }
           }
         } else {
+          // if (controller.detailData[0]['em_report_to'].contains(emId) && controller.detailData[0]['dinilai'] == 'N' || controller.detailData[0]['em_report2_to'].contains(emId) && controller.detailData[0]['dinilai'] == 'N') {
+          //   print('kodisi 5 terpenuhi');
+          //   controller.showButton.value = true;
+          // } else {
+          //   print('kodisi 5 gqgal');
+          //   controller.showButton.value = false;
+          // }
           if (controller.detailData[0]['em_ids'].contains(emId)) {
             print('kodisi 5 terpenuhi');
             controller.showButton.value = true;
@@ -802,7 +831,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
     print('ini emId ${widget.emId}');
     print('ini emIds ${widget.emIds}');
     print('ini delegasi ${widget.delegasi}');
-    print('ini delegasi ${controller.detailData[0]['delegasi']}');
+    print('ini em_report_to ${controller.detailData[0]['em_report_to']}');
     print('ini em_ids ${controller.detailData[0]['em_ids']}');
     print('ini value showButton ${controller.showButton.value}');
     print('ini status ${controller.detailData[0]['status']}');

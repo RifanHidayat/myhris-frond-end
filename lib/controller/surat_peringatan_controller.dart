@@ -21,6 +21,8 @@ class SuratPeringatanController extends GetxController {
   var isLoading = true.obs;
   var isLoadingAlasan = true.obs;
   var listAlasan = [].obs;
+  var diterbitkan = ''.obs;
+  var bulan = ''.obs;
 
   var jumlahNotifikasiBelumDibaca = 0.obs;
 
@@ -29,6 +31,63 @@ class SuratPeringatanController extends GetxController {
     super.onInit();
     getPeringatan();
     getJumlahNotifikasi();
+  }
+
+  // void getBranch() {
+  //   var connect = Api.connectionApi('get', {}, 'cabang');
+  //   connect.then((dynamic res) {
+  //     if (res.statusCode == 200) {
+  //       var valueBody = jsonDecode(res.body);
+  //       print('ini get barnch ${valueBody['data']}');
+  //       for (var data in valueBody['data']) {
+  //         branchList.add(data);
+  //       }
+  //       List data = valueBody['data'];
+  //       if (data.isNotEmpty) {
+  //         var listFirst = data.firstWhere((element) => element['name'] != null,
+  //             orElse: () => null);
+  //         if (listFirst != null) {
+  //           var fullName = listFirst['name'] ?? "";
+  //           String namaUserPertama = "$fullName";
+  //           selectBranch.value = namaUserPertama;
+  //         }
+  //       }
+  //       branchList.refresh;
+  //       selectBranch.refresh;
+  //       print(branchList);
+  //     } else {
+  //       print('error ${res.body}');
+  //     }
+  //   });
+  // }
+
+  
+  void infoIds(emId) {
+      Map<String, dynamic> body = {
+        'val': 'em_id',
+        'cari': emId,
+      };
+      var connect = Api.connectionApi("post", body, "whereOnce-employee");
+      connect.then((dynamic res) {
+        if (res.statusCode == 200) {
+          var valueBody = jsonDecode(res.body);
+          if (valueBody['data'] is List && valueBody['data'].isNotEmpty) {
+            var fullName = valueBody['data'][0]['full_name'];
+            print('Full name for $emId: $fullName');
+            print('lah ini dong yang kepangggil');
+            diterbitkan.value = fullName;
+          } else if (valueBody['data'] is Map) {
+            var fullName = valueBody['data']['full_name'];
+            print('Full name for $emId: $fullName');
+            print('ini kepanggil');
+            diterbitkan.value = fullName;
+          } else {
+            print('Unexpected data format for $emId');
+          }
+        }
+      }).catchError((e) {
+        print('Error fetching data for $emId: $e');
+      });
   }
 
   void getPeringatan() async {
@@ -49,18 +108,12 @@ class SuratPeringatanController extends GetxController {
 
   void getDetail(id) async {
     isLoadingAlasan.value = true;
-    var connect = Api.connectionApi('get', {}, "surat_peringatan/$id");
+    var connect = Api.connectionApi('get', {}, "surat-peringatan/$id");
     connect.then(
       (dynamic response) {
         if (response.statusCode == 200) {
           List data = jsonDecode(response.body)['data'];
           listAlasan.value = data;
-          // var belumDibaca = listAlasan.where((sp) {
-          //   return sp['is_view'] == 0;
-          // }).length;
-          // print('ini belum di baca : $belumDibaca');
-          // jumlahNotifikasiBelumDibaca.value = belumDibaca;
-          // jumlahNotifikasiBelumDibaca.refresh();
           isLoadingAlasan.value = false;
           getJumlahNotifikasi();
           print('Succes : ${response.body}');
@@ -130,7 +183,6 @@ class SuratPeringatanController extends GetxController {
           List data = jsonDecode(response.body)['data'];
           listAlasan.value = data;
           isLoadingAlasan.value = false;
-          generateAndOpenPdf(id);
           print('Succes : ${response.body}');
         } else {
           listAlasan.value = [];
@@ -173,7 +225,7 @@ class SuratPeringatanController extends GetxController {
     final pdfColor = Colors.red;
 
     final int colorInt = pdfColor.value;
-    // final imageData = await rootBundle.load('assets/5_cuti.png');
+    final imageData = await rootBundle.load('assets/icon.png');
 
     pdf.addPage(
       pw.MultiPage(
@@ -194,13 +246,13 @@ class SuratPeringatanController extends GetxController {
                               .center, // Elemen berada di tengah horizontal
                           children: [
                             // Bagian gambar/logo
-                            // pw.SizedBox(
-                            //   width: 70, // Ukuran logo
-                            //   child: pw.Image(
-                            //     pw.MemoryImage(imageData.buffer.asUint8List()),
-                            //     width: 70, // Ukuran logo
-                            //   ),
-                            // ),
+                            pw.SizedBox(
+                              width: 70, // Ukuran logo
+                              child: pw.Image(
+                                pw.MemoryImage(imageData.buffer.asUint8List()),
+                                width: 70, // Ukuran logo
+                              ),
+                            ),
                             pw.SizedBox(
                                 width: 25), // Jarak antara logo dan teks
                             // Bagian teks
@@ -210,7 +262,7 @@ class SuratPeringatanController extends GetxController {
                               children: [
                                 // Judul
                                 pw.Text(
-                                  'PT. SINAR ARTA MULIA',
+                                  'PT . SHAN INFORMASI SISTEM',
                                   style: pw.TextStyle(
                                     fontSize:
                                         34, // Ukuran font sedikit lebih kecil
@@ -222,7 +274,7 @@ class SuratPeringatanController extends GetxController {
                                     height: 8), // Jarak antar elemen teks
                                 // Sub-judul
                                 pw.Text(
-                                  'MECHANICAL, ELECTRICAL, AND AIR CONDITIONING CONTRACTORS',
+                                  'BEST SOLUTION FOR BUSINESS CONTROL',
                                   style: pw.TextStyle(
                                     fontSize:
                                         11.5, // Ukuran font sedikit lebih kecil untuk sub-judul
@@ -233,26 +285,16 @@ class SuratPeringatanController extends GetxController {
                                 ),
                                 pw.SizedBox(height: 8),
                                 // Alamat
-                                pw.Text(
-                                  'Sedayu City Boulevard Raya Blok E No. 90 (SCBRE/090), RT.8/RW.5 Rawa Terate, Cakung, DKI Jakarta 13920',
-                                  style: pw.TextStyle(
-                                    fontSize:
-                                        8, // Ukuran font sedikit lebih kecil untuk alamat
-                                    color: PdfColor.fromInt(
-                                        Constanst.onPrimary.value),
-                                  ),
-                                ),
-                                pw.SizedBox(height: 8),
+                                // pw.Text(
+                                //   'Sedayu City Boulevard Raya Blok E No. 90 (SCBRE/090), RT.8/RW.5 Rawa Terate, Cakung, DKI Jakarta 13920',
+                                //   style: pw.TextStyle(
+                                //     fontSize:
+                                //         8, // Ukuran font sedikit lebih kecil untuk alamat
+                                //     color: PdfColor.fromInt(
+                                //         Constanst.onPrimary.value),
+                                //   ),
+                                // ),
                                 // Informasi kontakkkk
-                                pw.Text(
-                                  'Telp. (+62 21) 2984 8586, E-mail : sinarartamulia@yahoo.co.id, Website : sinarartamulia.com',
-                                  style: pw.TextStyle(
-                                    fontSize:
-                                        9.5, // Ukuran font sedikit lebih kecil untuk kontak
-                                    color: PdfColor.fromInt(
-                                        Constanst.onPrimary.value),
-                                  ),
-                                ),
                               ],
                             ),
                           ],
