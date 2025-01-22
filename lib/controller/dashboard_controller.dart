@@ -3557,7 +3557,7 @@ class DashboardController extends GetxController {
                             if (type == "checkTracking") {
                               print('kesini');
                               Get.back();
-                              await controllerAbsensi.deteksiFakeGps(context);
+                              // await controllerAbsensi.deteksiFakeGps(context);
                               if (controllerAbsensi.statusDeteksi.value ==
                                       false &&
                                   controllerAbsensi.statusDeteksi2.value ==

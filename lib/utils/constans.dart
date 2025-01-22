@@ -254,7 +254,7 @@ class Constanst {
 
   static String convertGetMonth(String date) {
     DateTime convert = DateTime.parse(date);
-    var outputDate = DateFormat('MM');
+    var outputDate = DateFormat('MMM');
     return outputDate.format(convert);
   }
 

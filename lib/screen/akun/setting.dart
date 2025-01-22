@@ -12,12 +12,15 @@ import 'package:new_version_plus/new_version_plus.dart';
 import 'package:siscom_operasional/controller/auth_controller.dart';
 import 'package:siscom_operasional/controller/dashboard_controller.dart';
 import 'package:siscom_operasional/controller/setting_controller.dart';
+import 'package:siscom_operasional/controller/surat_peringatan_controller.dart';
 import 'package:siscom_operasional/screen/absen/camera_view_location.dart';
 import 'package:siscom_operasional/screen/akun/change_log.dart';
 import 'package:siscom_operasional/screen/akun/edit_password.dart';
 import 'package:siscom_operasional/screen/akun/face_recognigration.dart';
 import 'package:siscom_operasional/screen/akun/info_karyawan.dart';
 import 'package:siscom_operasional/screen/akun/personal_info.dart';
+import 'package:siscom_operasional/screen/surat_peringatan.dart';
+import 'package:siscom_operasional/screen/teguran_lisan.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
@@ -38,6 +41,7 @@ class _SettingState extends State<Setting> {
   final controller = Get.put(SettingController());
   final controllerDashboard = Get.put(DashboardController());
   final authController = Get.put(AuthController());
+  final suratController = Get.put(SuratPeringatanController());
   var faceRecog = false;
   var namaVersi = "...".obs;
 
@@ -1209,6 +1213,179 @@ class _SettingState extends State<Setting> {
         //   ),
         // ),
         const SizedBox(height: 8),
+        InkWell(
+          onTap: () => Get.to(SuratPeringatan()),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 12.0),
+            child: Column(
+              children: [
+                Divider(
+                  height: 0,
+                  thickness: 1,
+                  color: Constanst.colorNeutralBgTertiary,
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Obx( () =>Stack(children: [
+                            Icon(
+                              Iconsax.warning_2,
+                              color: Constanst.fgSecondary,
+                              size: 24,
+                            ),
+                            Visibility(
+                              visible: suratController.jumlahNotifikasiBelumDibaca.value
+                                      .toString() !=
+                                  "0",
+                              child: Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 18,
+                                  width: 18,
+                                  decoration: BoxDecoration(
+                                    color: Constanst.colorStateDangerBg,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(100.0),
+                                    ),
+                                    border: Border.all(
+                                      width: 1.0,
+                                      color: Constanst.colorStateDangerBorder,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Obx(
+                                      () => Text(
+                                        "${suratController.jumlahNotifikasiBelumDibaca.value}"
+                                                    .length >
+                                                2
+                                            ? '${"${suratController.jumlahNotifikasiBelumDibaca.value}".substring(0, 2)}+'
+                                            : "${suratController.jumlahNotifikasiBelumDibaca.value}",
+                                        style: GoogleFonts.inter(
+                                          color: Constanst.colorStateOnDangerBg,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Text(
+                            "Surat Peringatan",
+                            style: GoogleFonts.inter(
+                                color: Constanst.fgPrimary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14),
+                          ),
+                        )
+                      ],
+                    ),
+                    Icon(Icons.arrow_forward_ios_rounded,
+                        size: 18, color: Constanst.fgSecondary)
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => Get.to(TeguranLisan()),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 12.0),
+            child: Column(
+              children: [
+                Divider(
+                  height: 0,
+                  thickness: 1,
+                  color: Constanst.colorNeutralBgTertiary,
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Obx( () =>Stack(children: [
+                            Icon(
+                              Iconsax.warning_2,
+                              color: Constanst.fgSecondary,
+                              size: 24,
+                            ),
+                            Visibility(
+                              visible: suratController.jumlahNotifikasiBelumDibaca.value
+                                      .toString() !=
+                                  "0",
+                              child: Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 18,
+                                  width: 18,
+                                  decoration: BoxDecoration(
+                                    color: Constanst.colorStateDangerBg,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(100.0),
+                                    ),
+                                    border: Border.all(
+                                      width: 1.0,
+                                      color: Constanst.colorStateDangerBorder,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Obx(
+                                      () => Text(
+                                        "${suratController.jumlahNotifikasiBelumDibaca.value}"
+                                                    .length >
+                                                2
+                                            ? '${"${suratController.jumlahNotifikasiBelumDibaca.value}".substring(0, 2)}+'
+                                            : "${suratController.jumlahNotifikasiBelumDibaca.value}",
+                                        style: GoogleFonts.inter(
+                                          color: Constanst.colorStateOnDangerBg,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Text(
+                            "Surat Teguran Lisan",
+                            style: GoogleFonts.inter(
+                                color: Constanst.fgPrimary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14),
+                          ),
+                        )
+                      ],
+                    ),
+                    Icon(Icons.arrow_forward_ios_rounded,
+                        size: 18, color: Constanst.fgSecondary)
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

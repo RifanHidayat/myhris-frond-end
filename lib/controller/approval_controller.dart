@@ -1287,13 +1287,14 @@ class ApprovalController extends GetxController {
       url_tujuan = 'edit-emp_claim';
     } else {
       url_tujuan = detailData[0]['type'] == 'Tugas Luar' ||
-              detailData[0]['type'] == 'Lembur' && detailData[0]['dinilai'] == 'N'
+              detailData[0]['type'] == 'Lembur' &&
+                  detailData[0]['dinilai'] == 'N'
           ? 'edit-emp_labor-approval'
-          :detailData[0]['type'] == 'Lembur' && detailData[0]['dinilai'] == 'Y'
-          ? 'edit-emp_labor-approval-task'
-          : detailData[0]['type'] == 'wfh'
-              ? 'wfh-approval'
-              : 'edit-emp_leave-approval';
+          : detailData[0]['type'] == 'Lembur' && detailData[0]['dinilai'] == 'Y'
+              ? 'edit-emp_labor-approval-task'
+              : detailData[0]['type'] == 'wfh'
+                  ? 'wfh-approval'
+                  : 'edit-emp_leave-approval';
     }
 
     if (valuePolaPersetujuan.value == "1") {
@@ -1454,12 +1455,11 @@ class ApprovalController extends GetxController {
           print('status pengajuan $statusPengajuan');
           insertNotifikasi(dataEditFinal, statusPengajuan, tanggalNow, dt,
               pilihan, namaAtasanApprove, url_tujuan, alasanRejectShow);
-        } else{
+        } else {
           print('gagal appproveeeee');
         }
       });
-    
-    } else if (url_tujuan == 'edit-emp_labor-approval') {
+    } else if (url_tujuan == 'edit-emp_labor-approval' || url_tujuan == 'edit-emp_labor-approval-task') {
       Map<String, dynamic> body = {
         'em_id': dataEditFinal[0]['em_id'],
         'dari_jam': dataEditFinal[0]['dari_jam'],
@@ -1489,7 +1489,7 @@ class ApprovalController extends GetxController {
         "approve2_status": apply2Status
       };
       print("body approval lembur ${body.toString()}");
-      var connect = Api.connectionApi("post", body, "edit-emp_labor-approval");
+      var connect = Api.connectionApi("post", body, url_tujuan);
       connect.then((dynamic res) {
         if (res.statusCode == 200) {
           print('response aproval lembur ${res.body}');
@@ -2201,7 +2201,7 @@ class ApprovalController extends GetxController {
     };
     if (url_tujuan == 'edit-emp_leave-approval') {
       body['em_id'] = dataEditFinal[0]['em_id'];
-    } else if (url_tujuan == 'edit-emp_labor-approval') {
+    } else if (url_tujuan == 'edit-emp_labor-approval' || url_tujuan == 'edit-emp_labor-approval-task') {
       body['em_id'] = dataEditFinal[0]['em_id'];
     } else if (url_tujuan == 'edit-emp_claim') {
       body['em_id'] = dataEditFinal[0]['em_id'];
