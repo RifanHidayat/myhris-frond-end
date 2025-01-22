@@ -146,6 +146,8 @@ class _RiwayatIzinState extends State<RiwayatIzin> {
                             )),
                       ),
                     )
+
+                    
                   : Text(
                       "Riwayat Izin",
                       style: GoogleFonts.inter(
@@ -353,7 +355,7 @@ class _RiwayatIzinState extends State<RiwayatIzin> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Constanst.colorPrimary,
         onPressed: () {
-          controller.changeTypeSelected(controller.selectedType.value);
+           controller.changeTypeSelected(controller.selectedType.value);
           Get.to(FormPengajuanIzin(
             dataForm: [[], false],
           ));
