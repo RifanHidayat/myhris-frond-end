@@ -1287,8 +1287,10 @@ class ApprovalController extends GetxController {
       url_tujuan = 'edit-emp_claim';
     } else {
       url_tujuan = detailData[0]['type'] == 'Tugas Luar' ||
-              detailData[0]['type'] == 'Lembur' && detailData[0]['dinilai'] == 'Y'
+              detailData[0]['type'] == 'Lembur' && detailData[0]['dinilai'] == 'N'
           ? 'edit-emp_labor-approval'
+          :detailData[0]['type'] == 'Lembur' && detailData[0]['dinilai'] == 'Y'
+          ? 'edit-emp_labor-approval-task'
           : detailData[0]['type'] == 'wfh'
               ? 'wfh-approval'
               : 'edit-emp_leave-approval';
