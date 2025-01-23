@@ -924,7 +924,11 @@ class _PesanState extends State<Pesan> {
                                                                             ? 'Persetujuan Absensi'
                                                                             : title == 'WFH'
                                                                                 ? 'Persetujuan WFH'
-                                                                                : 'Persetujuan Kasbon',
+                                                                                : title == 'Kasbon'
+                                                                                    ? 'Persetujuan Kasbon'
+                                                                                    : title == 'Surat Peringatan'
+                                                                                        ? 'Persetujuan Surat Peringatan'
+                                                                                        : 'Persetujuan Teguran Lisan',
                                             style: GoogleFonts.inter(
                                                 fontWeight: FontWeight.w500,
                                                 color: Constanst.fgPrimary,
@@ -1153,6 +1157,18 @@ class _PesanState extends State<Pesan> {
                                             controller.filterApproveHistory(
                                                 'Pengajuan Klaim'),
                                         child: Text("Pengajuan Klaim")),
+                                    PopupMenuItem(
+                                        value: "7",
+                                        onTap: () =>
+                                            controller.filterApproveHistory(
+                                                'Pengajuan Surat Peringatan'),
+                                        child: Text("Pengajuan Surat Peringatan")),
+                                    PopupMenuItem(
+                                        value: "8",
+                                        onTap: () =>
+                                            controller.filterApproveHistory(
+                                                'Pengajuan Teguran Lisan'),
+                                        child: Text("Pengajuan Teguran Lisan")),
                                   ],
                                 )),
                       )

@@ -806,28 +806,26 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
             }
           }
         } else {
-          // if (controller.detailData[0]['em_report_to'].contains(emId) && controller.detailData[0]['dinilai'] == 'N' || controller.detailData[0]['em_report2_to'].contains(emId) && controller.detailData[0]['dinilai'] == 'N') {
-          //   print('kodisi 5 terpenuhi');
-          //   controller.showButton.value = true;
-          // } else {
-          //   print('kodisi 5 gqgal');
-          //   controller.showButton.value = false;
-          // }
-          if (controller.detailData[0]['em_ids'].contains(emId)) {
-            print('kodisi 5 terpenuhi');
-            controller.showButton.value = true;
+          if (controller.detailData[0]['dinilai'] == 'Y') {
+            if (controller.detailData[0]['em_ids'].contains(emId)) {
+              print('kodisi 5 terpenuhi');
+              controller.showButton.value = true;
+            } else {
+              print('kodisi 5 gqgal');
+              controller.showButton.value = false;
+            }
           } else {
-            print('kodisi 5 gqgal');
-            controller.showButton.value = false;
+            if (controller.detailData[0]['em_report2_to'].contains(emId)) {
+              print('kodisi 4 terpnuhi');
+              controller.showButton.value = true;
+            } else {
+              print('kondisi 4 gagal');
+              controller.showButton.value = false;
+            }
           }
         }
       }
     }
-
-    print(
-        'ini 1 ${controller.showButton.value == true && (controller.detailData[0]['status'] == "Pending" || controller.detailData[0]['approve_status'] == "Pending")}');
-    print(
-        'ini 2 ${controller.showButton.value == true && controller.detailData[0]['approve2_status'] == "Pending" && controller.detailData[0]['approve_status'] == 'Approve'}');
     print('ini emId ${widget.emId}');
     print('ini emIds ${widget.emIds}');
     print('ini delegasi ${widget.delegasi}');
@@ -868,6 +866,12 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
     print('ini typeAjuan $typeAjuan');
     var em_id = controller.detailData[0]['em_id_pengaju'];
     var em_id_user = AppData.informasiUser![0].em_id;
+    var status = controller.detailData[0]['status'];
+    var approveStatus = controller.detailData[0]['approve_status'];
+    var diNilai = controller.detailData[0]['dinilai'];
+    var delegasi = controller.detailData[0]['delegasi'];
+    var emReport = controller.detailData[0]['em_report_to'];
+    var emReport2 = controller.detailData[0]['em_report2_to'];
     print('ini em id apa yak $em_id');
     return Scaffold(
       backgroundColor: Constanst.coloBackgroundScreen,
@@ -949,24 +953,9 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
               padding: const EdgeInsets.all(16.0),
               child: Obx(
                 () => controller.showButton.value == true &&
-                            (controller.detailData[0]['status'] == "Pending" ||
-                                controller.detailData[0]['approve_status'] ==
-                                    "Pending") ||
-                        (controller.detailData[0]['status'] == "Approve" &&
-                                controller.detailData[0]['dinilai'] == "N") &&
-                            (controller.detailData[0]['delegasi']
-                                    .toString()
-                                    .contains(em_id_user) ||
-                                controller.detailData[0]['em_report_to']
-                                    .toString()
-                                    .contains(em_id_user) ||
-                                controller.detailData[0]['em_report2_to']
-                                    .toString()
-                                    .contains(em_id_user))
-                    // controller.detailData[0]['approve2_status'] ==
-                    //           "Pending" &&
-                    //       controller.detailData[0]['approve_status'] !=
-                    //           "Rejected"
+                            (status == "Pending" || approveStatus == "Pending" && delegasi.toString().contains(em_id_user)) 
+                            || (approveStatus == "Approve" && diNilai == "N" && emReport2.toString().contains(em_id_user)) ||
+                            (approveStatus == "Pending" && diNilai == "N" && emReport.toString().contains(em_id_user) )
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -1587,7 +1576,10 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                       ),
                                     ),
 
-                              widget.dinilai == "Y"
+                              widget.dinilai == "Y" &&
+                                      controller.detailData[0]
+                                              ['approve_status'] !=
+                                          'Pending'
                                   ? SizedBox()
                                   : InkWell(
                                       onTap: () {

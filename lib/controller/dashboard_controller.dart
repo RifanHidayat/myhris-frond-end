@@ -2252,7 +2252,6 @@ class DashboardController extends GetxController {
 
   Future<void> checkperaturanPerusahaan(String getEmid) async {
     var connect = Api.connectionApi("get", {}, "peraturan-perusahaan-check");
-    Future.delayed(const Duration(milliseconds: 500));
     connect.then((dynamic res) {
       var valueBody = jsonDecode(res.body);
       if (res.statusCode == 200) {
