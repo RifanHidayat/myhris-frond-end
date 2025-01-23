@@ -91,8 +91,7 @@ class PesanController extends GetxController {
     "Kasbon"
   ];
 
-  var listStatusPengajuan=[{'name':"None",'value'='none'},{'name':"name",'value'='teguran_lisan'},{'name':"name",'value'='surat_peringatan'}];
-  var statusPemgajuanIzin='none';
+ 
 
   @override
   void onReady() async {

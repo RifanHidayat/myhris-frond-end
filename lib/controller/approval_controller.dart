@@ -16,6 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 class ApprovalController extends GetxController {
   var cari = TextEditingController().obs;
   var alasanReject = TextEditingController().obs;
+   
   var alasan1 = TextEditingController().obs;
   var alasan2 = TextEditingController().obs;
   var taskControllers = <TextEditingController>[].obs;
@@ -29,7 +30,11 @@ class ApprovalController extends GetxController {
   var loadingString = "Memuat Data...".obs;
 
   var statusCari = false.obs;
-
+  var listStatusPengajuan=[{'name':"None",'value':"none"},{'name':"Teguran Lisan",'value':"teguran_lisan"},{'name':"Surat Peringatan",'value':"surat_peringatan"}].obs;
+  var statusPemgajuanIzin=''.obs;
+  var konsekuemsiList=[].obs;
+  var statusPengajuan=false;
+   
   var totalPercent = 0.0.obs;
   var listTask = [].obs;
   var listNotModif = [].obs;
@@ -137,7 +142,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'cuti',
       'bulan': bulanSelected.value,
@@ -210,7 +215,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'lembur',
       'bulan': bulanSelected.value,
@@ -283,7 +288,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'lembur',
       'bulan': bulanSelected.value,
@@ -348,7 +353,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'absensi',
       'bulan': bulanSelected.value,
@@ -436,7 +441,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'wfh',
       'bulan': bulanSelected.value,
@@ -518,7 +523,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'kasbon',
       'bulan': bulanSelected.value,
@@ -605,7 +610,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'tidak_hadir',
       'bulan': bulanSelected.value,
@@ -679,7 +684,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'tugas_luar',
       'bulan': bulanSelected.value,
@@ -748,7 +753,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'dinas_luar',
       'bulan': bulanSelected.value,
@@ -818,7 +823,7 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmCode,
       'name_data': 'klaim',
       'bulan': bulanSelected.value,
@@ -912,7 +917,7 @@ class ApprovalController extends GetxController {
 
   void infoDelegasi(delegasi) {
     print("info delegasi");
-    Map<String, dynamic> body = {
+    var  body = {
       'val': 'em_id',
       'cari': delegasi,
     };
@@ -929,7 +934,7 @@ class ApprovalController extends GetxController {
   void infoTask(emPengaju) {
     listTask.clear();
     taskControllers.clear();
-    Map<String, dynamic> body = {'nomor_ajuan': emPengaju};
+    var  body = {'nomor_ajuan': emPengaju};
     var connect = Api.connectionApi("post", body, "lembur/detail");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
@@ -964,7 +969,7 @@ class ApprovalController extends GetxController {
     print("info delegasi");
     fullNameApprove2.clear();
     for (var emId in listEmId) {
-      Map<String, dynamic> body = {
+      var  body = {
         'val': 'em_id',
         'cari': emId,
       };
@@ -1003,7 +1008,7 @@ class ApprovalController extends GetxController {
 
   void loadCutiPengaju(emId) {
     print("load cuti pengajuan");
-    Map<String, dynamic> body = {
+    var  body = {
       'val': 'em_id',
       'cari': emId,
     };
@@ -1269,13 +1274,39 @@ class ApprovalController extends GetxController {
   }
 
   void aksiMenyetujui(pilihan) {
-    print("object ${detailData[0]['type']}");
+        print("object ${detailData[0]['type']}");
     List dataEditFinal = [];
     for (var element in listNotModif.value) {
       if (element['id'] == detailData[0]['id']) {
         dataEditFinal.add(element);
       }
     }
+    // var listKonsekuensi=[];
+    // var statusPengajuannew='';
+    // if (detailData[0]['type']=='Cuti' || detailData[0]['type']=="Izin" || detailData[0]['type']=="Sakit"){
+    //   if (valuePolaPersetujuan.value=='1' || valuePolaPersetujuan.value==1){ 
+    //     statusPengajuannew=statusPemgajuanIzin.value;
+    //     konsekuemsiList.forEach((item){
+    //       listKonsekuensi.add(item.text);
+
+    //     });
+    
+    
+    //   }else if(valuePolaPersetujuan.value=='2' || valuePolaPersetujuan.value==2) {
+
+    //     if (dataEditFinal[0]['leave_status']=='Pending' || dataEditFinal[0]['leave_status']=='Approve1' || dataEditFinal[0]['leave_status']=='Approve 1'){
+
+    //     }else{
+
+    //     }
+
+
+
+
+    //   }
+    // }
+    
+
     var dt = DateTime.now();
     var dateString = "${dt.day}-${dt.month}-${dt.year}";
     var tanggalNow = Constanst.convertDateSimpan(dateString);
@@ -1349,6 +1380,7 @@ class ApprovalController extends GetxController {
           applyBy2 = "";
           applyId2 = "";
           apply2Status = "Pending";
+          
         } else if (dataEditFinal[0]['leave_status'] == "Approve") {
           // print("tes wfh ${tanggalNow}");
           statusPengajuan = pilihan == true ? 'Approve2' : 'Rejected';
@@ -1404,7 +1436,7 @@ class ApprovalController extends GetxController {
         : "";
     if (url_tujuan == 'edit-emp_leave-approval') {
       // emp_leave
-      Map<String, dynamic> body = {
+    var  body = {
         'em_id': dataEditFinal[0]['em_id'],
         'typeid': dataEditFinal[0]['typeid'],
         'leave_type': dataEditFinal[0]['leave_type'],
@@ -1431,9 +1463,14 @@ class ApprovalController extends GetxController {
         'activity_name':
             "$statusPengajuan Pengajuan ${detailData[0]['type']} pada tanggal $tanggalNow. Pengajuan atas nama ${detailData[0]['nama_pengaju']} $alasanRejectShow",
         'apply_status': applyStatus,
-        'apply2_status': apply2Status
+        'apply2_status': apply2Status,
+        // 'status_pengajuan':statusPengajuan,
+        // 'konsekuensi':listKonsekuensi,
+      
       };
-      print("body approval $body");
+
+      print("body new ${body}");
+   
       var connect = Api.connectionApi("post", body, "edit-emp_leave-approval");
       connect.then((dynamic res) {
         print('kesini gak sih lu');
@@ -1460,7 +1497,7 @@ class ApprovalController extends GetxController {
         }
       });
     } else if (url_tujuan == 'edit-emp_labor-approval' || url_tujuan == 'edit-emp_labor-approval-task') {
-      Map<String, dynamic> body = {
+      var  body = {
         'em_id': dataEditFinal[0]['em_id'],
         'dari_jam': dataEditFinal[0]['dari_jam'],
         'sampai_jam': dataEditFinal[0]['sampai_jam'],
@@ -1501,7 +1538,7 @@ class ApprovalController extends GetxController {
         }
       });
     } else if (url_tujuan == 'edit-emp_claim') {
-      Map<String, dynamic> body = {
+      var  body = {
         'status': statusPengajuan,
         'atten_date': detailData[0]['waktu_pengajuan'],
         'approve_date': applyDate1,
@@ -1537,7 +1574,7 @@ class ApprovalController extends GetxController {
       });
     } else if (url_tujuan == 'wfh-approval') {
       print('tes print');
-      Map<String, dynamic> body = {
+      var  body = {
         'em_id': dataEditFinal[0]['em_id'],
         'dari_jam': dataEditFinal[0]['dari_jam'],
         'sampai_jam': dataEditFinal[0]['sampai_jam'],
@@ -1721,7 +1758,7 @@ class ApprovalController extends GetxController {
     //     : "";
     // if (url_tujuan == 'edit-emp_leave') {
     // emp_leave
-    Map<String, dynamic> body = {
+    var  body = {
       'nomor_ajuan': detailData[0]['nomor_ajuan'].toString(),
       'em_id': AppData.informasiUser![0].em_id,
       'tanggal': formatDate(detailData[0]['tanggal_ajuan'].toString()),
@@ -1764,7 +1801,7 @@ class ApprovalController extends GetxController {
     // });
     // }
     // else if (url_tujuan == 'edit-emp_labor') {
-    //   Map<String, dynamic> body = {
+    //   var  body = {
     //     'em_id': dataEditFinal[0]['em_id'],
     //     'dari_jam': dataEditFinal[0]['dari_jam'],
     //     'sampai_jam': dataEditFinal[0]['sampai_jam'],
@@ -1799,7 +1836,7 @@ class ApprovalController extends GetxController {
     //     }
     //   });
     // } else if (url_tujuan == 'edit-emp_claim') {
-    //   Map<String, dynamic> body = {
+    //   var  body = {
     //     'status': statusPengajuan,
     //     'atten_date': detailData[0]['waktu_pengajuan'],
     //     'approve_date': applyDate1,
@@ -1835,7 +1872,7 @@ class ApprovalController extends GetxController {
     //   });
     // } else if (url_tujuan == 'wfh-approval') {
     //   print('tes print');
-    //   Map<String, dynamic> body = {
+    //   var  body = {
     //     'em_id': dataEditFinal[0]['em_id'],
     //     'dari_jam': dataEditFinal[0]['dari_jam'],
     //     'sampai_jam': dataEditFinal[0]['sampai_jam'],
@@ -1875,12 +1912,13 @@ class ApprovalController extends GetxController {
 
   void validasiPemakaianCuti(dataEditFinal) {
     print("validaasi pemakaian cuti");
-    Map<String, dynamic> body = {
+    var  body = {
       'val': 'name',
       'cari': dataEditFinal[0]['nama_tipe']
     };
     var connect = Api.connectionApi("post", body, "whereOnce-leave_types");
     connect.then((dynamic res) {
+      UtilsAlert.showToast("tes");
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         var statusPemotongan = valueBody['data'][0]['cut_leave'];
@@ -1892,7 +1930,7 @@ class ApprovalController extends GetxController {
   }
 
   insertAbsensiUserAfterApprove(dataEditFinal) {
-    Map<String, dynamic> body = {
+    var  body = {
       'dataAbsen': dataEditFinal,
     };
     var connect =
@@ -1912,7 +1950,7 @@ class ApprovalController extends GetxController {
   Future<bool>? arppovalpayroll({id}) {
     UtilsAlert.showLoadingIndicator(Get.context!);
     var emId = AppData.informasiUser![0].em_id;
-    Map<String, dynamic> body = {
+    var  body = {
       'id': id,
       'em_id': emId,
       'date': DateFormat('yyyy-MM-dd').format(DateTime.now()).toString()
@@ -2077,7 +2115,7 @@ class ApprovalController extends GetxController {
         ? ", Alasan pengajuan di tolak = ${alasanReject.value.text}"
         : "";
 
-    Map<String, dynamic> body = {
+    var  body = {
       'id': id.toString(),
       'em_id': ajuanEmid.toString(),
       'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(date)).toString(),
@@ -2146,7 +2184,7 @@ class ApprovalController extends GetxController {
 
   void cariEmployee(dataEditFinal) {
     print("cari employee");
-    Map<String, dynamic> body = {
+    var  body = {
       'val': 'full_name',
       'cari': dataEditFinal[0]['full_name']
     };
@@ -2161,7 +2199,7 @@ class ApprovalController extends GetxController {
   }
 
   void potongCuti(dataEditFinal, getEmidEmployee) {
-    Map<String, dynamic> body = {
+    var  body = {
       'em_id': getEmidEmployee,
       'terpakai': dataEditFinal[0]['leave_duration'],
     };
@@ -2190,7 +2228,7 @@ class ApprovalController extends GetxController {
     var title = "Pengajuan ${detailData[0]['type']} telah di $statusPengajuan";
     var stringDeskripsi =
         "Pengajuan ${detailData[0]['type']} kamu telah di $statusPengajuan oleh $namaAtasanApprove $alasanRejectShow";
-    Map<String, dynamic> body = {
+    var  body = {
       'title': title,
       'deskripsi': stringDeskripsi,
       'url': url_notifikasi,
@@ -2240,7 +2278,7 @@ class ApprovalController extends GetxController {
     var title = "Pengajuan ${detailData[0]['type']} telah di $statusPengajuan";
     var stringDeskripsi =
         "Pengajuan ${detailData[0]['type']} kamu telah di $statusPengajuan oleh $namaAtasanApprove $alasanRejectShow";
-    Map<String, dynamic> body = {
+    var  body = {
       'title': title,
       'deskripsi': stringDeskripsi,
       'url': url_notifikasi,

@@ -19,7 +19,7 @@ class AppData {
       LocalStorage.saveToDisk('selectBranch', value);
 // static set  periode(String value) =>
 //       LocalStorage.saveToDisk('periode', value);
-P
+
   static set statusAbsen(bool value) =>
       LocalStorage.saveToDisk('statusAbsen', value);
   static set kodeVerifikasi(String value) =>
