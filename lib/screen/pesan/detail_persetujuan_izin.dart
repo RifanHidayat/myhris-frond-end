@@ -31,6 +31,135 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
   var controllerGlobal = Get.put(GlobalController());
   int hours = 0, minutes = 0, second = 0;
 
+
+    void showBottomApproval(em_id) {
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Iconsax.tick_circle,
+                        color: Colors.green,
+                        size: 24,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 8, top: 2),
+                        child: Text(
+                          "Menyetujui",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+
+
+                  Container(
+                  ch
+                  )
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: Constanst.borderStyle1,
+                        border: Border.all(
+                            width: 1.0,
+                            color: const Color.fromARGB(255, 211, 205, 205))),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: 8,
+                          bottom: MediaQuery.of(context).viewInsets.bottom),
+                      child: TextField(
+                        cursorColor: Colors.black,
+                        controller: controller.alasanReject.value,
+                        maxLines: null,
+                        maxLength: 225,
+                        autofocus: true,
+                        decoration: new InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Pelanggaran yang di lakukan"),
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.done,
+                        style: const TextStyle(
+                            fontSize: 12.0, height: 2.0, color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                          child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextButtonWidget(
+                          title: "Kembali",
+                          onTap: () => Navigator.pop(Get.context!),
+                          colorButton: Colors.red,
+                          colortext: Colors.white,
+                          border: BorderRadius.circular(8.0),
+                        ),
+                      )),
+                      Expanded(
+                          child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextButtonWidget(
+                          title: "Tolak",
+                          onTap: () {
+                            if (controller.alasanReject.value.text != "") {
+                              Navigator.pop(Get.context!);
+                              validasiMenyetujui(false, em_id);
+                              
+                            } else {
+                              UtilsAlert.showToast(
+                                  "Harap isi alasan terlebih dahulu");
+                            }
+                          },
+                          colorButton: Constanst.colorPrimary,
+                          colortext: Colors.white,
+                          border: BorderRadius.circular(8.0),
+                        ),
+                      ))
+                    ],
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 30,
+            )
+          ],
+        );
+      },
+    );
+  }
+
   void showBottomAlasanReject(em_id) {
     showModalBottomSheet(
       context: Get.context!,
@@ -444,7 +573,28 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
                             height: 40,
                             child: ElevatedButton(
                               onPressed: () {
+
+
+                                if ( (controller.valuePolaPersetujuan == 2 ||
+                                  controller.valuePolaPersetujuan == "2") && typeAjuan =='Approve 1' ){
+                                    showBottomApproval(em_id) ;
+
+                                    return;
+
+                                
+
+                                  }
+                                   if ( (controller.valuePolaPersetujuan == 1 ||
+                                  controller.valuePolaPersetujuan == "1") && typeAjuan =='Pending' ){
+                                    showBottomApproval(em_id) ;
+
+                                    return;
+
+                                
+
+                                  }
                                 validasiMenyetujui(true, em_id);
+
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Constanst.colorWhite,
