@@ -548,15 +548,15 @@ class GlobalController extends GetxController {
     };
     print("body notifikasi ${emIdApproval2}");
     try {
-      var connect =
-          Api.connectionApi("post", body, "push_notification_approval");
-      connect.then((dynamic res) {
-        if (res.statusCode == 200) {
-          // print()
-          var valueBody = jsonDecode(res.body);
-          print("response notif ${valueBody.toString()}");
-        }
-      });
+      // var connect =
+      //     Api.connectionApi("post", body, "push_notification_approval");
+      // connect.then((dynamic res) {
+      //   if (res.statusCode == 200) {
+      //     // print()
+      //     var valueBody = jsonDecode(res.body);
+      //     print("response notif ${valueBody.toString()}");
+      //   }
+      // });
     } catch (e) {
       print("errpr ${e}");
     }

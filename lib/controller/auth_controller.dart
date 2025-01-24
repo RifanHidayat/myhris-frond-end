@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 // import 'package:background_location_tracker/background_location_tracker.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 // import 'package:flutter_background_service/flutter_background_service.dart';

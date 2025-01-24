@@ -98,6 +98,8 @@ class PesanController extends GetxController {
     "Teguran Lisan"
   ];
 
+ 
+
   @override
   void onReady() async {
     getTimeNow();

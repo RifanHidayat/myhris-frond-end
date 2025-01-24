@@ -53,7 +53,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html/parser.dart' as htmlParser;
 import 'package:html/dom.dart' as dom;
-import 'package:upgrader/upgrader.dart';
+// import 'package:upgrader/upgrader.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'chatting/history.dart';
@@ -148,8 +148,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return UpgradeAlert(
-      child: Scaffold(
+    return  Scaffold(
         backgroundColor: Constanst.coloBackgroundScreen,
         floatingActionButton: _isVisible == true
             ? Container()
@@ -851,7 +850,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
           ),
         ),
-      ),
+     
     );
   }
 
