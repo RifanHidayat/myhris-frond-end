@@ -19,7 +19,11 @@ class Api {
           .encode('aplikasioperasionalsiscom:siscom@ptshaninformasi#2022@'));
 
   // API PROD
+
+  // static var basicUrl = "http://mobilehris.siscom.id:3009/";
+
    //static var basicUrl = "http://mobilehris.siscom.id:3009/";
+
 
   // API DEV
      static var basicUrl = "http://kantor.membersis.com:2627/";

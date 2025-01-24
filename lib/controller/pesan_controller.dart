@@ -16,6 +16,7 @@ import 'package:siscom_operasional/screen/pesan/detail_persetujuan_kasbon.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_klaim.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_lembur.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_payroll.dart';
+import 'package:siscom_operasional/screen/pesan/detail_persetujuan_surat_peringatan.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_wfh.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_absensi.dart';
@@ -26,6 +27,8 @@ import 'package:siscom_operasional/screen/pesan/persetujuan_kasbon.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_klaim.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_lembur.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_payroll.dart';
+import 'package:siscom_operasional/screen/pesan/persetujuan_surat_peringatan.dart';
+import 'package:siscom_operasional/screen/pesan/persetujuan_teguran_lisan.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_wfh.dart';
 import 'package:siscom_operasional/utils/api.dart';
@@ -58,6 +61,8 @@ class PesanController extends GetxController {
   var jumlahApprovePayroll = 0.obs;
   var jumlahApproveWfh = 0.obs;
   var jumlahApproveKasbon = 0.obs;
+  var jumlahApproveSuratPeringatan = 0.obs;
+  var jumlahApproveTeguranLIsan = 0.obs;
   var jumlahNotifikasiBelumDibaca = 0.obs;
   var jumlahCheckin = 0.obs;
 
@@ -88,7 +93,9 @@ class PesanController extends GetxController {
     "Payroll",
     "Absensi",
     "WFH",
-    "Kasbon"
+    "Kasbon",
+    "Surat Peringatan",
+    "Teguran Lisan"
   ];
 
  
@@ -165,6 +172,9 @@ class PesanController extends GetxController {
           jumlahCheckin.value = valueBody['jumlah_checkin'];
           jumlahApproveWfh.value = valueBody['jumlah_wfh'];
           jumlahApproveKasbon.value = valueBody['jumlah_kasbon'];
+          jumlahApproveSuratPeringatan.value =
+              valueBody['jumlah_surat_peringatan'];
+           jumlahApproveTeguranLIsan.value = valueBody['jumlah_teguran_lisan']; 
 
           jumlahPersetujuan.value = jumlahApproveCuti.value +
               jumlahApproveLembur.value +
@@ -174,7 +184,9 @@ class PesanController extends GetxController {
               jumlahApproveKlaim.value +
               jumlahCheckin.value +
               jumlahApproveWfh.value +
-              jumlahApproveKasbon.value;
+              jumlahApproveKasbon.value +
+              jumlahApproveSuratPeringatan.value;
+              jumlahApproveTeguranLIsan.value;
 
           this.jumlahApproveCuti.refresh();
           this.jumlahApproveLembur.refresh();
@@ -186,6 +198,8 @@ class PesanController extends GetxController {
           this.jumlahCheckin.refresh();
           this.jumlahApproveWfh.refresh();
           this.jumlahApproveKasbon.refresh();
+          this.jumlahApproveSuratPeringatan.refresh();
+          this.jumlahApproveTeguranLIsan.refresh();
           jumlahApprovePayroll.refresh();
 
           print("Jumlah Approval payroll ${jumlahApprovePayroll}");
@@ -605,6 +619,22 @@ class PesanController extends GetxController {
 
         dataScreenPersetujuan.value.add(data);
         this.dataScreenPersetujuan.refresh();
+      } else if (element == "Surat Peringatan") {
+        var data = {
+          'title': element,
+          'jumlah_approve': "${jumlahApproveSuratPeringatan.value}",
+        };
+
+        dataScreenPersetujuan.value.add(data);
+        this.dataScreenPersetujuan.refresh();
+      } else if (element == "Teguran Lisan") {
+        var data = {
+          'title': element,
+          'jumlah_approve': "${jumlahApproveTeguranLIsan.value}",
+        };
+
+        dataScreenPersetujuan.value.add(data);
+        this.dataScreenPersetujuan.refresh();
       }
     }
     statusScreenInfoApproval.value = false;
@@ -681,15 +711,39 @@ class PesanController extends GetxController {
                                                     tahunSelectedSearchHistory
                                                         .value,
                                               ))
-                                            : Get.to(Approval(
-                                                title: index['title'],
-                                                bulan:
-                                                    bulanSelectedSearchHistory
-                                                        .value,
-                                                tahun:
-                                                    tahunSelectedSearchHistory
-                                                        .value,
-                                              ));
+                                            : index['title'] ==
+                                                    "Surat Peringatan"
+                                                ? Get.to(
+                                                    PersetujuanSuratPeringatan(
+                                                    title: index['title'],
+                                                    bulan:
+                                                        bulanSelectedSearchHistory
+                                                            .value,
+                                                    tahun:
+                                                        tahunSelectedSearchHistory
+                                                            .value,
+                                                  ))
+                                                : index['title'] ==
+                                                        "Teguran Lisan"
+                                                    ? Get.to(
+                                                        PersetujuanTeguranLisan(
+                                                        title: index['title'],
+                                                        bulan:
+                                                            bulanSelectedSearchHistory
+                                                                .value,
+                                                        tahun:
+                                                            tahunSelectedSearchHistory
+                                                                .value,
+                                                      ))
+                                                    : Get.to(Approval(
+                                                        title: index['title'],
+                                                        bulan:
+                                                            bulanSelectedSearchHistory
+                                                                .value,
+                                                        tahun:
+                                                            tahunSelectedSearchHistory
+                                                                .value,
+                                                      ));
     // }
   }
 
@@ -835,7 +889,30 @@ class PesanController extends GetxController {
             delegasi: delegasi),
         idx,
       );
-    } else {}
+    } else if (title == "Approval Surat Peringatan" ||
+        url == 'Surat Peringatan') {
+      loadAndNavigate(
+        'Surat Peringatan',
+        () => DetailPersetujuanSuratPeringatan(
+            emId: emIdPengaju,
+            title: 'Surat Peringatan',
+            idxDetail: idx,
+            delegasi: delegasi),
+        idx,
+      );
+    } else if (title == "Approval Teguran Lisan" ||
+        url == 'Teguran Lisan') {
+      loadAndNavigate(
+        'Teguran Lisan',
+        () => DetailPersetujuanSuratPeringatan(
+            emId: emIdPengaju,
+            title: 'Teguran Lisan',
+            idxDetail: idx,
+            delegasi: delegasi),
+        idx,
+      );
+        }
+    else {}
   }
 
   // void routeApprovalNotifFCm({

@@ -97,13 +97,13 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                           Get.to(() => SuratPeringatanDetail(
                                 sp: list.sp,
                                 nama: list.nama,
-                                posisi: list.posisi,
-                                nomor: list.nomor_surat,
-                                hal: list.hal,
-                                tglSrt: list.tgl_surat,
+                                posisi: list.posisi.toString(),
+                                nomor: list.nomor_surat.toString(),
+                                hal: list.hal.toString(),
+                                tglSrt: list.tgl_surat.toString(),
                                 pelanggaran: list.title.toString(),
-                                alasan: list.alasan,
-                                diterbitkan: list.diterbitkan_oleh,
+                                alasan: list.alasan.toString(),
+                                diterbitkan: list.diterbitkan_oleh.toString(),
                               ));
                         },
                       );

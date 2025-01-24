@@ -94,6 +94,7 @@ class _DashboardState extends State<Dashboard> {
     controller.checkperaturanPerusahaan(emId);
     // setState(() {
     Future.wait([
+      controller.checkperaturanPerusahaan(emId),
       controller.updateInformasiUser(),
       controller.showDialogHistoryTerlambat(),
       controllerBpj.employeDetaiBpjs(),
@@ -916,7 +917,7 @@ class _DashboardState extends State<Dashboard> {
                       ? Column(
                           children: [
                             Text(
-                              AppData.informasiUser![0].branchName.toString(),
+                              AppData.informasiUser![0].branchName,
                               style: GoogleFonts.inter(
                                   color: Constanst.fgSecondary,
                                   fontSize: 12,
@@ -1333,7 +1334,8 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                                 ),
                                 onTap: () {
-                                  print('ini sisa kontrak ${AppData.informasiUser![0].sisaKontrak}');
+                                  print(
+                                      'ini sisa kontrak ${AppData.informasiUser![0].sisaKontrak}');
                                   if (AppData.informasiUser![0].sisaKontrak
                                               .toString() ==
                                           'null' ||
@@ -1879,7 +1881,7 @@ class _DashboardState extends State<Dashboard> {
                                       controllerAbsensi.titleAbsen.value =
                                           "Absen Keluar";
                                       controllerAbsensi.typeAbsen.value = 2;
-                                      String timeOutValue = 
+                                      String timeOutValue =
                                           controller.timeOut.value;
 
                                       try {
@@ -1919,7 +1921,8 @@ class _DashboardState extends State<Dashboard> {
                                                         Curves.easeOutCubic),
                                                 child: CustomDialog(
                                                   title: "Peringatan",
-                                                  content: "Anda yakin ingin pulang lebih cepat?",
+                                                  content:
+                                                      "Anda yakin ingin pulang lebih cepat?",
                                                   positiveBtnText: "Yah",
                                                   negativeBtnText: "Kembali",
                                                   style: 1,
@@ -3526,7 +3529,6 @@ class _DashboardState extends State<Dashboard> {
     absenControllre.getPlaceCoordinate();
     controllerPesan.getTimeNow();
     var emId = AppData.informasiUser![0].em_id.toString();
-
     controller.checkperaturanPerusahaan(emId);
 
     controller.initData();

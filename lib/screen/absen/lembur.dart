@@ -844,10 +844,18 @@ class _LemburState extends State<Lembur> {
                     : controller.listLembur.value[index]['status'];
           }
           var namaTypeAjuan = controller.listLembur.value[index]['type'];
-          var alasan1 = controller.listLembur.value[index]['alasan1'];
+          var alasan;
+          if (controller.listLembur.value[index]['alasan2'] == "" ||
+              controller.listLembur.value[index]['alasan2'] == "null" ||
+              controller.listLembur.value[index]['alasan2'] == null) {
+            alasan = controller.listLembur.value[index]['alasan1'];
+          } else {
+            alasan = controller.listLembur.value[index]['alasan2'];
+          }
           var approveDate = controller.listLembur.value[index]['approve_date'];
           var uraian = controller.listLembur.value[index]['uraian'];
           var approve;
+          print( 'ini approve2 by oke${controller.listLembur.value[index]['approve2_by']}');
           if (controller.listLembur.value[index]['approve2_by'] == "" ||
               controller.listLembur.value[index]['approve2_by'] == "null" ||
               controller.listLembur.value[index]['approve2_by'] == null) {
@@ -868,7 +876,7 @@ class _LemburState extends State<Lembur> {
                       borderRadius: BorderRadius.all(Radius.circular(8))),
                   onTap: (){
                     controller.showDetailLembur(
-                      controller.listLembur[index], approve, alasan1);
+                      controller.listLembur[index], approve, alasan);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(
@@ -1012,7 +1020,7 @@ class _LemburState extends State<Lembur> {
                                             ),
                                         const SizedBox(height: 6),
                                         Text(
-                                          alasan1.toString(),
+                                          alasan.toString(),
                                           style: GoogleFonts.inter(
                                               fontWeight: FontWeight.w400,
                                               color: Constanst.fgSecondary,
@@ -1050,7 +1058,7 @@ class _LemburState extends State<Lembur> {
                                                   ),
                                             const SizedBox(height: 6),
                                             Text(
-                                              alasan1.toString(),
+                                              alasan.toString(),
                                               style: GoogleFonts.inter(
                                                   fontWeight: FontWeight.w400,
                                                   color: Constanst.fgSecondary,
