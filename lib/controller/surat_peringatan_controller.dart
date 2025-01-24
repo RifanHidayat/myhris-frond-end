@@ -11,13 +11,14 @@ import 'package:open_file_plus/open_file_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:siscom_operasional/model/surat_peringatan_model.dart';
+import 'package:siscom_operasional/model/teguran_lisan_model.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:siscom_operasional/utils/constans.dart';
 
 class SuratPeringatanController extends GetxController {
   var peringatanlist = <Peringatan>[].obs;
-  var teguranList = [].obs;
+  var teguranList = <TeguranLisanModel>[].obs;
   var isLoading = true.obs;
   var isLoadingAlasan = true.obs;
   var listAlasan = [].obs;
@@ -163,11 +164,11 @@ class SuratPeringatanController extends GetxController {
       (dynamic response) {
         if (response.statusCode == 200) {
           List data = jsonDecode(response.body)['data'];
-          teguranList.value = Peringatan.fromJsonToList(data);
+          teguranList.value = TeguranLisanModel.fromJsonToList(data);
           isLoading.value = false;
-          print('ini peringatanlist $data');
+          print('ini Teguran Lisan $data');
         } else {
-          print('gagal dapet surat peringatan ${response.code}');
+          print('gagal dapet Teguran Lisan ${response.code}');
         }
       },
     );

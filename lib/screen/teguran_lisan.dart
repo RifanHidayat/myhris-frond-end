@@ -36,7 +36,7 @@ class _TeguranLisanState extends State<TeguranLisan> {
   @override
   Widget build(BuildContext context) {
     print(
-        'ini surat peringatan lenght : ${controller.peringatanlist.value.length}');
+        'ini surat peringatan lenght : ${controller.teguranList.value.length}');
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

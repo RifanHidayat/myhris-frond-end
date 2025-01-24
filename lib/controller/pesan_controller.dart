@@ -28,6 +28,7 @@ import 'package:siscom_operasional/screen/pesan/persetujuan_klaim.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_lembur.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_payroll.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_surat_peringatan.dart';
+import 'package:siscom_operasional/screen/pesan/persetujuan_teguran_lisan.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_wfh.dart';
 import 'package:siscom_operasional/utils/api.dart';
@@ -627,7 +628,7 @@ class PesanController extends GetxController {
       } else if (element == "Teguran Lisan") {
         var data = {
           'title': element,
-          'jumlah_approve': "${jumlahApproveKasbon.value}",
+          'jumlah_approve': "${jumlahApproveTeguranLIsan.value}",
         };
 
         dataScreenPersetujuan.value.add(data);
@@ -723,7 +724,7 @@ class PesanController extends GetxController {
                                                 : index['title'] ==
                                                         "Teguran Lisan"
                                                     ? Get.to(
-                                                        PersetujuanSuratPeringatan(
+                                                        PersetujuanTeguranLisan(
                                                         title: index['title'],
                                                         bulan:
                                                             bulanSelectedSearchHistory

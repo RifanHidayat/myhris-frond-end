@@ -8,6 +8,8 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:siscom_operasional/controller/approval_controller.dart';
 import 'package:siscom_operasional/controller/pesan_controller.dart';
+import 'package:siscom_operasional/controller/surat_peringatan_controller.dart';
+import 'package:siscom_operasional/screen/pesan/detail_persetujuan_teguran_lisan.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
@@ -23,6 +25,7 @@ class PersetujuanTeguranLisan extends StatefulWidget {
 class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
     with SingleTickerProviderStateMixin {
   var controller = Get.put(ApprovalController());
+  var controllerSp = Get.put(SuratPeringatanController());
 
   @override
   void initState() {
@@ -261,6 +264,9 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
 
   
   Widget listDataApproval() {
+    if (controller.listData.value.isEmpty) {
+      controller.loadingString.value = 'tidak ada pengajuan';
+    }
     controller.listData.value.sort((a, b){
       DateTime dateA = DateTime.parse(a['tanggal_ajuan']);
       DateTime dateB = DateTime.parse(b['tanggal_ajuan']);
@@ -304,7 +310,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                   onTap: () {
-                    Get.to(DetailPersetujuanSuratPeringatan(
+                    Get.to(DetailPersetujuanTeguranLisan(
                       emId: emIdPengaju,
                       title: typeAjuan,
                       idxDetail: "$idx",
@@ -482,15 +488,13 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
 
   Widget _approval(index) {
     var data = controller.listData[index];
-    var namaApprove1 = controller.listData.value[index]['approve_by'] ?? "";
-    var namaApprove2 = controller.listData.value[index]['nama_approve2'] ?? "";
+    var approveId = data['approve_id'];
+    var fullName = controllerSp.infoIds(approveId);
     var leave_status = controller.listData.value[index]['approve_status'] ?? "";
 
     if (leave_status == "Rejected") {
       return Container(
-        child: namaApprove1 == ""
-            ? const SizedBox()
-            : Row(
+        child: Row(
                 children: [
                   Icon(
                     Iconsax.close_circle,
@@ -500,7 +504,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
                     width: 8,
                   ),
                   Text(
-                    "rejected by  - $namaApprove1",
+                    "Rejected by  - ${approveId}",
                     style: GoogleFonts.inter(
                         fontWeight: FontWeight.w500,
                         color: Constanst.fgPrimary,
@@ -537,7 +541,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
 
     if (controller.valuePolaPersetujuan.value.toString() == "1") {
       return Container(
-        child: namaApprove1 == ""
+        child: approveId == ""
             ? const SizedBox()
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -550,7 +554,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
                     width: 8,
                   ),
                   Text(
-                    "Approved by  - $namaApprove1",
+                    "Approved by  - ${approveId}",
                     style: GoogleFonts.inter(
                         fontWeight: FontWeight.w500,
                         color: Constanst.fgPrimary,
@@ -563,10 +567,10 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
 
     if (leave_status == "Rejected") {
       return Container(
-        child: namaApprove1 == ""
+        child: approveId == ""
             ? const SizedBox()
             : Text(
-                "Rejected by  - $namaApprove1",
+                "Rejected by  - ${approveId}",
                 style: GoogleFonts.inter(
                     fontWeight: FontWeight.w500,
                     color: Constanst.fgPrimary,
@@ -577,7 +581,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
 
     if (leave_status == "Approve2") {
       return Container(
-        child: namaApprove1 == ""
+        child: approveId == ""
             ? const SizedBox()
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -590,7 +594,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
                     width: 8,
                   ),
                   Text(
-                    "Approved 2 by  - $namaApprove2",
+                    "Approved 2 by  - ${approveId}",
                     style: GoogleFonts.inter(
                         fontWeight: FontWeight.w500,
                         color: Constanst.fgPrimary,
@@ -611,7 +615,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
         Padding(
           padding: const EdgeInsets.only(left: 3),
           child: Text(
-            "${leave_status} by ${namaApprove1}",
+            "${leave_status} by ${approveId}",
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
                 fontWeight: FontWeight.w500,

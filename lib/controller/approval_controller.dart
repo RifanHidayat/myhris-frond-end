@@ -127,7 +127,8 @@ class ApprovalController extends GetxController {
               loadkasbon(status);
             } else if (title == "Surat Peringatan") {
               loadSuratPeringatan(status);
-            } else if (title == 'Teguran Lisan'){
+            } else if (title == 'Teguran Lisan') {
+              loadTeguranLisan(status);
             }
           }
         }
@@ -705,15 +706,13 @@ class ApprovalController extends GetxController {
           loadingString.value = 'Tidak ada pengajuan';
         }
         var filteredData = valueBody['data'];
-      if (status == "riwayat") {
-        filteredData = valueBody['data']
-            .where((element) {
-              print("Status element: ${element['approve_status']}");
-              return element['approve_status'] != 'Pending';
-            })
-            .toList();
-      }
-      debugPrint("Filtered data: $filteredData", wrapWidth: 5000);
+        if (status == "riwayat") {
+          filteredData = valueBody['data'].where((element) {
+            print("Status element: ${element['approve_status']}");
+            return element['approve_status'] != 'Pending';
+          }).toList();
+        }
+        debugPrint("Filtered data: $filteredData", wrapWidth: 5000);
 
         listNotModif.value = filteredData;
         for (var element in filteredData) {
@@ -773,7 +772,7 @@ class ApprovalController extends GetxController {
       }
     });
   }
-  
+
   void aksiMenyetujuiSp(pilihan) {
     Map<String, dynamic> body = {
       'nomor_ajuan': detailData[0]['nomor_ajuan'].toString(),
@@ -810,6 +809,125 @@ class ApprovalController extends GetxController {
         var valueBody = jsonDecode(res.body);
         isLoadingAlasan.value = false;
         listAlasan.value = valueBody['data'];
+      }
+    });
+  }
+
+  void loadTeguranLisan(status) {
+    var urlLoad = valuePolaPersetujuan.value == "1"
+        ? "spesifik_approval"
+        : "spesifik_approval_multi";
+    listNotModif.value.clear();
+    listData.value.clear();
+    listDataAll.value.clear();
+    var dataUser = AppData.informasiUser;
+    var getEmCode = dataUser![0].em_id;
+    Map<String, dynamic> body = {
+      'em_id': getEmCode,
+      'name_data': 'teguran_lisan',
+      'bulan': bulanSelected.value,
+      'tahun': tahunSelected.value,
+      'status': status == "riwayat" ? '' : 'pending',
+    };
+    var connect = Api.connectionApi("post", body, urlLoad);
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        // Get.snackbar("tes555 :", '${valueBody['data']}');
+        print("value body ${valueBody}");
+        if (valueBody['data'].length == 0) {
+          loadingString.value = 'Tidak ada pengajuan';
+        }
+        var filteredData = valueBody['data'];
+        if (status == "riwayat") {
+          filteredData = valueBody['data'].where((element) {
+            print("Status element: ${element['approve_status']}");
+            return element['approve_status'] != 'Pending';
+          }).toList();
+        }
+        debugPrint("Filtered data: $filteredData", wrapWidth: 5000);
+
+        listNotModif.value = filteredData;
+        for (var element in filteredData) {
+          var fullName = element['full_name'] ?? "";
+          var convertNama = "$fullName";
+          var filterStatus = element['leave_status'];
+          var data = {
+            'id': element['id'],
+            'nama_pengaju': convertNama,
+            'emId_pengaju': element['em_id'],
+            'em_id': element['em_id'],
+            'title_ajuan': 'Surat Peringatan',
+            'tanggal_ajuan': element['tanggal_ajuan'],
+            'waktu_dari': "-",
+            'waktu_sampai': "-",
+            'durasi': element['leave_duration'],
+            'nama': element['nama'],
+            'leave_status': filterStatus,
+            'delegasi': element['em_delegation'],
+            'nama_approve1': element['approve_by'],
+            'nama_approve2': element['approve2_by'],
+            'waktu_pengajuan': element['atten_date'],
+            'catatan': element['reason'],
+            'type': 'Surat Peringatan',
+            'category': element['category'],
+            'lainnya': "",
+            'file': element['req_file'] ?? "",
+            'uraian': element['uraian'],
+            'nomor_ajuan': element['nomor_ajuan'],
+            'em_report_to': element['em_report_to'],
+            'em_report2_to': element['em_report2_to'],
+            'nama_divisi': element['nama_divisi'],
+            'place_in': element['place_in'],
+            'place_out': element['place_out'],
+            'approve_id': element['approve_id'],
+            'approve_by': element['approve_by'],
+            'approve_date': element['approve_date'],
+            'status': element['status'],
+            'approve_status': element['approve_status'],
+            'approve2_status': element['approve2_status'],
+            'catatan_masuk': element['catatan_masuk'],
+            'catatan_keluar': element['catatan_keluar'],
+            'lokasi_masuk': element['lokasi_masuk'],
+            'lokasi_keluar': element['lokasi_keluar'],
+            'foto_masuk': element['foto_masuk'],
+            'foto_keluar': element['foto_keluar'],
+          };
+          listData.value.add(data);
+          listDataAll.value.add(data);
+        }
+        listData.value.sort(
+            (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
+        this.listData.refresh();
+        this.listNotModif.refresh();
+      }
+    });
+  }
+
+  
+  void aksiMenyetujuiTeguranLisan(pilihan) {
+    Map<String, dynamic> body = {
+      'nomor_ajuan': detailData[0]['nomor_ajuan'].toString(),
+      'em_id': AppData.informasiUser![0].em_id,
+      'tanggal': formatDate(detailData[0]['tanggal_ajuan'].toString()),
+      'status': pilihan == 'Tolak' ? 'Rejected' : 'Approve',
+      'id': detailData[0]['id'].toString(),
+      'alasan': alasanReject.value.text
+    };
+    print("body approval 1 ${body.toString()}");
+    var connect = Api.connectionApi("post", body, "teguran_lisan/approval");
+    connect.then((dynamic res) {
+      var dt = DateTime.now();
+
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        print("response valueBody ${valueBody.toString()}");
+        Get.back();
+        Get.back();
+        Get.back();
+
+        startLoadData(
+            'Teguran Lisan', "${dt.month}", "${dt.year}", 'persetujuan');
       }
     });
   }
@@ -1603,7 +1721,8 @@ class ApprovalController extends GetxController {
           print('gagal appproveeeee');
         }
       });
-    } else if (url_tujuan == 'edit-emp_labor-approval' || url_tujuan == 'edit-emp_labor-approval-task') {
+    } else if (url_tujuan == 'edit-emp_labor-approval' ||
+        url_tujuan == 'edit-emp_labor-approval-task') {
       Map<String, dynamic> body = {
         'em_id': dataEditFinal[0]['em_id'],
         'dari_jam': dataEditFinal[0]['dari_jam'],
@@ -2345,7 +2464,8 @@ class ApprovalController extends GetxController {
     };
     if (url_tujuan == 'edit-emp_leave-approval') {
       body['em_id'] = dataEditFinal[0]['em_id'];
-    } else if (url_tujuan == 'edit-emp_labor-approval' || url_tujuan == 'edit-emp_labor-approval-task') {
+    } else if (url_tujuan == 'edit-emp_labor-approval' ||
+        url_tujuan == 'edit-emp_labor-approval-task') {
       body['em_id'] = dataEditFinal[0]['em_id'];
     } else if (url_tujuan == 'edit-emp_claim') {
       body['em_id'] = dataEditFinal[0]['em_id'];
