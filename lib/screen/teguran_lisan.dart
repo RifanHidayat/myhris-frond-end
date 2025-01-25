@@ -176,7 +176,7 @@ class SuratTeguranDetail extends StatelessWidget {
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              'NO : 004/ HRD /${nomor}/ 2025',
+                              '$nomor',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),

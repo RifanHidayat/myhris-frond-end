@@ -199,7 +199,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                       Text('Divisi    : $posisi'),
                       SizedBox(height: 20),
                       Text(
-                        'Telah melakukan Pelanggaran yaitu terlambat lebih dari 3 (Tiga) kali pada bulan ${controller.bulan.value}, dimana hal tersebut sudah menjadi Peraturan Perusahaan yang harus di taati bersama. Oleh karena itu kami memberikan $sp kepada saudara $nama, dengan ketentuan sebagai berikut : ',
+                        'Telah melakukan Pelanggaran yaitu ${pelanggaran} pada bulan ${controller.bulan.value}, dimana hal tersebut sudah menjadi Peraturan Perusahaan yang harus di taati bersama. Oleh karena itu kami memberikan $sp kepada saudara $nama, dengan ketentuan sebagai berikut : ',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
@@ -237,7 +237,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                         height: 15,
                       ),
                       Text(
-                        '4. ${controller.listAlasan[0]['name']}',
+                        '4. ${alasan}',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(

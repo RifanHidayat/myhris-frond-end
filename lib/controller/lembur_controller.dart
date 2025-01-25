@@ -545,7 +545,10 @@ class LemburController extends GetxController {
         (listTask.isEmpty && dinilai.value == 'N')) {
       print('ini kepangil');
       UtilsAlert.showToast("Lengkapi form *");
-    } else {
+    } else if (isTaskEmpty){
+      UtilsAlert.showToast("Wajib isi keterangan task");
+    }
+    else {
       if (statusForm.value == false) {
         print('ini kepangil');
         UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
