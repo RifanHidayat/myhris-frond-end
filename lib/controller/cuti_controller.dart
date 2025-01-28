@@ -838,6 +838,7 @@ class CutiController extends GetxController {
   void urutkanTanggalSelected() {
     var hasilConvert = [];
     var tampungStringTanggal = "";
+    print('ini tanggal ${tanggalSelected}');
     if (statusForm.value == true) {
       if (tanggalSelectedEdit.value.isNotEmpty) {
         tanggalSelectedEdit.value.forEach((element) {
@@ -870,7 +871,7 @@ class CutiController extends GetxController {
       if (tanggalSelected.value.isNotEmpty) {
         tanggalSelected.value.forEach((element) {
           var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(DateTime.parse(element));
+          String formatted = inputFormat.format(DateTime.parse(element.toString()));
           hasilConvert.add(formatted);
         });
         hasilConvert.sort((a, b) {

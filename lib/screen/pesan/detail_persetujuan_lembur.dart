@@ -868,6 +868,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
     var em_id_user = AppData.informasiUser![0].em_id;
     var status = controller.detailData[0]['status'];
     var approveStatus = controller.detailData[0]['approve_status'];
+    var approveStatus2 = controller.detailData[0]['approve2_status'];
     var diNilai = controller.detailData[0]['dinilai'];
     var delegasi = controller.detailData[0]['delegasi'];
     var emReport = controller.detailData[0]['em_report_to'];
@@ -954,7 +955,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
               child: Obx(
                 () => controller.showButton.value == true &&
                             (status == "Pending" || approveStatus == "Pending" && delegasi.toString().contains(em_id_user)) 
-                            || (approveStatus == "Approve" && diNilai == "N" && emReport2.toString().contains(em_id_user)) ||
+                            || (approveStatus == "Approve" && diNilai == "N" && emReport2.toString().contains(em_id_user) && approveStatus2 == 'Pending') ||
                             (approveStatus == "Pending" && diNilai == "N" && emReport.toString().contains(em_id_user) )
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1082,7 +1083,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                                 width: 1.0)),
                                       ),
                                       child: Text(
-                                        'Hasil Lembur ${controller.showButton.value}',
+                                        'Hasil Lembur',
                                         style: GoogleFonts.inter(
                                             fontWeight: FontWeight.w500,
                                             color: Constanst.colorPrimary,

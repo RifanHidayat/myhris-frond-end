@@ -488,7 +488,7 @@ class _PersetujuanTeguranLisanState extends State<PersetujuanTeguranLisan>
 
   Widget _approval(index) {
     var data = controller.listData[index];
-    var approveId = data['approve_id'];
+    var approveId = data['approve_by'];
     var fullName = controllerSp.infoIds(approveId);
     var leave_status = controller.listData.value[index]['approve_status'] ?? "";
 
