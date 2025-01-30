@@ -20,6 +20,8 @@ class ApprovalController extends GetxController {
   var alasan1 = TextEditingController().obs;
   var alasan2 = TextEditingController().obs;
   var taskControllers = <TextEditingController>[].obs;
+  ScrollController scrollController = ScrollController();
+  List<FocusNode> focusNodes = [];
 
   var isLoadingAlasan = false.obs;
   var listAlasan = [].obs;
@@ -1547,22 +1549,28 @@ class ApprovalController extends GetxController {
       }
     }
     var listKonsekuensi = '';
+    listKonsekuensi = konsekuemsiList.map((item) => item['konsekuensi']).join(',');
     var statusPengajuannew = '';
+    print("ini valuepola persetujuan${valuePolaPersetujuan.value}");
     if (detailData[0]['type'] == 'Cuti' ||
         detailData[0]['type'] == "Izin" ||
         detailData[0]['type'] == "Sakit") {
+          print('kesini lgak');
       if (valuePolaPersetujuan.value == '1' ||
           valuePolaPersetujuan.value == 1) {
         statusPengajuannew = statusPemgajuanIzin.value;
-        listKonsekuensi = konsekuemsiList.map((item) => item.trim()).join(',');
+        listKonsekuensi = konsekuemsiList.map((item) => item['konsekuesi']).join(',');
+        print('ini list konsekuensi ${listKonsekuensi}');
       } else if (valuePolaPersetujuan.value == '2' ||
           valuePolaPersetujuan.value == 2) {
         if (dataEditFinal[0]['leave_status'] == 'Pending' ||
             dataEditFinal[0]['leave_status'] == 'Approve1' ||
             dataEditFinal[0]['leave_status'] == 'Approve 1') {
-              listKonsekuensi = konsekuemsiList.map((item) => item.trim()).join(',');
+              listKonsekuensi = konsekuemsiList.map((item) => item['konsekuesi']).join(',');
+              print('ini list konsekuensi ${listKonsekuensi}');
         } else {
-
+          listKonsekuensi = konsekuemsiList.map((item) => item['konsekuesi']).join(',');
+          print('ini list konsekuensi ${listKonsekuensi}');
         }
       }
     }
@@ -1724,6 +1732,7 @@ class ApprovalController extends GetxController {
         'apply_status': applyStatus,
         'apply2_status': apply2Status,
         'konsekuensi': listKonsekuensi,
+        'tipe_surat': statusPemgajuanIzin.value,
       };
 
       print("body new ${body}");

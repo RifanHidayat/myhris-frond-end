@@ -32,7 +32,7 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
   @override
   void initState() {
     controller.loadCutiUser();
-   // controller.loadDataTypeCuti();
+    // controller.loadDataTypeCuti();
     print("data biaya ${widget.dataForm![0]}");
     if (widget.dataForm![1] == true) {
       controller.dariTanggal.value.text = widget.dataForm![0]['start_date'];
@@ -83,9 +83,8 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
       controller.endDate.value = "";
       controller.alasan.value.text = "";
       controller.namaFileUpload.value = "";
-    
-     controller.selectedTypeCuti.value = "";
-       
+      controller.statusForm.value = false;
+      controller.selectedTypeCuti.value = "";
     }
     super.initState();
   }
@@ -154,10 +153,12 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(12)),
                             border: Border.all(color: Constanst.fgBorder)),
-                        child: controller.showStatus==true?controller.cutLeave.value == 0 ||
-                                controller.cutLeave.value.toString() == "0"
-                            ? informasiSisaCutiMelahirkan()
-                            : informasiSisaCuti():SizedBox(),
+                        child: controller.showStatus == true
+                            ? controller.cutLeave.value == 0 ||
+                                    controller.cutLeave.value.toString() == "0"
+                                ? informasiSisaCutiMelahirkan()
+                                : informasiSisaCuti()
+                            : SizedBox(),
                       ),
                       const SizedBox(height: 16),
                       Container(
@@ -167,18 +168,18 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                             border: Border.all(color: Constanst.fgBorder)),
                         child: Column(
                           children: [
-                             formTanggalCutiMelahirkan(),
-                             
+                            formTanggalCutiMelahirkan(),
+
                             Obx(() => controller.showTipe.value == false
-                                    ? SizedBox()
-                                    : formTipe()),
+                                ? SizedBox()
+                                : formTipe()),
                             // controller.dateSelected.value == 2 ||
                             //         controller.dateSelected.value.toString() ==
                             //             '2'
-                                // ? formTanggalCutiMelahirkan()
-                                
-                                // : formTanggalCuti(),
-                               
+                            // ? formTanggalCutiMelahirkan()
+
+                            // : formTanggalCuti(),
+
                             formDelegasiKepada(),
                             formUploadFile(),
                             formAlasan(),
@@ -213,9 +214,9 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                   if (controller.dateSelected.value == 2 ||
                       controller.dateSelected.value.toString() == "2") {
                     //--------------------menggunakan range---------------------------
-                    if(controller.startDate.value.isEmpty){
+                    if (controller.startDate.value.isEmpty) {
                       UtilsAlert.showToast("Tanggal mulai harus disi");
-                    }else if(controller.endDate.value.isEmpty){
+                    } else if (controller.endDate.value.isEmpty) {
                       UtilsAlert.showToast("Tanggal selesai harus disi");
                     }
                     DateTime tempStartDate = DateTime.parse(
@@ -243,6 +244,7 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                     // Calculate the difference between the two dates
                     Duration difference = date2.difference(date1);
                     controller.durasiIzin.value = difference.inDays + 1;
+                    UtilsAlert.showToast(controller.durasiIzin.value.toString());
                     controller.durasiCutiMelahirkan.value =
                         difference.inDays + 1;
 
@@ -822,18 +824,25 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                                     controller.endDate.value.toString()))
                                 .toString());
                         // Define two DateTime objects representing the two dates
+                        DateTime today = DateTime.now();
+                        DateTime onlyDate =
+                            DateTime(today.year, today.month, today.day);
                         DateTime date1 = DateTime(tempStartDate.year,
                             tempStartDate.month, tempStartDate.day);
                         DateTime date2 = DateTime(tempEndDate.year,
                             tempEndDate.month, tempEndDate.day);
+                        print('ini now ${onlyDate}');
+                        print('ini date1 $date1');
 
                         // Calculate the difference between the two dates
-                        Duration difference = date2.difference(date1);
-                        controller.durasiIzin.value = difference.inDays + 1;
+                        Duration difference = date1.difference(onlyDate);
+                        print(
+                            'ini durasi izin : ${controller.durasiIzin.value}');
+                        print('ini diferent cuti : $difference');
                         controller.durasiCutiMelahirkan.value =
-                            difference.inDays + 1;
+                            difference.inDays;
 
-                             for (var i = tempStartDate;
+                        for (var i = tempStartDate;
                             i.isBefore(tempEndDate) ||
                                 i.isAtSameMomentAs(tempEndDate);
                             i = i.add(Duration(days: 1))) {
@@ -846,7 +855,9 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                               .add(controller.startDate.value);
                         }
 
-                           controller.loadDataTypeCuti(durasi:controller.durasiCutiMelahirkan.value.toString() );
+                        controller.loadDataTypeCuti(
+                            durasi: controller.durasiCutiMelahirkan.value
+                                .toString());
 
                         // absenController.tglAjunan.value =
                         //     DateFormat('yyyy-MM-dd').format(time).toString();

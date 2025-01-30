@@ -28,7 +28,7 @@ class CutiController extends GetxController {
   var alasan = TextEditingController().obs;
   var cari = TextEditingController().obs;
   var departemen = TextEditingController().obs;
-   var showTipe = false.obs;
+  var showTipe = false.obs;
 
   var filePengajuan = File("").obs;
   var startDate = "".obs;
@@ -46,7 +46,7 @@ class CutiController extends GetxController {
   var durasiCutiMelahirkan = 0.obs;
   Rx<List<String>> allEmployeeDelegasi = Rx<List<String>>([]);
   Rx<List<String>> allTipeFormCutiDropdown = Rx<List<String>>([]);
-  var showStatus=false.obs;
+  var showStatus = false.obs;
   var isRequiredFile = '0'.obs;
 
   var limitCuti = 0.obs;
@@ -238,8 +238,8 @@ class CutiController extends GetxController {
     allTipe.value.clear();
     //  UtilsAlert.showLoadingIndicator(Get.context!);
 
-
-  var body = {'durasi': '${durasi}'};
+    var body = {'durasi': '${durasi}'};
+    print('ini body cuti tipe : $body');
     var connect = Api.connectionApi("post", body, "cuti-tipe");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
@@ -263,37 +263,35 @@ class CutiController extends GetxController {
 
           allTipe.value.add(data);
         }
-        if (allTipe.value.length>0){
-           if (statusForm.value == false) {
-          var getFirst = allTipe.value.first;
-          selectedTypeCuti.value = getFirst['name'];
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
-          Get.back();
-        } else {
-          var getFirst = allTipe.value
-              .firstWhere((element) => element['id'] == typeIdEdit.value);
-          selectedTypeCuti.value = getFirst['name'];
-
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
+        if (allTipe.value.length > 0) {
+          if (statusForm.value == false) {
+            var getFirst = allTipe.value.first;
+            selectedTypeCuti.value = getFirst['name'];
+            dateSelected.value = getFirst['select_date'];
+            allowMinus.value = getFirst['allow_minus'];
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            isBackDate.value = getFirst['back_date'].toString();
             Get.back();
-        }
+          } else {
+            var getFirst = allTipe.value
+                .firstWhere((element) => element['id'] == typeIdEdit.value);
+            selectedTypeCuti.value = getFirst['name'];
 
- showStatus.value=true;
-  showTipe.value = true;
+            dateSelected.value = getFirst['select_date'];
+            allowMinus.value = getFirst['allow_minus'];
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            isBackDate.value = getFirst['back_date'].toString();
+            Get.back();
+          }
 
-        }else{
-          showStatus.value=false;
-           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
-             showTipe.value = false;
-             Get.back();
+          showStatus.value = true;
+          showTipe.value = true;
+        } else {
+          showStatus.value = false;
+          UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+          showTipe.value = false;
+          Get.back();
         }
-       
 
         this.allTipe.refresh();
         this.selectedTypeCuti.refresh();
@@ -303,16 +301,14 @@ class CutiController extends GetxController {
     });
   }
 
-
-  void loadDataTypeCutiEdit({durasi,detailData}) {
+  void loadDataTypeCutiEdit({durasi, detailData}) {
     UtilsAlert.showLoadingIndicator(Get.context!);
-    print("load data cuti");
+    print("load data cuti $durasi");
     allTipeFormCutiDropdown.value.clear();
     allTipe.value.clear();
     //  UtilsAlert.showLoadingIndicator(Get.context!);
 
-
-  var body = {'durasi': '${durasi}'};
+    var body = {'durasi': '${durasi}'};
     var connect = Api.connectionApi("post", body, "cuti-tipe");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
@@ -336,40 +332,39 @@ class CutiController extends GetxController {
 
           allTipe.value.add(data);
         }
-        if (allTipe.value.length>0){
-           if (statusForm.value == false) {
-          var getFirst = allTipe.value.first;
-          selectedTypeCuti.value = getFirst['name'];
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
-          Get.back();
-        } else {
-          var getFirst = allTipe.value
-              .firstWhere((element) => element['id'] == typeIdEdit.value);
-          selectedTypeCuti.value = getFirst['name'];
-
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
+        if (allTipe.value.length > 0) {
+          if (statusForm.value == false) {
+            var getFirst = allTipe.value.first;
+            selectedTypeCuti.value = getFirst['name'];
+            dateSelected.value = getFirst['select_date'];
+            allowMinus.value = getFirst['allow_minus'];
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            isBackDate.value = getFirst['back_date'].toString();
             Get.back();
-        }
+          } else {
+            var getFirst = allTipe.value
+                .firstWhere((element) => element['id'] == typeIdEdit.value);
+            selectedTypeCuti.value = getFirst['name'];
 
- showStatus.value=true;
-  showTipe.value = true;
-    Get.to(FormPengajuanCuti(
-                                    dataForm: [detailData, true],
-                                  ));
-                                  // Get.back();
-        }else{
-          showStatus.value=false;
-           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
-             showTipe.value = false;
-             Get.back();
+            dateSelected.value = getFirst['select_date'];
+            allowMinus.value = getFirst['allow_minus'];
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            isBackDate.value = getFirst['back_date'].toString();
+            Get.back();
+          }
+
+          showStatus.value = true;
+          showTipe.value = true;
+          Get.to(FormPengajuanCuti(
+            dataForm: [detailData, true],
+          ));
+          // Get.back();
+        } else {
+          showStatus.value = false;
+          UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+          showTipe.value = false;
+          Get.back();
         }
-       
 
         this.allTipe.refresh();
         this.selectedTypeCuti.refresh();
@@ -378,8 +373,6 @@ class CutiController extends GetxController {
       }
     });
   }
-
-
 
   void loadDataTypeCuti1() {
     // print("load data cuti");
@@ -470,7 +463,7 @@ class CutiController extends GetxController {
     });
   }
 
-   void loadDataAjuanCutiEdit({durasi,data}) {
+  void loadDataAjuanCutiEdit({durasi, data}) {
     AlllistHistoryAjuan.value.clear();
     listHistoryAjuan.value.clear();
     stringLoading.value = "Memuat Data...";
@@ -621,16 +614,13 @@ class CutiController extends GetxController {
 
     // }else{
 
-    if (em_id=="" ){
-
-    }else{
-       var getData =
-        allEmployee.value.firstWhere((element) => element["em_id"] == em_id);
-    selectedDelegasi.value = getData["full_name"];
-    this.selectedDelegasi.refresh();
-
+    if (em_id == "") {
+    } else {
+      var getData =
+          allEmployee.value.firstWhere((element) => element["em_id"] == em_id);
+      selectedDelegasi.value = getData["full_name"];
+      this.selectedDelegasi.refresh();
     }
-   
 
     //}
     print("data employee ${em_id},${allEmployee.value}");
@@ -738,10 +728,9 @@ class CutiController extends GetxController {
   void validasiKirimPengajuan() async {
     if (isRequiredFile.value == "1" && uploadFile.value == false) {
       UtilsAlert.showToast("Form unggah file harus di isi");
-    } else if (alasan.value.text == ""){
+    } else if (alasan.value.text == "") {
       UtilsAlert.showToast("Form Catatan Harus di isi");
-    }
-    else {
+    } else {
       var hitung = jumlahCuti.value - cutiTerpakai.value;
 
       if (hitung <= 0 || hitung == 0) {
@@ -843,7 +832,8 @@ class CutiController extends GetxController {
       if (tanggalSelectedEdit.value.isNotEmpty) {
         tanggalSelectedEdit.value.forEach((element) {
           var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(DateTime.parse(element.toString()));
+          String formatted =
+              inputFormat.format(DateTime.parse(element.toString()));
           hasilConvert.add(formatted);
         });
         hasilConvert.sort((a, b) {
@@ -871,7 +861,8 @@ class CutiController extends GetxController {
       if (tanggalSelected.value.isNotEmpty) {
         tanggalSelected.value.forEach((element) {
           var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(DateTime.parse(element.toString()));
+          String formatted =
+              inputFormat.format(DateTime.parse(element.toString()));
           hasilConvert.add(formatted);
         });
         hasilConvert.sort((a, b) {
@@ -943,8 +934,8 @@ class CutiController extends GetxController {
         'em_id': '$getEmid',
         'typeid': validasiTipeSelected,
         'nomor_ajuan': getNomorAjuanTerakhir,
-       // 'leave_type': 'Full Day',
-          'leave_type': 'FULLDAY',
+        // 'leave_type': 'Full Day',
+        'leave_type': 'FULLDAY',
         'start_date': dariTanggal.value.text,
         'end_date': sampaiTanggal.value.text,
         'leave_duration': durasiIzin.value,
@@ -1021,14 +1012,18 @@ class CutiController extends GetxController {
               dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
             ));
           } else {
+            print('ini value body cuti ${valueBody}');
             if (valueBody['message'] == "ulang") {
               var nomorAjuanTerakhirDalamAntrian =
                   valueBody['data'][0]['nomor_ajuan'];
               checkNomorAjuanDalamAntrian(nomorAjuanTerakhirDalamAntrian);
-            } else {
+            } else if (valueBody['message'] == 'gagal ambil data') {
               Navigator.pop(Get.context!);
               UtilsAlert.showToast(
                   "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
+            } else {
+              Navigator.pop(Get.context!);
+              UtilsAlert.showToast(valueBody['message']);
             }
           }
         }
@@ -1084,7 +1079,7 @@ class CutiController extends GetxController {
             title: typeNotifFcm,
             message: description,
             tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1118,7 +1113,7 @@ class CutiController extends GetxController {
         //     title: typeNotifFcm,
         //     message: description,
         //     tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1919,13 +1914,9 @@ class CutiController extends GetxController {
                 ),
                 typeAjuan == "Approve" ||
                         typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
-                    : const SizedBox(height: 16),
-                typeAjuan == "Approve" ||
-                        typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
+                        typeAjuan == "Approve 2" || 
+                        typeAjuan == "Rejected"
+                    ? const SizedBox(height: 16)
                     : Row(
                         children: [
                           Expanded(
@@ -1973,7 +1964,8 @@ class CutiController extends GetxController {
                               child: ElevatedButton(
                                 onPressed: () {
                                   print(detailData.toString());
-                                  loadDataTypeCutiEdit(durasi:durasi,detailData:detailData);
+                                  loadDataTypeCutiEdit(
+                                      durasi: durasi, detailData: detailData);
                                   // Get.to(FormPengajuanCuti(
                                   //   dataForm: [detailData, true],
                                   // ));
