@@ -738,7 +738,7 @@ class ApprovalController extends GetxController {
             'emId_pengaju': element['em_id'],
             'em_id': element['em_id'],
             'title_ajuan': 'Surat Peringatan',
-            'tanggal_ajuan': element['tanggal_ajuan'],
+            'tanggal_ajuan': element['atten_date'],
             'waktu_dari': "-",
             'waktu_sampai': "-",
             'durasi': element['leave_duration'],
@@ -776,8 +776,6 @@ class ApprovalController extends GetxController {
           listData.value.add(data);
           listDataAll.value.add(data);
         }
-        listData.value.sort(
-            (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
         this.listData.refresh();
         this.listNotModif.refresh();
       }
@@ -815,6 +813,18 @@ class ApprovalController extends GetxController {
     print("info delegasi");
     isLoadingAlasan.value = true;
     var connect = Api.connectionApi("get", {}, "surat_peringatan/${id}/alasan");
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        isLoadingAlasan.value = false;
+        listAlasan.value = valueBody['data'];
+      }
+    });
+  }
+
+  void fetchAlasanTeguranLisan(id) {
+    isLoadingAlasan.value = true;
+    var connect = Api.connectionApi("get", {}, "teguran_lisan/${id}");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
@@ -868,8 +878,8 @@ class ApprovalController extends GetxController {
             'nama_pengaju': convertNama,
             'emId_pengaju': element['em_id'],
             'em_id': element['em_id'],
-            'title_ajuan': 'Surat Peringatan',
-            'tanggal_ajuan': element['tanggal_ajuan'],
+            'title_ajuan': 'Surat teguran Lisan',
+            'tanggal_ajuan': element['atten_date'],
             'waktu_dari': "-",
             'waktu_sampai': "-",
             'durasi': element['leave_duration'],
@@ -879,8 +889,8 @@ class ApprovalController extends GetxController {
             'nama_approve1': element['approve_by'],
             'nama_approve2': element['approve2_by'],
             'waktu_pengajuan': element['atten_date'],
-            'catatan': element['reason'],
-            'type': 'Surat Peringatan',
+            'catatan': element['pelangaran'],
+            'type': 'Teguran Lisan',
             'category': element['category'],
             'lainnya': "",
             'file': element['req_file'] ?? "",
@@ -907,8 +917,6 @@ class ApprovalController extends GetxController {
           listData.value.add(data);
           listDataAll.value.add(data);
         }
-        listData.value.sort(
-            (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
         this.listData.refresh();
         this.listNotModif.refresh();
       }
@@ -1549,6 +1557,7 @@ class ApprovalController extends GetxController {
       }
     }
     var listKonsekuensi = '';
+    print(konsekuemsiList);
     listKonsekuensi = konsekuemsiList.map((item) => item['konsekuensi']).join(',');
     var statusPengajuannew = '';
     print("ini valuepola persetujuan${valuePolaPersetujuan.value}");
@@ -1559,17 +1568,17 @@ class ApprovalController extends GetxController {
       if (valuePolaPersetujuan.value == '1' ||
           valuePolaPersetujuan.value == 1) {
         statusPengajuannew = statusPemgajuanIzin.value;
-        listKonsekuensi = konsekuemsiList.map((item) => item['konsekuesi']).join(',');
+        // listKonsekuensi = konsekuemsiList.map((item) => item['konsekuensi']).join(',');
         print('ini list konsekuensi ${listKonsekuensi}');
       } else if (valuePolaPersetujuan.value == '2' ||
           valuePolaPersetujuan.value == 2) {
         if (dataEditFinal[0]['leave_status'] == 'Pending' ||
             dataEditFinal[0]['leave_status'] == 'Approve1' ||
             dataEditFinal[0]['leave_status'] == 'Approve 1') {
-              listKonsekuensi = konsekuemsiList.map((item) => item['konsekuesi']).join(',');
+              // listKonsekuensi = konsekuemsiList.map((item) => item['konsekuensi']).join(',');
               print('ini list konsekuensi ${listKonsekuensi}');
         } else {
-          listKonsekuensi = konsekuemsiList.map((item) => item['konsekuesi']).join(',');
+          // listKonsekuensi = konsekuemsiList.map((item) => item['konsekuensi']).join(',');
           print('ini list konsekuensi ${listKonsekuensi}');
         }
       }

@@ -70,8 +70,8 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
           controller.dateSelected.value == "2") {
       } else {
         for (var element in listDateTerpilih) {
-          var convertDate = DateTime.parse(element);
-          getDummy.add(convertDate);
+          // var convertDate = DateTime.parse(element);
+          // getDummy.add(convertDate);
         }
       }
 
@@ -244,7 +244,6 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                     // Calculate the difference between the two dates
                     Duration difference = date2.difference(date1);
                     controller.durasiIzin.value = difference.inDays + 1;
-                    UtilsAlert.showToast(controller.durasiIzin.value.toString());
                     controller.durasiCutiMelahirkan.value =
                         difference.inDays + 1;
 

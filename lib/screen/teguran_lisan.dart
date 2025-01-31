@@ -98,7 +98,7 @@ class _TeguranLisanState extends State<TeguranLisan> {
                                 sp: list.sp,
                                 nama: list.nama,
                                 posisi: list.posisi,
-                                nomor: list.nomor_surat,
+                                nomor: list.nomor_surat.toString(),
                                 hal: list.hal,
                                 tglSrt: list.tgl_surat,
                                 pelanggaran: list.pelanggaran,
@@ -176,7 +176,7 @@ class SuratTeguranDetail extends StatelessWidget {
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              '$nomor',
+                              'NO : ${nomor == 'null' ? '-' : nomor}',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),
@@ -214,12 +214,24 @@ class SuratTeguranDetail extends StatelessWidget {
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
-                        height: 15,
+                        height: 8,
                       ), 
-                      Text(
-                        '3. ${controller.listAlasan[0]['name']}',
-                        textAlign: TextAlign.start,
-                      ),
+                      controller.listAlasan.isEmpty
+                          ? SizedBox()
+                          : Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                              children: List.generate(
+                                controller.listAlasan.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    '${index + 3}. ${controller.listAlasan[index]['name']}',
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ),
+                              ),
+                            ),
                       SizedBox(
                         height: 15,
                       ), 
@@ -232,6 +244,7 @@ class SuratTeguranDetail extends StatelessWidget {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Column(
                             children: [
@@ -243,12 +256,12 @@ class SuratTeguranDetail extends StatelessWidget {
                                     fontSize: 16),
                               ),
                               SizedBox(
-                                height: 35,
+                                height: 47,
                               ),
                               Text(
                                 controller.diterbitkan.value,
-                                style: TextStyle(
-                                    fontSize: 12),
+                                // style: TextStyle(
+                                //     fontSize: 12),
                               ),
                             ],
                           ),
@@ -266,7 +279,7 @@ class SuratTeguranDetail extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12.0),
                               ),
-                              SizedBox(height: 25),
+                              SizedBox(height: 50),
                               Text('$nama'),
                             ],
                           ),

@@ -825,66 +825,55 @@ class CutiController extends GetxController {
   }
 
   void urutkanTanggalSelected() {
-    var hasilConvert = [];
     var tampungStringTanggal = "";
-    print('ini tanggal ${tanggalSelected}');
-    if (statusForm.value == true) {
-      if (tanggalSelectedEdit.value.isNotEmpty) {
-        tanggalSelectedEdit.value.forEach((element) {
-          var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted =
-              inputFormat.format(DateTime.parse(element.toString()));
-          hasilConvert.add(formatted);
-        });
-        hasilConvert.sort((a, b) {
-          return DateTime.parse(a).compareTo(DateTime.parse(b));
-        });
-        var getFirst = hasilConvert.first;
-        var getLast = hasilConvert.last;
-        dariTanggal.value.text = getFirst;
-        sampaiTanggal.value.text = getLast;
-        durasiIzin.value = hasilConvert.length;
-        hasilConvert.forEach((element) {
-          if (tampungStringTanggal == "") {
-            tampungStringTanggal = element;
-          } else {
-            tampungStringTanggal = "$tampungStringTanggal,$element";
-          }
-        });
-        stringSelectedTanggal.value = tampungStringTanggal;
-        this.dariTanggal.refresh();
-        this.sampaiTanggal.refresh();
-        this.durasiIzin.refresh();
-        this.stringSelectedTanggal.refresh();
-      }
-    } else {
-      if (tanggalSelected.value.isNotEmpty) {
-        tanggalSelected.value.forEach((element) {
-          var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted =
-              inputFormat.format(DateTime.parse(element.toString()));
-          hasilConvert.add(formatted);
-        });
-        hasilConvert.sort((a, b) {
-          return DateTime.parse(a).compareTo(DateTime.parse(b));
-        });
-        var getFirst = hasilConvert.first;
-        var getLast = hasilConvert.last;
-        dariTanggal.value.text = getFirst;
-        sampaiTanggal.value.text = getLast;
-        durasiIzin.value = hasilConvert.length;
-        hasilConvert.forEach((element) {
-          if (tampungStringTanggal == "") {
-            tampungStringTanggal = element;
-          } else {
-            tampungStringTanggal = "$tampungStringTanggal,$element";
-          }
-        });
-        stringSelectedTanggal.value = tampungStringTanggal;
-        this.dariTanggal.refresh();
-        this.sampaiTanggal.refresh();
-        this.durasiIzin.refresh();
-        this.stringSelectedTanggal.refresh();
+    print('ini tanggal: $tanggalSelected');
+    print('ini tanggal: $tanggalSelectedEdit');
+
+    // Menentukan daftar tanggal yang akan diproses
+    List<dynamic> tanggalDiproses =
+        statusForm.value ? tanggalSelected.value : tanggalSelected.value;
+
+    if (tanggalDiproses.isNotEmpty) {
+      // Konversi ke DateTime dan hapus duplikasi
+      List<DateTime> hasilConvert = tanggalDiproses
+          .map((element) => element is DateTime
+              ? element
+              : DateTime.parse(element.toString()))
+          .toSet()
+          .toList();
+
+      // Urutkan tanggal
+      hasilConvert.sort((a, b) => a.compareTo(b));
+
+      if (hasilConvert.isNotEmpty) {
+        DateTime dari = hasilConvert.first;
+        DateTime sampai = hasilConvert.last;
+
+        // Generate semua tanggal dalam rentang tersebut
+        List<String> semuaTanggal = [];
+        for (DateTime date = dari;
+            date.isBefore(sampai.add(Duration(days: 1)));
+            date = date.add(Duration(days: 1))) {
+          semuaTanggal.add(DateFormat('yyyy-MM-dd').format(date));
+        }
+
+        // Set hasil ke variabel yang sesuai
+        dariTanggal.value.text = DateFormat('yyyy-MM-dd').format(dari);
+        sampaiTanggal.value.text = DateFormat('yyyy-MM-dd').format(sampai);
+        durasiIzin.value = semuaTanggal.length;
+        stringSelectedTanggal.value = semuaTanggal.join(',');
+
+        // Debugging
+        print("Dari tanggal: ${dariTanggal.value.text}");
+        print("Sampai tanggal: ${sampaiTanggal.value.text}");
+        print("Durasi izin: ${durasiIzin.value}");
+        print("String selected tanggal: ${stringSelectedTanggal.value}");
+
+        // Refresh semua nilai
+        dariTanggal.refresh();
+        sampaiTanggal.refresh();
+        durasiIzin.refresh();
+        stringSelectedTanggal.refresh();
       }
     }
   }
@@ -916,8 +905,8 @@ class CutiController extends GetxController {
         'leave_type': 'FULLDAY',
         'start_date': startDate.value,
         'end_date': endDate.value,
-        'leave_duration': durasiCutiMelahirkan.value,
-        'date_selected': '',
+        'leave_duration': durasiIzin.value,
+        'date_selected': stringSelectedTanggal.value,
         'apply_date': '',
         'reason': alasan.value.text,
         'leave_status': 'Pending',
@@ -1033,6 +1022,7 @@ class CutiController extends GetxController {
       body['cari'] = idEditFormCuti.value;
       body['activity_name'] =
           "Edit Pengajuan Cuti. Tanggal Pengajuan = $convertTanggalBikinPengajuan";
+      print('ini body edit cuti $body');
       var connect = Api.connectionApi("post", body, "edit-emp_leave");
       connect.then((dynamic res) {
         if (res.statusCode == 200) {
@@ -1713,7 +1703,7 @@ class CutiController extends GetxController {
                                       Text(
                                         index == listTanggalTerpilih.length - 1
                                             ? tanggalConvert2
-                                            : '$tanggalConvert, ',
+                                            : '$tanggalConvert,',
                                         style: GoogleFonts.inter(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 16,
@@ -1914,7 +1904,7 @@ class CutiController extends GetxController {
                 ),
                 typeAjuan == "Approve" ||
                         typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2" || 
+                        typeAjuan == "Approve 2" ||
                         typeAjuan == "Rejected"
                     ? const SizedBox(height: 16)
                     : Row(

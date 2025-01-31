@@ -322,7 +322,6 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                         onTap: () {
                                           controller.konsekuemsiList
                                               .add({"konsekuensi": ""});
-                                          controller.konsekuemsiList.refresh();
                                         },
                                         child: Container(
                                           padding: EdgeInsets.only(
@@ -396,6 +395,7 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                         } else {
                                           Navigator.pop(Get.context!);
                                           validasiMenyetujui(true, em_id);
+                                          print(controller.konsekuemsiList);
                                         }
                                       } else {
                                         UtilsAlert.showToast(
@@ -403,6 +403,7 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                       }
                                     } else {
                                       Navigator.pop(Get.context!);
+                                      print(controller.konsekuemsiList);
                                       validasiMenyetujui(true, em_id);
                                     }
                                   },
@@ -648,18 +649,9 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                                         Expanded(
                                                           flex: 90,
                                                           child: TextFormField(
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .multiline,
-                                                            textInputAction:
-                                                                TextInputAction
-                                                                    .done,
                                                             onChanged: (value) {
                                                               data['konsekuensi'] =
                                                                   value;
-                                                              controller
-                                                                  .konsekuemsiList
-                                                                  .refresh();
                                                             },
                                                             controller:
                                                                 TextEditingController(
@@ -723,7 +715,6 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                         onTap: () {
                                           controller.konsekuemsiList
                                               .add({'konsekuensi': ''});
-                                          controller.konsekuemsiList.refresh();
                                         },
                                         child: Container(
                                           padding: EdgeInsets.only(
@@ -799,11 +790,11 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                           Navigator.pop(Get.context!);
                                           print(
                                               'ini list ${controller.konsekuemsiList}');
-                                          // validasiMenyetujui(false, em_id);
+                                          validasiMenyetujui(false, em_id);
                                         }
                                       } else {
                                         Navigator.pop(Get.context!);
-                                        // validasiMenyetujui(false, em_id);
+                                        validasiMenyetujui(false, em_id);
                                       }
                                     } else {
                                       UtilsAlert.showToast(

@@ -101,7 +101,7 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                                 nomor: list.nomor_surat.toString(),
                                 hal: list.hal.toString(),
                                 tglSrt: list.tgl_surat.toString(),
-                                pelanggaran: list.title.toString(),
+                                pelanggaran: list.alasan.toString(),
                                 alasan: list.alasan.toString(),
                                 diterbitkan: list.diterbitkan_oleh.toString(),
                               ));
@@ -179,7 +179,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              'NO : ${nomor}',
+                              'NO : ${nomor == 'null' ? '-' : nomor}',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),
@@ -227,19 +227,31 @@ class SuratPeringatanDetail extends StatelessWidget {
                       ),
                       Text(
                         sp == 'Surat Peringatan 3'
-                        ? '3. Saudara wajib mengembalikan seluruh barang-barang milik perusahaan yang Saudara gunakan selama bekerja di perusahaan.  '
-                        : sp == 'Surat Peringatan 2'
-                        ? '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 3 (Tiga) hari.'
-                        : '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 1 (Satu) hari.',
+                            ? '3. Saudara wajib mengembalikan seluruh barang-barang milik perusahaan yang Saudara gunakan selama bekerja di perusahaan.  '
+                            : sp == 'Surat Peringatan 2'
+                                ? '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 3 (Tiga) hari.'
+                                : '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 1 (Satu) hari.',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
-                        height: 15,
+                        height: 8,
                       ),
-                      Text(
-                        '4. ${alasan}',
-                        textAlign: TextAlign.start,
-                      ),
+                      controller.listAlasan.isEmpty
+                          ? SizedBox()
+                          : Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                              children: List.generate(
+                                controller.listAlasan.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    '${index + 4}. ${controller.listAlasan[index]['name']}',
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ),
+                              ),
+                            ),
                       SizedBox(
                         height: 15,
                       ),
@@ -252,6 +264,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Column(
                             children: [
@@ -262,11 +275,11 @@ class SuratPeringatanDetail extends StatelessWidget {
                                     fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               SizedBox(
-                                height: 35,
+                                height: 47,
                               ),
                               Text(
                                 controller.diterbitkan.value,
-                                style: TextStyle(fontSize: 12),
+                                // style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),
@@ -283,7 +296,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12.0),
                               ),
-                              SizedBox(height: 25),
+                              SizedBox(height: 50),
                               Text('$nama'),
                             ],
                           ),

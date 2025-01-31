@@ -109,6 +109,7 @@ class SuratPeringatanController extends GetxController {
 
   void getDetail(id) async {
     isLoadingAlasan.value = true;
+    listAlasan.clear();
     var connect = Api.connectionApi('get', {}, "surat-peringatan/$id");
     connect.then(
       (dynamic response) {
@@ -177,6 +178,7 @@ class SuratPeringatanController extends GetxController {
   
   void getDetailTeguran(id) async {
     isLoadingAlasan.value = true;
+    listAlasan.clear();
     var connect = Api.connectionApi('get', {}, "teguran_lisan/$id");
     connect.then(
       (dynamic response) {

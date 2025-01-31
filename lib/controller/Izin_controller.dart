@@ -2184,13 +2184,8 @@ void loaDataTipe({durasi}) {
                 ),
                 typeAjuan == "Approve" ||
                         typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
-                    : const SizedBox(height: 16),
-                typeAjuan == "Approve" ||
-                        typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
+                        typeAjuan == "Approve 2" || typeAjuan == "Rejected"
+                    ? const SizedBox(height: 16)
                     : Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Row(

@@ -245,7 +245,7 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
   void initState() {
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
-    controller.fetchAlasan(widget.idxDetail);
+    controller.fetchAlasanTeguranLisan(widget.idxDetail);
     super.initState();
     var emId = AppData.informasiUser![0].em_id;
 
@@ -687,7 +687,7 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      "${controller.detailData[0]['uraian'] ?? "-"}",
+                                      "${controller.detailData[0]['catatan'] ?? "-"}",
                                       style: GoogleFonts.inter(
                                           color: Constanst.fgPrimary,
                                           fontWeight: FontWeight.w500,

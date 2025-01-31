@@ -268,11 +268,11 @@ class _PersetujuanSuratPeringatanState extends State<PersetujuanSuratPeringatan>
 
   
   Widget listDataApproval() {
-    controller.listData.value.sort((a, b){
-      DateTime dateA = DateTime.parse(a['tanggal_ajuan']);
-      DateTime dateB = DateTime.parse(b['tanggal_ajuan']);
-      return dateB.compareTo(dateA);
-    });
+    // controller.listData.value.sort((a, b){
+    //   DateTime dateA = DateTime.parse(a['tanggal_ajuan']);
+    //   DateTime dateB = DateTime.parse(b['tanggal_ajuan']);
+    //   return dateB.compareTo(dateA);
+    // });
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
       child: ListView.builder(
