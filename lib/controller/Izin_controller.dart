@@ -294,6 +294,7 @@ class IzinController extends GetxController {
       'tahun': tahunSelectedSearchHistory.value,
       'type_id': id.toString()
     };
+    print(body);
     var connect =
         Api.connectionApi("post", body, "emp_leave_load_izin_Kategori");
     await connect.then((dynamic res) {

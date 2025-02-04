@@ -1260,7 +1260,7 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
 
                                   return;
                                 }
-                                // validasiMenyetujui(true, em_id);
+                                validasiMenyetujui(true, em_id);
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Constanst.colorWhite,

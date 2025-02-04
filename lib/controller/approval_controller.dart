@@ -2372,6 +2372,7 @@ class ApprovalController extends GetxController {
         applyId2 = "";
         applyStatus = pilihan == true ? 'Approve' : 'Rejected';
         apply2Status = pilihan == true ? 'Pending' : 'Rejected';
+        status = pilihan == true ? 'Approve' : 'Rejected';
       } else if (leaveStatus == "Approve") {
         statusPengajuan = pilihan == true ? 'Approve2' : 'Rejected';
         applyDate1 = apdDate1;
@@ -2382,6 +2383,7 @@ class ApprovalController extends GetxController {
         applyBy2 = name;
         applyId2 = emId;
         apply2Status = pilihan == true ? 'Approve' : 'Rejected';
+        status = pilihan == true ? 'Approve2' : 'Rejected';
       }
     }
     var alasanRejectShow = alasanReject.value.text != ""
@@ -2394,7 +2396,7 @@ class ApprovalController extends GetxController {
       'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(date)).toString(),
       'bulan': DateFormat('MM').format(DateTime.parse(date)).toString(),
       'tahun': DateFormat('yyyy').format(DateTime.parse(date)).toString(),
-      'status': pilihan == true ? 'Approve' : 'Rejected',
+      'status': status,
       'signin_time': checkin.toString(),
       'signout_time': checkout.toString(),
       'approved_id': emId.toString(),
