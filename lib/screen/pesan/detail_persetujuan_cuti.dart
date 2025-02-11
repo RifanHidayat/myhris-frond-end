@@ -92,6 +92,74 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                             height: 16,
                           ),
                           Obx(() {
+                            var sp = controller.searchSp;
+                             return controller.searchSp.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${sp[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          SizedBox(height: 12),
+                          Obx(() {
+                            var tl = controller.searchTl;
+                             return controller.searchTl.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          const SizedBox(height: 12),
+                          Obx(() {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -486,6 +554,74 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                             height: 16,
                           ),
                           Obx(() {
+                            var sp = controller.searchSp;
+                            return controller.searchSp.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          SizedBox(height: 12),
+                          Obx(() {
+                            var tl = controller.searchTl;
+                             return controller.searchTl.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          const SizedBox(height: 12),
+                          Obx(() {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -791,6 +927,7 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                           print(
                                               'ini list ${controller.konsekuemsiList}');
                                           validasiMenyetujui(false, em_id);
+
                                         }
                                       } else {
                                         Navigator.pop(Get.context!);
@@ -1512,7 +1649,7 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                               //             fontSize: 16),
                               //       ),
                               Text(
-                                "${controller.detailData[0]['type']} - ${controller.detailData[0]['category']}",
+                                "${controller.detailData[0]['nama_tipe']} - ${controller.detailData[0]['category']}",
                                 style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w500,
                                     color: Constanst.fgPrimary,

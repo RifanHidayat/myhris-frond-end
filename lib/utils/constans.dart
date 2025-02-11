@@ -169,7 +169,15 @@ class Constanst {
   }
 
   static String convertDate5(String date) {
-    DateTime convert = DateTime.parse(date);
+    List<String> parts = date.split('-');
+  if (parts.length == 3) {
+    parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
+    parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
+  } else {
+    throw FormatException("Invalid date format: $date");
+  }
+  String fixedDate = parts.join('-');
+    DateTime convert = DateTime.parse(fixedDate);
     var bulan = DateFormat('MMMM');
     var hari = DateFormat('dd');
     var tahun = DateFormat('yyyy');
@@ -255,7 +263,7 @@ class Constanst {
   static String convertGetMonth(String date) {
     DateTime convert = DateTime.parse(date);
     var outputDate = DateFormat('MMM');
-    return outputDate.format(convert);
+    return bulanIndoLengkap(outputDate.format(convert));
   }
 
   static String hariIndo(String hari) {
@@ -277,6 +285,49 @@ class Constanst {
       hari = hari;
     }
     return hari;
+  }
+
+  static String bulanIndoLengkap(String bulan) {
+    if (bulan == "Jan") {
+      bulan = "Januari";
+      // bulan = "Januari";
+    } else if (bulan == "Feb") {
+      bulan = "Febuari";
+      // bulan = "Februari";
+    } else if (bulan == "Mar") {
+      bulan = "Maret";
+      // bulan = "Maret";
+    } else if (bulan == "Apr") {
+      bulan = "April";
+      // bulan = "April";
+    } else if (bulan == "Mai") {
+      bulan = "Mei";
+      // bulan = "Mei";
+    } else if (bulan == "Jun") {
+      bulan = "Juni";
+      // bulan = "Juni";
+    } else if (bulan == "Jul") {
+      bulan = "Juli";
+      // bulan = "Juli";
+    } else if (bulan == "Agu") {
+      bulan = "Agustus";
+      // bulan = "Agustus";
+    } else if (bulan == "Sep") {
+      bulan = "September";
+      // bulan = "September";
+    } else if (bulan == "Oct") {
+      bulan = "Okttober";
+      // bulan = "Oktober";
+    } else if (bulan == "Nov") {
+      bulan = "November";
+      // bulan = "November";
+    } else if (bulan == "Dec") {
+      bulan = "Desember";
+      // bulan = "Desember";
+    } else {
+      bulan = bulan;
+    }
+    return bulan;
   }
 
   static String bulanIndo(String bulan) {

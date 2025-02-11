@@ -188,7 +188,6 @@ class DashboardController extends GetxController {
     // }
     //  getUserInfo();
     print("loginnn: ${AppData.isLogin}");
-
     super.onInit();
   }
 
@@ -1018,7 +1017,8 @@ class DashboardController extends GetxController {
         minute: int.parse(AppData.informasiUser![0].endTime
             .toString()
             .split(':')[1])); // Waktu kedua
-
+    print('ini waktu 1${AppData.informasiUser![0].startTime}');
+    print('ini waktu 2${waktu2}');
     int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
     int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
 
@@ -2432,6 +2432,7 @@ class DashboardController extends GetxController {
         } else {
           print("bah: $valueBody");
         }
+        checkperaturanPerusahaan(getEmid);
       }else{
         print('ini error woooy');
       }
@@ -2871,7 +2872,7 @@ class DashboardController extends GetxController {
             var valueBody = jsonDecode(res.body);
 
             var temporary = valueBody['data'];
-
+            print('ini data menu utama ${temporary}');
             List<Map<String, dynamic>> menusUtama = [];
             for (var element in temporary) {
               menusUtama.add({

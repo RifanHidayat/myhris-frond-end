@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:siscom_operasional/controller/auth_controller.dart';
 import 'package:siscom_operasional/controller/dashboard_controller.dart';
 import 'package:siscom_operasional/utils/api.dart';
+import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:http/http.dart' as http;
@@ -406,6 +407,7 @@ void _scrollToEnd() async {
                                               ? () {
                                                 print('ini login email${controller.email.value.text}');
                                                   controller.loginUser();
+                                                  // dashboardController.checkperaturanPerusahaan(AppData.informasiUser![0].em_id);
                                                 }
                                               : null,
                                           style: ElevatedButton.styleFrom(

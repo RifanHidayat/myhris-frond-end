@@ -353,6 +353,7 @@ class AuthController extends GetxController {
         print("nama database ${selectedDb.value}");
         AppData.selectedDatabase = selectedDb.value;
         AppData.selectedPerusahan = selectedPerusahaan.value;
+        
 
         List<UserModel> getData = [];
 

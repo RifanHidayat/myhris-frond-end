@@ -42,7 +42,7 @@ class CutiController extends GetxController {
   var departementAkses = [].obs;
   var allNameLaporanCuti = [].obs;
   var allNameLaporanCutiCopy = [].obs;
-  var tanggalSelectedEdit = <DateTime>[].obs;
+  var tanggalSelectedEdit = [].obs;
   var durasiCutiMelahirkan = 0.obs;
   Rx<List<String>> allEmployeeDelegasi = Rx<List<String>>([]);
   Rx<List<String>> allTipeFormCutiDropdown = Rx<List<String>>([]);
@@ -235,6 +235,7 @@ class CutiController extends GetxController {
     UtilsAlert.showLoadingIndicator(Get.context!);
     print("load data cuti");
     allTipeFormCutiDropdown.value.clear();
+    selectedTypeCuti.value = '';
     allTipe.value.clear();
     //  UtilsAlert.showLoadingIndicator(Get.context!);
 
@@ -264,23 +265,31 @@ class CutiController extends GetxController {
           allTipe.value.add(data);
         }
         if (allTipe.value.length > 0) {
-          if (statusForm.value == false) {
-            var getFirst = allTipe.value.first;
-            selectedTypeCuti.value = getFirst['name'];
+          var getFirst = allTipe.value.first;
+
+          if (!statusForm.value) {
+            selectedTypeCuti.value = getFirst['name'].toString();
             dateSelected.value = getFirst['select_date'];
             allowMinus.value = getFirst['allow_minus'];
             isRequiredFile.value = getFirst['upload_file'].toString();
             isBackDate.value = getFirst['back_date'].toString();
+            cutLeave.value = getFirst['cut_leave'];
+            limitCuti.value = getFirst['leave_day'];
             Get.back();
           } else {
-            var getFirst = allTipe.value
-                .firstWhere((element) => element['id'] == typeIdEdit.value);
-            selectedTypeCuti.value = getFirst['name'];
+            var getFirstEdit = allTipe.value.firstWhere(
+              (element) => element['id'] == typeIdEdit.value,
+              orElse: () =>
+                  getFirst, 
+            );
 
-            dateSelected.value = getFirst['select_date'];
-            allowMinus.value = getFirst['allow_minus'];
-            isRequiredFile.value = getFirst['upload_file'].toString();
-            isBackDate.value = getFirst['back_date'].toString();
+            selectedTypeCuti.value = getFirstEdit['name'].toString();
+            dateSelected.value = getFirstEdit['select_date'];
+            allowMinus.value = getFirstEdit['allow_minus'];
+            isRequiredFile.value = getFirstEdit['upload_file'].toString();
+            isBackDate.value = getFirstEdit['back_date'].toString();
+            cutLeave.value = getFirstEdit['cut_leave'];
+            limitCuti.value = getFirstEdit['leave_day'];
             Get.back();
           }
 
@@ -340,6 +349,8 @@ class CutiController extends GetxController {
             allowMinus.value = getFirst['allow_minus'];
             isRequiredFile.value = getFirst['upload_file'].toString();
             isBackDate.value = getFirst['back_date'].toString();
+            limitCuti.value = getFirst['leave_day'];
+            cutLeave.value = getFirst['cut_leave'];
             Get.back();
           } else {
             var getFirst = allTipe.value
@@ -350,6 +361,8 @@ class CutiController extends GetxController {
             allowMinus.value = getFirst['allow_minus'];
             isRequiredFile.value = getFirst['upload_file'].toString();
             isBackDate.value = getFirst['back_date'].toString();
+            limitCuti.value = getFirst['leave_day'];
+            cutLeave.value = getFirst['cut_leave'];
             Get.back();
           }
 
@@ -671,7 +684,7 @@ class CutiController extends GetxController {
             this.statusHitungCuti.refresh();
           } else {
             jumlahCuti.value = totalDay;
-            cutLeave.value = 1;
+            // cutLeave.value = 1;
             cutiTerpakai.value = terpakai;
             this.jumlahCuti.refresh();
             this.cutiTerpakai.refresh();
@@ -1351,7 +1364,8 @@ class CutiController extends GetxController {
                       ),
                     ),
                   ],
-                )
+                ),
+                SizedBox(height: 16.0)
               ],
             ),
           ),
@@ -1524,12 +1538,21 @@ class CutiController extends GetxController {
   void showDetailRiwayat(detailData, apply_by, alasanReject) {
     var nomorAjuan = detailData['nomor_ajuan'];
     var tanggalMasukAjuan = detailData['atten_date'];
+    var tanggalMasukAjuanDate = DateTime.parse(detailData['atten_date']);
     var namaTypeAjuan = detailData['name'];
     var tanggalAjuanDari = detailData['start_date'];
     var tanggalAjuanSampai = detailData['end_date'];
+    var tanggalAjuanDariDate = DateTime.parse(detailData['start_date']);
     var alasan = detailData['reason'];
     var durasi = detailData['leave_duration'];
     var typeAjuan = detailData['leave_status'];
+    var tanggalMasuk = DateTime(tanggalMasukAjuanDate.year,
+        tanggalMasukAjuanDate.month, tanggalMasukAjuanDate.day);
+    var tanggalDari = DateTime(tanggalAjuanDariDate.year,
+        tanggalAjuanDariDate.month, tanggalAjuanDariDate.day);
+
+    Duration difference = tanggalDari.difference(tanggalMasuk);
+    print('ini data diferent ${difference}');
     if (valuePolaPersetujuan.value == "1") {
       typeAjuan = detailData['leave_status'];
     } else {
@@ -1907,80 +1930,84 @@ class CutiController extends GetxController {
                         typeAjuan == "Approve 2" ||
                         typeAjuan == "Rejected"
                     ? const SizedBox(height: 16)
-                    : Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 40,
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Constanst
-                                      .border, // Set the desired border color
-                                  width: 1.0,
+                    : Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
+                      child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 40,
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Constanst
+                                        .border, // Set the desired border color
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                borderRadius: BorderRadius.circular(8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    // Get.back();
+                                    batalkanPengajuanCuti(detailData);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Constanst.color4,
+                                      backgroundColor: Constanst.colorWhite,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      elevation: 0,
+                                      // padding: EdgeInsets.zero,
+                                      padding:
+                                          const EdgeInsets.fromLTRB(0, 0, 0, 0)),
+                                  child: Text(
+                                    'Batalkan',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.color4,
+                                        fontSize: 14),
+                                  ),
+                                ),
                               ),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Get.back();
-                                  batalkanPengajuanCuti(detailData);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    foregroundColor: Constanst.color4,
-                                    backgroundColor: Constanst.colorWhite,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: SizedBox(
+                                height: 40,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    print(detailData.toString());
+                                    loadDataTypeCutiEdit(
+                                        durasi: difference,
+                                        detailData: detailData);
+                                    // Get.to(FormPengajuanCuti(
+                                    //   dataForm: [detailData, true],
+                                    // ));
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Constanst.colorWhite,
+                                    backgroundColor: Constanst.colorPrimary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     elevation: 0,
-                                    // padding: EdgeInsets.zero,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                                child: Text(
-                                  'Batalkan',
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      color: Constanst.color4,
-                                      fontSize: 14),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: SizedBox(
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  print(detailData.toString());
-                                  loadDataTypeCutiEdit(
-                                      durasi: durasi, detailData: detailData);
-                                  // Get.to(FormPengajuanCuti(
-                                  //   dataForm: [detailData, true],
-                                  // ));
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Constanst.colorWhite,
-                                  backgroundColor: Constanst.colorPrimary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
                                   ),
-                                  elevation: 0,
-                                  // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
-                                ),
-                                child: Text(
-                                  'Edit',
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      color: Constanst.colorWhite,
-                                      fontSize: 14),
+                                  child: Text(
+                                    'Edit',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.colorWhite,
+                                        fontSize: 14),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
+                          ],
+                        ),
+                    )
               ],
             ),
           ),

@@ -2165,7 +2165,7 @@ class AbsenController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        print('data body ${valueBody}');
+        print('data body absen ${valueBody}');
         if (valueBody['status'] == true) {
           List data = valueBody['data'];
           loading.value =

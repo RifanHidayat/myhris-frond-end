@@ -90,6 +90,74 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
                             height: 16,
                           ),
                           Obx(() {
+                            var sp = controller.searchSp;
+                             return controller.searchSp.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          SizedBox(height: 12),
+                          Obx(() {
+                            var tl = controller.searchTl;
+                             return controller.searchTl.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          const SizedBox(height: 12),
+                          Obx(() {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -257,15 +325,9 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
                                                           flex: 90,
                                                           child: TextFormField(
                                                             onChanged: (value) {
-                                                              controller
-                                                                  .konsekuemsiList[
-                                                                      index]
-                                                                  .value = value;
-                                                              controller
-                                                                  .konsekuemsiList
-                                                                  .refresh();
+                                                              data['konsekuensi'] = value;
                                                             },
-                                                            controller: data,
+                                                            controller: TextEditingController(text: data['konsekuensi']),
                                                             style:
                                                                 const TextStyle(
                                                                     fontSize:
@@ -322,9 +384,7 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
                                       ),
                                       InkWell(
                                         onTap: () {
-                                          controller.konsekuemsiList.add(
-                                              TextEditingController(text: ""));
-                                          controller.konsekuemsiList.refresh();
+                                          controller.konsekuemsiList.add({'konsekuensi': ''});
                                         },
                                         child: Container(
                                           padding: EdgeInsets.only(
@@ -486,6 +546,76 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
                           const SizedBox(
                             height: 16,
                           ),
+                          Obx(() {
+                            var sp = controller.searchSp;
+                             return controller.searchSp.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          SizedBox(height: 12),
+                          Obx(() {
+                            var tl = controller.searchTl;
+                            print('search tl${controller.searchTl.isNotEmpty}');
+                            print('search tl${controller.searchTl}');
+                             return controller.searchTl.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          const SizedBox(height: 12),
                           Obx(() {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1035,7 +1165,6 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
   void initState() {
     controller.statusPemgajuanIzin.value = "none";
     controller.konsekuemsiList.clear();
-
     controller.alasanReject.value.text = "";
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
@@ -2195,7 +2324,7 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
         text2 = "Pending Approval 2";
       }
       if (data['apply2_status'] == "Rejected") {
-        text2 = "Rejected 2 By - ${data['nama_approve1']}";
+        text2 = "Rejected 2 By - ${data['nama_approve2']}";
       }
 
       if (data['apply2_status'] == "Approve") {
@@ -2204,125 +2333,125 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
     }
     return Container(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            "Status Pengajuan",
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w400,
+              fontSize: 14,
+              color: Constanst.fgSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Status Pengajuan",
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Constanst.fgSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      data['apply_status'] == "Pending"
-                          ? Icon(
-                              Iconsax.timer,
-                              color: Constanst.warning,
-                              size: 22,
-                            )
-                          : data['apply_status'] == "Rejected"
-                              ? const Icon(
-                                  Iconsax.close_circle,
-                                  color: Colors.red,
-                                  size: 22,
-                                )
-                              : const Icon(
-                                  Iconsax.tick_circle,
-                                  color: Colors.green,
-                                  size: 22,
-                                ),
-                      // Icon(
-                      //   Iconsax.close_circle,
-                      //   color: Constanst.color4,
-                      //   size: 22,
-                      // ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${text} ",
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  color: Constanst.fgPrimary,
-                                  fontSize: 14)),
-                          const SizedBox(height: 4),
-                        ],
-                      ),
-                    ],
-                  ),
-                  data['apply_status'] == "Approve"
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 2.5, top: 2, bottom: 2),
-                              child: Container(
-                                height: 30,
-                                child: VerticalDivider(
-                                  color: Constanst.Secondary,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  data['apply2_status'] == "Pending"
-                                      ? Icon(
-                                          Iconsax.timer,
-                                          color: Constanst.warning,
-                                          size: 22,
-                                        )
-                                      : data['apply2_status'] == "Rejected"
-                                          ? const Icon(
-                                              Iconsax.close_circle,
-                                              color: Colors.red,
-                                              size: 22,
-                                            )
-                                          : const Icon(
-                                              Iconsax.tick_circle,
-                                              color: Colors.green,
-                                              size: 22,
-                                            ),
-                                  // Icon(
-                                  //   Iconsax.close_circle,
-                                  //   color: Constanst.color4,
-                                  //   size: 22,
-                                  // ),
-                                  const SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("${text2} ",
-                                          style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              color: Constanst.fgPrimary,
-                                              fontSize: 14)),
-                                      const SizedBox(height: 4),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+              data['apply_status'] == "Pending"
+                  ? Icon(
+                      Iconsax.timer,
+                      color: Constanst.warning,
+                      size: 22,
+                    )
+                  : data['apply_status'] == "Rejected"
+                      ? const Icon(
+                          Iconsax.close_circle,
+                          color: Colors.red,
+                          size: 22,
                         )
-                      : const SizedBox(),
-                ],
+                      : const Icon(
+                          Iconsax.tick_circle,
+                          color: Colors.green,
+                          size: 22,
+                        ),
+              // Icon(
+              //   Iconsax.close_circle,
+              //   color: Constanst.color4,
+              //   size: 22,
+              // ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("${text} ",
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w500,
+                            color: Constanst.fgPrimary,
+                            fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    const SizedBox(height: 4),
+                  ],
+                ),
               ),
             ],
-          )
+          ),
+          data['apply_status'] == "Approve"
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 2.5, top: 2, bottom: 2),
+                      child: Container(
+                        height: 30,
+                        child: VerticalDivider(
+                          color: Constanst.Secondary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          data['apply2_status'] == "Pending"
+                              ? Icon(
+                                  Iconsax.timer,
+                                  color: Constanst.warning,
+                                  size: 22,
+                                )
+                              : data['apply2_status'] == "Rejected"
+                                  ? const Icon(
+                                      Iconsax.close_circle,
+                                      color: Colors.red,
+                                      size: 22,
+                                    )
+                                  : const Icon(
+                                      Iconsax.tick_circle,
+                                      color: Colors.green,
+                                      size: 22,
+                                    ),
+                          // Icon(
+                          //   Iconsax.close_circle,
+                          //   color: Constanst.color4,
+                          //   size: 22,
+                          // ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text("${text2} ",
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.fgPrimary,
+                                        fontSize: 14),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,),
+                                const SizedBox(height: 4),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : const SizedBox(),
         ],
       ),
     );
