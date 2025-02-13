@@ -8,7 +8,7 @@ import 'package:siscom_operasional/controller/dashboard_controller.dart';
 import 'package:siscom_operasional/controller/global_controller.dart';
 import 'package:siscom_operasional/screen/absen/camera_view.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_absen.dart';
-import 'package:siscom_operasional/screen/absen/pengajuan%20absen.dart';
+import 'package:siscom_operasional/screen/absen/pengajuan_absen.dart';
 import 'package:siscom_operasional/screen/init_screen.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';

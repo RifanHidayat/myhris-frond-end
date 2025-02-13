@@ -287,8 +287,7 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                     controller.tanggalSelected.value
                         .add(DateTime.parse(controller.endDate.value));
                         print('kemari 1');
-                    // controller.validasiKirimPengajuan();
-
+                    controller.validasiKirimPengajuan();
                     // Print the result
                   } else {
                     //mengugunakan multiple date

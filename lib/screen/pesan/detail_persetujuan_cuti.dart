@@ -110,7 +110,9 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "karyawan ${sp[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}",
+                                        sp[0]['status'] == 'Approve'
+                                        ? "Karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}"
+                                        : 'Karyawan ${sp[0]['nama']} mempunyai surat peringatan dengan nomor ${sp[0]['nomor']}, status: ${sp[0]['status']}',
                                         textAlign: TextAlign.left,
                                         style: GoogleFonts.inter(
                                             fontWeight: FontWeight.w400,
@@ -144,7 +146,9 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}",
+                                        tl[0]['status'] == 'Approve'
+                                        ? "Karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}"
+                                        : 'Karyawan ${tl[0]['nama']} mempunyai teguran lisan dengan nomor ${tl[0]['nomor']}, status: ${tl[0]['status']}',
                                         textAlign: TextAlign.left,
                                         style: GoogleFonts.inter(
                                             fontWeight: FontWeight.w400,
@@ -572,7 +576,9 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}",
+                                        sp[0]['status'] == 'Approve'
+                                        ? "Karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}"
+                                        : 'Karyawan ${sp[0]['nama']} mempunyai surat peringatan dengan nomor ${sp[0]['nomor']}, status: ${sp[0]['status']}',
                                         textAlign: TextAlign.left,
                                         style: GoogleFonts.inter(
                                             fontWeight: FontWeight.w400,
@@ -606,7 +612,9 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}",
+                                        tl[0]['status'] == 'Approve'
+                                        ? "Karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}"
+                                        : 'Karyawan ${tl[0]['nama']} mempunyai teguran lisan dengan nomor ${tl[0]['nomor']}, status: ${tl[0]['status']}',
                                         textAlign: TextAlign.left,
                                         style: GoogleFonts.inter(
                                             fontWeight: FontWeight.w400,

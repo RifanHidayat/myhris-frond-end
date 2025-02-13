@@ -51,7 +51,7 @@ import 'package:siscom_operasional/screen/absen/laporan/laporan_lembur.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_semua_pengajuan.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/absen/lembur.dart';
-import 'package:siscom_operasional/screen/absen/pengajuan%20absen.dart';
+import 'package:siscom_operasional/screen/absen/pengajuan_absen.dart';
 import 'package:siscom_operasional/screen/absen/riwayat_izin.dart';
 import 'package:siscom_operasional/screen/absen/tugas_luar.dart';
 import 'package:siscom_operasional/screen/absen/form/form_pengajuan_cuti.dart';
@@ -2550,6 +2550,7 @@ class DashboardController extends GetxController {
             lamaBekerja: element['lama_bekerja'],
             lamaBekerjaFormat: element['lama_bekerja_format'],
             branchId: element['branch_id'],
+            tipeAbsen: element['tipe_absen']
           );
           print('ini branch id ${element['branch_id']}');
           getData.add(data);
@@ -2573,6 +2574,10 @@ class DashboardController extends GetxController {
       }
       //   Api().validateAuth(res.statusCode );
     });
+  }
+  bool isVisibleAbsenIstirahat() {
+    return AppData.informasiUser![0].tipeAbsen.toString() == "3" &&
+        !wfhstatus.value;
   }
 
   Future<void> updateWorkTime() async {

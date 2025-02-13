@@ -24,12 +24,12 @@ class _TeguranLisanState extends State<TeguranLisan> {
   void initState() {
     super.initState();
     controller.getTeguran();
-    controller.getJumlahNotifikasi();
+    controller.getJumlahNotifikasiTl();
   }
 
   void _onRefresh() async {
     controller.getTeguran();
-    controller.getJumlahNotifikasi();
+    controller.getJumlahNotifikasiTl();
     refreshController.refreshCompleted();
   }
 
@@ -85,10 +85,10 @@ class _TeguranLisanState extends State<TeguranLisan> {
                         trailing: Icon(Icons.arrow_forward_ios),
                         // subtitle: Text(formatDate(list.approve_date)),
                         onTap: () {
-                          // if (list.isView == 0) {
-                          //   controller.updateDataNotif(list.id);
-                          //   controller.getPeringatan();
-                          // }
+                          if (list.isView == 0) {
+                            controller.updateDataNotifTl(list.id, list.em_id);
+                            controller.getTeguran();
+                          }
 
                           print('ini teguran list data : ${list}');
                           controller.infoIds(list.diterbitkan_oleh);

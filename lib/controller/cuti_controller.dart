@@ -951,7 +951,9 @@ class CutiController extends GetxController {
         'ajuan': '1',
         'created_by': getEmid,
         'menu_name': 'Cuti',
-        'apply_status': "Pending"
+        'apply_status': "Pending",
+        'total_cuti': jumlahCuti.toInt(),
+        'cut_leave': cutLeave.value
       };
     }
 
@@ -1038,8 +1040,8 @@ class CutiController extends GetxController {
       print('ini body edit cuti $body');
       var connect = Api.connectionApi("post", body, "edit-emp_leave");
       connect.then((dynamic res) {
+        var valueBody = jsonDecode(res.body);
         if (res.statusCode == 200) {
-          var valueBody = jsonDecode(res.body);
           Navigator.pop(Get.context!);
 
           var pesan1 = "Pengajuan ${selectedTypeCuti.value} berhasil di edit";
@@ -1054,6 +1056,9 @@ class CutiController extends GetxController {
           Get.offAll(BerhasilPengajuan(
             dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
           ));
+        }else{
+          Navigator.pop(Get.context!);
+              UtilsAlert.showToast(valueBody['message']);
         }
       });
     }

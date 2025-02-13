@@ -431,6 +431,7 @@ class AuthController extends GetxController {
             isViewTracking: element['is_view_tracking'],
             is_tracking: element['is_tracking'],
             tanggalBerakhirKontrak: element['tanggal_berakhir_kontrak'],
+            tipeAbsen: element['tipe_absen']
             //   startTime: "00:01",
             // endTime: "23:59",
           );
@@ -656,7 +657,8 @@ class AuthController extends GetxController {
               interval: element['interval'],
               interval_tracking: element['interval_tracking'],
               isViewTracking: element['is_view_tracking'],
-              is_tracking: element['is_tracking']
+              is_tracking: element['is_tracking'],
+              tipeAbsen: element['tipe_absen']
               // startTime: "00:01",
               // endTime: "23:59",
               );

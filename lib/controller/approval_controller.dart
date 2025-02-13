@@ -732,7 +732,8 @@ class ApprovalController extends GetxController {
           var data = {
             'nomor': element['nomor'],
             'nama': element['nama'],
-            'exp': element['exp_date']
+            'exp': element['exp_date'],
+            'status': element['status']
           };
           searchSp.value.add(data);
         }
@@ -759,7 +760,8 @@ class ApprovalController extends GetxController {
           var data = {
             'nomor': element['nomor'],
             'nama': element['nama'],
-            'exp': element['exp_date']
+            'exp': element['exp_date'],
+            'status': element['status']
           };
           searchTl.value.add(data);
         }

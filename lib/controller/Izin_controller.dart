@@ -1005,7 +1005,7 @@ class IzinController extends GetxController {
   }
 
   void checkNomorAjuan(status) {
-    print(tanggalBikinPengajuan.value);
+    print('ini tanggal bikin pengajuan ${tanggalBikinPengajuan.value}');
     urutkanTanggalSelected(status);
     var convertTanggalBikinPengajuan = status == false
         ? Constanst.convertDateSimpan(tanggalBikinPengajuan.value)
@@ -1255,7 +1255,9 @@ class IzinController extends GetxController {
       'leave_files': namaFileUpload.value,
       'ajuan': getAjuanType,
       'type': ' ${selectedDropdownFormTidakMasukKerjaTipe.value}',
-      'apply_status': "Pending"
+      'apply_status': "Pending",
+      'total_cuti': jumlahIzin.value,
+      'cut_leave': cutLeave.value
     };
 
     print("data body izin ${body}");
@@ -1373,6 +1375,10 @@ class IzinController extends GetxController {
           Get.offAll(BerhasilPengajuan(
             dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
           ));
+        } else {
+          var valueBody = jsonDecode(res.body);
+          UtilsAlert.showToast(valueBody['message']);
+          Get.back();
         }
       });
     }
@@ -1487,7 +1493,8 @@ class IzinController extends GetxController {
         result.add(element);
       }
     }
-    return result[0]['ajuan'];
+    print('ini validasi type ajuan : ${result}');
+    return result[0]['status'];
   }
 
   String validasiSelectedDelegasi() {
@@ -2174,24 +2181,26 @@ class IzinController extends GetxController {
                                     size: 22,
                                   ),
                                   const SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Rejected by $approve_by",
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Rejected by $approve_by",
+                                            style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                color: Constanst.fgPrimary,
+                                                fontSize: 14)),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          alasanReject,
                                           style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              color: Constanst.fgPrimary,
-                                              fontSize: 14)),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        alasanReject,
-                                        style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w400,
-                                            color: Constanst.fgSecondary,
-                                            fontSize: 14),
-                                      )
-                                    ],
+                                              fontWeight: FontWeight.w400,
+                                              color: Constanst.fgSecondary,
+                                              fontSize: 14),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ],
                               )

@@ -170,13 +170,13 @@ class Constanst {
 
   static String convertDate5(String date) {
     List<String> parts = date.split('-');
-  if (parts.length == 3) {
-    parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
-    parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
-  } else {
-    throw FormatException("Invalid date format: $date");
-  }
-  String fixedDate = parts.join('-');
+    if (parts.length == 3) {
+      parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
+      parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
+    } else {
+      throw FormatException("Invalid date format: $date");
+    }
+    String fixedDate = parts.join('-');
     DateTime convert = DateTime.parse(fixedDate);
     var bulan = DateFormat('MMMM');
     var hari = DateFormat('dd');
@@ -192,13 +192,13 @@ class Constanst {
 
   static String convertDate6(String date) {
     List<String> parts = date.split('-');
-  if (parts.length == 3) {
-    parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
-    parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
-  } else {
-    throw FormatException("Invalid date format: $date");
-  }
-  String fixedDate = parts.join('-');
+    if (parts.length == 3) {
+      parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
+      parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
+    } else {
+      throw FormatException("Invalid date format: $date");
+    }
+    String fixedDate = parts.join('-');
     DateTime convert = DateTime.parse(fixedDate);
     var hari = DateFormat('EEEE');
     var tanggal = DateFormat('dd MMM yyyy', 'id');
@@ -229,11 +229,21 @@ class Constanst {
   }
 
   static String convertDateSimpan(String date) {
-    var inputFormat = DateFormat('dd-MM-yyyy');
-    var inputDate = inputFormat.parse(date);
-    var outputFormat = DateFormat('yyyy-MM-dd');
-    var outputDate = outputFormat.format(inputDate);
-    return outputDate;
+    try {
+      // Jika format sudah "yyyy-MM-dd", langsung return
+      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(date)) {
+        return date;
+      }
+
+      var inputFormat = DateFormat('dd-MM-yyyy');
+      var inputDate = inputFormat.parse(date);
+      var outputFormat = DateFormat('yyyy-MM-dd');
+
+      return outputFormat.format(inputDate);
+    } catch (e) {
+      print('Error parsing date: $e');
+      return '';
+    }
   }
 
   static String convertDateBulanDanTahun(String date) {

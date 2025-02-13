@@ -82,6 +82,16 @@ class AbsenController extends GetxController {
   var checkoutAjuan = "".obs;
   var checkinAjuan2 = "".obs;
   var checkoutAjuan2 = "".obs;
+  var checkinIstiahat = "".obs;
+  var checkoutIstirahat = "".obs;
+  var placeCoordinateCheckinRest = [].obs;
+  var placeCoordinateCheckoutRest = [].obs;
+  var absenLongLatMasukRest = [].obs;
+  var absenKeluarLongLatRest = [].obs;
+  var addressMasukRest = "".obs;
+  var addressKeluarRest = "".obs;
+  RxBool isChecked3 = false.obs;
+  RxBool isChecked4 = false.obs;
   var catataanAjuan = TextEditingController();
   var imageAjuan = "".obs;
   var nomorAjuan = "".obs;
@@ -254,6 +264,144 @@ class AbsenController extends GetxController {
   void showInputCari() {
     statusCari.value = !statusCari.value;
   }
+
+    void getPlaceCoordinateCheckoutRest() {
+    print("place coordinates Rest");
+    placeCoordinate.clear();
+
+    var connect = Api.connectionApi(
+      "get",
+      {},
+      "places_coordinate_pengajuan",
+      params: "&id=${AppData.informasiUser![0].em_id}&date=${tglAjunan.value}",
+    );
+
+    connect.then((dynamic res) {
+      if (res == false) {
+        print("error");
+        //UtilsAlert.koneksiBuruk();
+      } else {
+        if (res.statusCode == 200) {
+          print("Place coordinate 200" + res.body.toString());
+          var valueBody = jsonDecode(res.body);
+          selectedType.value = valueBody['data'][0]['place'];
+
+          List filter = [];
+          for (var element in valueBody['data']) {
+            if (element['isFilterView'] == 1) {
+              element['is_selected'] = false;
+              filter.add(element);
+            }
+          }
+
+          placeCoordinateCheckoutRest.value = filter;
+          placeCoordinateCheckoutRest.refresh();
+        } else {
+          print("Place coordinate !=200" + res.body.toString());
+        }
+      }
+    });
+    placeCoordinateCheckoutRest.refresh();
+  }
+
+  void getPlaceCoordinateCheckinRest() {
+    print("place coordinates Rest");
+    placeCoordinate.clear();
+
+    var connect = Api.connectionApi(
+      "get",
+      {},
+      "places_coordinate_pengajuan",
+      params: "&id=${AppData.informasiUser![0].em_id}&date=${tglAjunan.value}",
+    );
+
+    connect.then((dynamic res) {
+      if (res == false) {
+        print("error");
+        //UtilsAlert.koneksiBuruk();
+      } else {
+        if (res.statusCode == 200) {
+          print("Place coordinate 200" + res.body.toString());
+          var valueBody = jsonDecode(res.body);
+          selectedType.value = valueBody['data'][0]['place'];
+
+          List filter = [];
+          for (var element in valueBody['data']) {
+            if (element['isFilterView'] == 1) {
+              element['is_selected'] = false;
+              filter.add(element);
+            }
+          }
+
+          placeCoordinateCheckinRest.value = filter;
+          placeCoordinateCheckinRest.refresh();
+        } else {
+          print("Place coordinate !=200" + res.body.toString());
+        }
+      }
+    });
+    placeCoordinateCheckinRest.refresh();
+  }
+
+   Future<void> convertLatLongListToAddressesoutRest(latLongList) async {
+    // absenLongLatMasuk.clear();
+    try {
+      //  for (var coordinates in latLongList) {
+      double latitude = double.parse(latLongList[0].toString());
+      double longitude = double.parse(latLongList[1].toString());
+
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        var place = placemarks.first;
+        var addressData = {
+          'name': place.name ?? '',
+          'locality': place.locality ?? '',
+          'postalCode': place.postalCode ?? '',
+          'country': place.country ?? '',
+          "street": place.street ?? '',
+          'subLocality': place.subLocality ?? '',
+          'subAdministrativeArea': place.subAdministrativeArea ?? '',
+          'administrativeArea': place.administrativeArea ?? ''
+        };
+        String formattedAddress =
+            "${place.street}, ${place.name}, ${place.subLocality}, ${place.locality}, ${place.subAdministrativeArea}, ${place.administrativeArea}, ${place.postalCode}";
+        addressKeluarRest.value = formattedAddress;
+      } else {}
+      //  }
+    } catch (e) {}
+  }
+
+  Future<void> convertLatLongListToAddressesinRest(latLongList) async {
+    // absenLongLatMasuk.clear();
+    try {
+      //  for (var coordinates in latLongList) {
+      double latitude = double.parse(latLongList[0].toString());
+      double longitude = double.parse(latLongList[1].toString());
+
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        var place = placemarks.first;
+        var addressData = {
+          'name': place.name ?? '',
+          'locality': place.locality ?? '',
+          'postalCode': place.postalCode ?? '',
+          'country': place.country ?? '',
+          "street": place.street ?? '',
+          'subLocality': place.subLocality ?? '',
+          'subAdministrativeArea': place.subAdministrativeArea ?? '',
+          'administrativeArea': place.administrativeArea ?? ''
+        };
+        String formattedAddress =
+            "${place.street}, ${place.name}, ${place.subLocality}, ${place.locality}, ${place.subAdministrativeArea}, ${place.administrativeArea}, ${place.postalCode}";
+        addressMasukRest.value = formattedAddress;
+      } else {}
+      //  }
+    } catch (e) {}
+  }
+
+
 
   void showBottomBranch() {
     showModalBottomSheet(
@@ -2206,6 +2354,16 @@ class AbsenController extends GetxController {
                 namaHariLibur: el['hari_libur'],
                 jamKerja: el['jam_kerja'],
                 jamPulang: el['jam_pulang'],
+                breakoutTime: el['breakout_time'],
+                breakoutNote: el['breakout_note'],
+                breakoutPict: el['breakout_pict'],
+                breakoutPlace: el['place_break_out'],
+                breakinTime: el['breakin_time'],
+                breakinNote: el['breakin_note'],
+                breakinPict: el['breakin_pict'],
+                breakinPlace: el['place_break_in'],
+                breakinAddr: el['breakin_addr'],
+                breakoutAddr: el['breakout_addr'],
                 statusView: el['status_view'] ?? false));
             tempHistoryAbsen.value = historyAbsen.value;
             // historyAbsen.value.add(AbsenModel(
@@ -2496,6 +2654,16 @@ class AbsenController extends GetxController {
                 offDay: el['off_date'],
                 namaHariLibur: el['hari_libur'],
                 jamKerja: el['jam_kerja'],
+                breakoutTime: el['breakout_time'],
+                breakoutNote: el['breakout_note'],
+                breakoutPict: el['breakout_pict'],
+                breakoutPlace: el['place_break_out'],
+                breakinTime: el['breakin_time'],
+                breakinNote: el['breakin_note'],
+                breakinPict: el['breakin_pict'],
+                breakinPlace: el['place_break_in'],
+                breakinAddr: el['breakin_addr'],
+                breakoutAddr: el['breakout_addr'],
                 statusView: el['status_view'] ?? false));
             tempHistoryAbsen.value = historyAbsen.value;
             // historyAbsen.value.add(AbsenModel(
@@ -4122,6 +4290,8 @@ class AbsenController extends GetxController {
     // placeCoordinateCheckout.clear();
     absenLongLatMasuk.clear();
     absenKeluarLongLat.clear();
+    absenKeluarLongLatRest.clear();
+    absenLongLatMasukRest.clear();
     // isChecked.value = false;
     // isChecked2.value = false;
     // tglAjunan.value = "";
@@ -4172,6 +4342,30 @@ class AbsenController extends GetxController {
           : "",
       'file': imageAjuan.value,
       'tgl_ajuan': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      'checkin_rest': checkinIstiahat.value.toString() == ""
+          ? "00:00:00"
+          : checkinIstiahat.value.toString(),
+      'checkout_rest': checkoutIstirahat.value.toString() == ""
+          ? "00:00:00"
+          : checkoutIstirahat.value.toString(),
+      'lokasi_masuk_id_rest': placeCoordinateCheckinRest
+              .where((p0) => p0['is_selected'] == true)
+              .toList()
+              .isNotEmpty
+          ? placeCoordinateCheckinRest
+              .where((p0) => p0['is_selected'] == true)
+              .toList()[0]['id']
+          : "",
+      'lokasi_keluar_id_rest': placeCoordinateCheckoutRest
+              .where((p0) => p0['is_selected'] == true)
+              .toList()
+              .isNotEmpty
+          ? placeCoordinateCheckoutRest
+              .where((p0) => p0['is_selected'] == true)
+              .toList()[0]['id']
+          : "",
+      "address_masuk_rest": addressMasukRest.value.toString(),
+      "address_keluar_rest": addressKeluarRest.value.toString(),
     };
     print('body data ajuan ${body}');
     var connect = Api.connectionApi("post", body, "save-employee-attendance");

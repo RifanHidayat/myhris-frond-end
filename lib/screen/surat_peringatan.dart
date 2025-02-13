@@ -85,7 +85,7 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                         subtitle: Text(formatDate(list.approve_date)),
                         onTap: () {
                           if (list.isView == 0) {
-                            controller.updateDataNotif(list.id);
+                            controller.updateDataNotifSp(list.id, list.em_id);
                             controller.getPeringatan();
                           }
                           controller.getDetail(list.id);
