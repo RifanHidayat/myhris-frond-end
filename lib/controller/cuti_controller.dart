@@ -26,6 +26,7 @@ class CutiController extends GetxController {
   var dariTanggal = TextEditingController().obs;
   var sampaiTanggal = TextEditingController().obs;
   var alasan = TextEditingController().obs;
+  var focus = FocusNode();
   var cari = TextEditingController().obs;
   var departemen = TextEditingController().obs;
   var showTipe = false.obs;
@@ -44,6 +45,7 @@ class CutiController extends GetxController {
   var allNameLaporanCutiCopy = [].obs;
   var tanggalSelectedEdit = [].obs;
   var durasiCutiMelahirkan = 0.obs;
+  var messageApi = ''.obs;
   Rx<List<String>> allEmployeeDelegasi = Rx<List<String>>([]);
   Rx<List<String>> allTipeFormCutiDropdown = Rx<List<String>>([]);
   var showStatus = false.obs;
@@ -1023,11 +1025,13 @@ class CutiController extends GetxController {
               checkNomorAjuanDalamAntrian(nomorAjuanTerakhirDalamAntrian);
             } else if (valueBody['message'] == 'gagal ambil data') {
               Navigator.pop(Get.context!);
-              UtilsAlert.showToast(
-                  "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
+              messageApi.value = "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD";
+              // UtilsAlert.showToast(
+              //     "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
             } else {
               Navigator.pop(Get.context!);
-              UtilsAlert.showToast(valueBody['message']);
+              messageApi.value = valueBody['message'];
+              // UtilsAlert.showToast(valueBody['message']);
             }
           }
         }
@@ -1058,7 +1062,8 @@ class CutiController extends GetxController {
           ));
         }else{
           Navigator.pop(Get.context!);
-              UtilsAlert.showToast(valueBody['message']);
+          messageApi.value = valueBody['message'];
+              // UtilsAlert.showToast(valueBody['message']);
         }
       });
     }
@@ -1557,6 +1562,9 @@ class CutiController extends GetxController {
         tanggalAjuanDariDate.month, tanggalAjuanDariDate.day);
 
     Duration difference = tanggalDari.difference(tanggalMasuk);
+    print('ini data diferent ${difference.inDays}');
+    print('ini data diferent ${tanggalMasuk}');
+    print('ini data diferent ${tanggalDari}');
     print('ini data diferent ${difference}');
     if (valuePolaPersetujuan.value == "1") {
       typeAjuan = detailData['leave_status'];
@@ -1985,7 +1993,7 @@ class CutiController extends GetxController {
                                   onPressed: () {
                                     print(detailData.toString());
                                     loadDataTypeCutiEdit(
-                                        durasi: difference,
+                                        durasi: difference.inDays.toString(),
                                         detailData: detailData);
                                     // Get.to(FormPengajuanCuti(
                                     //   dataForm: [detailData, true],

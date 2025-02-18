@@ -15,6 +15,7 @@ import 'package:siscom_operasional/controller/absen_controller.dart';
 import 'package:siscom_operasional/controller/auth_controller.dart';
 
 import 'package:siscom_operasional/main.dart';
+import 'package:siscom_operasional/screen/absen/absen_istirahat_masuk_keluar.dart';
 import 'package:siscom_operasional/screen/absen/absen_masuk_keluar.dart';
 import 'package:siscom_operasional/screen/absen/absen_masuk_keluar_offline.dart';
 import 'package:siscom_operasional/utils/constans.dart';
@@ -321,24 +322,32 @@ class _CameraViewState extends State<CameraViewLocation> {
                               InkWell(
                                   onTap: () {
                                     Get.back();
-                                    // if (!authController.isConnected.value) {
-                                    //   Get.to(AbsenMasukKeluarOffline(
-                                    //     status: widget.status == 'masuk'
-                                    //         ? "Absen Masuk"
-                                    //         : "Absen Keluar",
-                                    //   ));
-                                    // } else {
-                                    Navigator.push(
-                                      Get.context!,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              AbsenMasukKeluar(
-                                                status: widget.status == 'masuk'
-                                                    ? "Absen Masuk"
-                                                    : "Absen Keluar",
-                                              )),
-                                    );
-                                    // }
+                                     if (controllerAbsensi
+                                        .isAbsenIstirahat.value) {
+                                      Navigator.push(
+                                        Get.context!,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AbsenIstirahatMasukKeluar(
+                                                  status:
+                                                      widget.status == 'masuk'
+                                                          ? "Absen Istirahat"
+                                                          : "Absen Mulai Kerja",
+                                                )),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        Get.context!,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AbsenMasukKeluar(
+                                                  status:
+                                                      widget.status == 'masuk'
+                                                          ? "Absen Masuk"
+                                                          : "Absen Keluar",
+                                                )),
+                                      );
+                                    }
                                   },
                                   child: const Icon(
                                     Iconsax.tick_circle,

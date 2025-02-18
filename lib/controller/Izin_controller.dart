@@ -26,6 +26,7 @@ class IzinController extends GetxController {
   var jamAjuan = TextEditingController().obs;
   var sampaiJamAjuan = TextEditingController().obs;
   var alasan = TextEditingController().obs;
+  var focus = FocusNode();
   var departemen = TextEditingController().obs;
   var izinTerpakai = 0.obs;
   var jumlahIzin = 0.obs;
@@ -37,6 +38,7 @@ class IzinController extends GetxController {
   var outLimit = ''.obs;
   var lateLimit = ''.obs;
   var showTipeCuti = false.obs;
+  var messageApi = ''.obs;
 
   var typeTap = 0.obs;
   var startDate = ''.obs;
@@ -1340,13 +1342,15 @@ class IzinController extends GetxController {
               UtilsAlert.showToast(valueBody['error']);
             } else {
               Navigator.pop(Get.context!);
-              UtilsAlert.showToast(
-                  "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
+              messageApi.value = "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD";
+              // UtilsAlert.showToast(
+              //     "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
             }
           }
         } else {
           var valueBody = jsonDecode(res.body);
-          UtilsAlert.showToast(valueBody['message']);
+          messageApi.value = valueBody['message'];
+          // UtilsAlert.showToast(valueBody['message']);
           Get.back();
         }
       });
@@ -1377,7 +1381,8 @@ class IzinController extends GetxController {
           ));
         } else {
           var valueBody = jsonDecode(res.body);
-          UtilsAlert.showToast(valueBody['message']);
+          messageApi.value = valueBody['message'];
+          // UtilsAlert.showToast(valueBody['message']);
           Get.back();
         }
       });

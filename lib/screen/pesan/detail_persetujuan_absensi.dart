@@ -351,6 +351,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
     var em_id = controller.detailData[0]['emId_pengaju'];
     var no_ajuan =
         controller.detailData[0]['nomor_ajuan'].toString().substring(0, 2);
+    var emId = AppData.informasiUser![0].em_id;
     return Scaffold(
       backgroundColor: Constanst.coloBackgroundScreen,
       // appBar: AppBar(
@@ -419,17 +420,13 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Obx(() => controller.showButton.value == true ||
+        child: Obx(() => 
                 controller.showButton.value == true &&
                     (controller.detailData[0]['status'] == "Pending" ||
                         controller.detailData[0]['approve_status'] ==
                             "Pending" ||
                         controller.detailData[0]['approve_status'] ==
-                            "Pending" ||
-                        (controller.detailData[0]['approve2_status'] ==
-                                "Pending" &&
-                            controller.detailData[0]['approve_status'] !=
-                                "Rejected"))
+                            "Pending") && controller.detailData[0]['em_report_to'].toString().contains(emId)
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -448,7 +445,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          print(AppData.informasiUser![0].em_id);
+                          
                           print(controller.detailData[0]['em_report_to']);
                           print(controller.detailData[0]['em_report2_to']);
                           // print("tes");
@@ -502,7 +499,86 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                   ),
                 ],
               )
-            : const SizedBox()),
+            : controller.showButton.value == true &&
+                    (controller.detailData[0]['status'] == "Pending" ||
+                        controller.detailData[0]['approve2_status'] ==
+                            "Pending" ||
+                        controller.detailData[0]['approve_status'] ==
+                            "Approve") && controller.detailData[0]['em_report2_to'].toString().contains(emId)
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 40,
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color:
+                              Constanst.border, // Set the desired border color
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          
+                          print(controller.detailData[0]['em_report_to']);
+                          print(controller.detailData[0]['em_report2_to']);
+                          // print("tes");
+                          showBottomAlasanReject(em_id);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Constanst.color4,
+                            backgroundColor: Constanst.colorWhite,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                            // padding: EdgeInsets.zero,
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
+                        child: Text(
+                          'Tolak',
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                              color: Constanst.color4,
+                              fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          validasiMenyetujui(true, em_id);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Constanst.colorWhite,
+                          backgroundColor: Constanst.colorPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                          // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
+                        ),
+                        child: Text(
+                          'Menyetujui',
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                              color: Constanst.colorWhite,
+                              fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : const SizedBox()
+            ),
       ),
       body: WillPopScope(
         onWillPop: () async {
@@ -594,26 +670,28 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                                     ),
                                   ),
                             const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "${controller.detailData[0]['nama_pengaju']}",
-                                  style: GoogleFonts.inter(
-                                      color: Constanst.fgPrimary,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  controller.detailData[0]['nama_divisi'] ??
-                                      "".toString(),
-                                  style: GoogleFonts.inter(
-                                      color: Constanst.fgSecondary,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14),
-                                ),
-                              ],
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${controller.detailData[0]['nama_pengaju']}",
+                                    style: GoogleFonts.inter(
+                                        color: Constanst.fgPrimary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    controller.detailData[0]['nama_divisi'] ??
+                                        "".toString(),
+                                    style: GoogleFonts.inter(
+                                        color: Constanst.fgSecondary,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -815,14 +893,6 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                                           fontWeight: FontWeight.w500,
                                           fontSize: 16),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "Setelah",
-                                      style: GoogleFonts.inter(
-                                          color: Constanst.fgSecondary,
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 12),
-                                    ),
                                     // Padding(
                                     //   padding: const EdgeInsets.only(
                                     //       top: 12.0, bottom: 12.0),
@@ -873,14 +943,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                                           fontWeight: FontWeight.w500,
                                           fontSize: 16),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "Setelah",
-                                      style: GoogleFonts.inter(
-                                          color: Constanst.fgSecondary,
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 12),
-                                    ),
+                                    
                                     // Padding(
                                     //   padding: const EdgeInsets.only(
                                     //       top: 12.0, bottom: 12.0),
@@ -896,181 +959,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                             ),
                           ],
                         ),
-                        // Row(
-                        //   children: [
-                        //     Expanded(
-                        //       child: Column(
-                        //         crossAxisAlignment:
-                        //             CrossAxisAlignment.start,
-                        //         children: [
-                        //           Text(
-                        //             "Absen Masuk",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 14),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             "_ _ : _ _",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w500,
-                        //                 fontSize: 16),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             "Sebelum",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 12),
-                        //           ),
-                        //           Padding(
-                        //             padding: const EdgeInsets.only(
-                        //                 top: 12.0, bottom: 12.0),
-                        //             child: Divider(
-                        //               thickness: 1,
-                        //               height: 0,
-                        //               color: Constanst.border,
-                        //             ),
-                        //           ),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //     Padding(
-                        //       padding: const EdgeInsets.only(
-                        //           left: 16.0, right: 16.0),
-                        //       child: Icon(
-                        //         Iconsax.arrow_right_1,
-                        //         color: Constanst.fgSecondary,
-                        //         size: 22,
-                        //       ),
-                        //     ),
-                        //     Expanded(
-                        //       child: Column(
-                        //         crossAxisAlignment:
-                        //             CrossAxisAlignment.start,
-                        //         children: [
-                        //           Text(
-                        //             "Absen Masuk",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 14),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             DateFormat.Hm().format(
-                        //                 DateFormat("dd-MM-yyyy HH:mm:ss")
-                        //                     .parse(controller.detailData[0]
-                        //                         ['waktu_dari'])),
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgPrimary,
-                        //                 fontWeight: FontWeight.w500,
-                        //                 fontSize: 16),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             "Setelah",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 12),
-                        //           ),
-                        //           Padding(
-                        //             padding: const EdgeInsets.only(
-                        //                 top: 12.0, bottom: 12.0),
-                        //             child: Divider(
-                        //               thickness: 1,
-                        //               height: 0,
-                        //               color: Constanst.border,
-                        //             ),
-                        //           ),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                        // Row(
-                        //   children: [
-                        //     Expanded(
-                        //       child: Column(
-                        //         crossAxisAlignment:
-                        //             CrossAxisAlignment.start,
-                        //         children: [
-                        //           Text(
-                        //             "Absen Keluar",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 14),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             "_ _ : _ _",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w500,
-                        //                 fontSize: 16),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             "Sebelum",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 12),
-                        //           ),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //     Padding(
-                        //       padding: const EdgeInsets.only(
-                        //           left: 16.0, right: 16.0),
-                        //       child: Icon(
-                        //         Iconsax.arrow_right_1,
-                        //         color: Constanst.fgSecondary,
-                        //         size: 22,
-                        //       ),
-                        //     ),
-                        //     Expanded(
-                        //       child: Column(
-                        //         crossAxisAlignment:
-                        //             CrossAxisAlignment.start,
-                        //         children: [
-                        //           Text(
-                        //             "Absen Keluar",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 14),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             DateFormat.Hm().format(
-                        //                 DateFormat("dd-MM-yyyy HH:mm:ss")
-                        //                     .parse(controller.detailData[0]
-                        //                         ['waktu_sampai'])),
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgPrimary,
-                        //                 fontWeight: FontWeight.w500,
-                        //                 fontSize: 16),
-                        //           ),
-                        //           const SizedBox(height: 4),
-                        //           Text(
-                        //             "Setelah",
-                        //             style: GoogleFonts.inter(
-                        //                 color: Constanst.fgSecondary,
-                        //                 fontWeight: FontWeight.w400,
-                        //                 fontSize: 12),
-                        //           ),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-
+                        
                         Padding(
                           padding:
                               const EdgeInsets.only(top: 12.0, bottom: 12.0),
@@ -1080,6 +969,121 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                             color: Constanst.border,
                           ),
                         ),
+                        Row(
+                          children: [
+                            Visibility(
+                              visible: DateFormat.Hm().format(
+                                      DateFormat("HH:mm:ss").parse(
+                                          controller.detailData[0]
+                                              ['breakout_time'] == null || controller.detailData[0]
+                                              ['breakout_time'] == null ? '00:00:00' : controller.detailData[0]
+                                              ['breakout_time'])) !=
+                                  "00:00",
+                              child: Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Istirahat Keluar",
+                                      style: GoogleFonts.inter(
+                                          color: Constanst.fgSecondary,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      DateFormat.Hm().format(
+                                          DateFormat("HH:mm:ss")
+                                              .parse( controller.detailData[0]
+                                              ['breakout_time'] == null || controller.detailData[0]
+                                              ['breakout_time'] == null ? '00:00:00' : controller.detailData[0]
+                                              ['breakout_time'])),
+                                      style: GoogleFonts.inter(
+                                          color: Constanst.fgPrimary,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16),
+                                    ),
+                                    // Padding(
+                                    //   padding: const EdgeInsets.only(
+                                    //       top: 12.0, bottom: 12.0),
+                                    //   child: Divider(
+                                    //     thickness: 1,
+                                    //     height: 0,
+                                    //     color: Constanst.border,
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(
+                            //       left: 16.0, right: 16.0),
+                            //   child: Icon(
+                            //     Iconsax.arrow_right_1,
+                            //     color: Constanst.fgSecondary,
+                            //     size: 22,
+                            //   ),
+                            // ),
+                            Visibility(
+                              visible: DateFormat.Hm().format(
+                                      DateFormat("HH:mm:ss").parse(
+                                           controller.detailData[0]
+                                              ['breakin_time'] == null || controller.detailData[0]
+                                              ['breakin_time'] == null ? '00:00:00' : controller.detailData[0]
+                                              ['breakin_time'])) !=
+                                  "00:00",
+                              child: Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Istirahat Masuk",
+                                      style: GoogleFonts.inter(
+                                          color: Constanst.fgSecondary,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      DateFormat.Hm().format(
+                                          DateFormat("HH:mm:ss")
+                                              .parse( controller.detailData[0]
+                                              ['breakin_time'] == null || controller.detailData[0]
+                                              ['breakin_time'] == null ? '00:00:00' : controller.detailData[0]
+                                              ['breakin_time'])),
+                                      style: GoogleFonts.inter(
+                                          color: Constanst.fgPrimary,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16),
+                                    ),
+                                    
+                                    // Padding(
+                                    //   padding: const EdgeInsets.only(
+                                    //       top: 12.0, bottom: 12.0),
+                                    //   child: Divider(
+                                    //     thickness: 1,
+                                    //     height: 0,
+                                    //     color: Constanst.border,
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(top: 12.0, bottom: 12.0),
+                          child: Divider(
+                            thickness: 1,
+                            height: 0,
+                            color: Constanst.border,
+                          ),
+                        ),
+                        
                         Text(
                           "Catatan",
                           style: GoogleFonts.inter(
@@ -2770,7 +2774,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
         text2 = "Pending Approval 2";
       }
       if (data['approve2_status'] == "Rejected") {
-        text2 = "Rejected 1 By - ${data['nama_approve1']}";
+        text2 = "Rejected By - ${data['nama_approve2']}";
       }
 
       if (data['approve2_status'] == "Approve") {

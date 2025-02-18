@@ -99,10 +99,10 @@ class _TeguranLisanState extends State<TeguranLisan> {
                                 nama: list.nama,
                                 posisi: list.posisi,
                                 nomor: list.nomor_surat.toString(),
-                                hal: list.hal,
-                                tglSrt: list.tgl_surat,
+                                hal: list.hal.toString(),
+                                tglSrt: list.eff_date,
                                 pelanggaran: list.pelanggaran,
-                                diterbitkan: list.diterbitkan_oleh,
+                                diterbitkan: list.diterbitkan_oleh.toString(),
                               ));
                         },
                       );
@@ -269,7 +269,8 @@ class SuratTeguranDetail extends StatelessWidget {
                             children: [
                               SizedBox(height: 20),
                               Text(
-                                'Jakarta, ${DateFormat('dd MMMM yyyy').format(DateTime.parse(tglSrt.toString()))}',
+                                // tglSrt,
+                                'Jakarta, ${formatDate(tglSrt)}',
                                 style: TextStyle(
                                     fontSize: 12.0),
                               ),
@@ -293,7 +294,7 @@ class SuratTeguranDetail extends StatelessWidget {
 
   String formatDate(String dateString) {
     DateTime dateTime = DateTime.parse(dateString);
-    String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+    String formattedDate = DateFormat('dd MMMM yyyy', 'id_ID').format(dateTime);
     return formattedDate;
   }
 }

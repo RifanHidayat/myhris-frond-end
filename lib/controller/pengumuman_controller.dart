@@ -89,13 +89,13 @@ class PengumumanController extends GetxController {
               .toUpperCase()
               .compareTo(a['begin_date'].toUpperCase()));
 
-          pengumumanList.value = data;
+          pengumumanList.value = filter1;
           var belumDibaca = pengumumanList.where((pengumuman) {
           return pengumuman['is_view'] == 0; 
         }).length;
         jumlahNotifikasiBelumDibaca.value = belumDibaca;
         jumlahNotifikasiBelumDibaca.refresh();
-          getJumlahNotifikasi();
+          // getJumlahNotifikasi();
 
         }
       }
@@ -124,7 +124,8 @@ class PengumumanController extends GetxController {
 
   void updateDataNotif(data) {
     Map<String, dynamic> body = {
-      "id": data,
+      "notice_id": data,
+      "em_id": AppData.informasiUser![0].em_id,
     };
     var connect = Api.connectionApi("post", body, "notice/count/save");
     connect.then((dynamic res) async {

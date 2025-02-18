@@ -50,6 +50,7 @@ class UserModel {
   var lamaBekerja;
   var lamaBekerjaFormat;
   var tipeAbsen;
+  var periodeAwal;
   
 
   UserModel({
@@ -100,6 +101,7 @@ class UserModel {
     this.lamaBekerja,
     this.lamaBekerjaFormat,
     this.tipeAbsen,
+    this.periodeAwal
     
   });
 
@@ -152,6 +154,7 @@ class UserModel {
       "lama_bekerja_format": lamaBekerjaFormat,
       "branch_id": branchId,
       "tipe_absen": tipeAbsen,
+      "periode_awal": periodeAwal,
       
     };
   }
@@ -204,7 +207,7 @@ class UserModel {
       lamaBekerja: map['lama_bekerja'],
       lamaBekerjaFormat: map['lama_bekerja_format'],
       branchId: map['branch_id'],
-      
+      periodeAwal: map['periode_awal'],
       tipeAbsen: map['tipe_absen'],
     );
   }

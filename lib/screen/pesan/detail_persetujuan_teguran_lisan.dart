@@ -248,6 +248,7 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
     controller.fetchAlasanTeguranLisan(widget.idxDetail);
     super.initState();
     var emId = AppData.informasiUser![0].em_id;
+    print('ini idxDetail ${controller.detailData}');
 
     if (controllerGlobal.valuePolaPersetujuan.value.toString() == "1") {
       if (controller.detailData[0]['nama_approve1'] == "" ||
@@ -545,28 +546,30 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                                                 ),
                                               ),
                                         const SizedBox(width: 12),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${controller.detailData[0]['nama_pengaju']}",
-                                              style: GoogleFonts.inter(
-                                                  color: Constanst.fgPrimary,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 16),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              controller.detailData[0]
-                                                      ['nama_divisi'] ??
-                                                  "".toString(),
-                                              style: GoogleFonts.inter(
-                                                  color: Constanst.fgSecondary,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14),
-                                            ),
-                                          ],
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${controller.detailData[0]['nama_pengaju']}",
+                                                style: GoogleFonts.inter(
+                                                    color: Constanst.fgPrimary,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                controller.detailData[0]
+                                                        ['nama_divisi'] ??
+                                                    "".toString(),
+                                                style: GoogleFonts.inter(
+                                                    color: Constanst.fgSecondary,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),

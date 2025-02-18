@@ -29,6 +29,7 @@ import 'package:siscom_operasional/controller/setting_controller.dart';
 import 'package:siscom_operasional/controller/tab_controller.dart';
 import 'package:siscom_operasional/controller/tracking_controller.dart';
 import 'package:siscom_operasional/database/sqlite/sqlite_database_helper.dart';
+import 'package:siscom_operasional/screen/absen/absen_istirahat_masuk_keluar.dart';
 import 'package:siscom_operasional/screen/absen/absesi_location.dart';
 import 'package:siscom_operasional/screen/absen/camera_view.dart';
 import 'package:siscom_operasional/screen/absen/face_id_registration.dart';
@@ -38,6 +39,7 @@ import 'package:siscom_operasional/screen/akun/personal_info.dart';
 import 'package:siscom_operasional/screen/chatting/history.dart';
 import 'package:siscom_operasional/screen/detail_informasi.dart';
 import 'package:siscom_operasional/screen/informasi.dart';
+import 'package:siscom_operasional/screen/monitoring.dart';
 import 'package:siscom_operasional/screen/pengumuman.dart';
 import 'package:siscom_operasional/screen/peraturan/peraturan_perusahaan_screen.dart';
 import 'package:siscom_operasional/screen/pesan/pesan.dart';
@@ -495,13 +497,19 @@ class _DashboardState extends State<Dashboard> {
                     SafeArea(
                       child: Padding(
                         padding: EdgeInsets.only(
-                            top: 290.0
-                            // _isVisible
-                            //     ? (controller.status.value == "[]" &&
-                            //             controller.wfhstatus.value)
-                            //         ? 290.0
-                            //         : 290.0
-                            //     : 180.0
+                            top: (controller.isVisibleAbsenIstirahat())
+                                ? 350.0
+                                : (controller.isVisibleAbsenIstirahat())
+                                    ? 260.0
+                                    : 
+                                    // _isVisible
+                                        (controller.status.value == "[]" &&
+                                                controller
+                                                    .wfhstatus.value) // ||
+                                            // (controller.absenOfflineStatus.value)
+                                            ? 300.0
+                                            : 285.0
+                                        
                               ),
                         child: Container(
                           decoration: BoxDecoration(
@@ -1300,6 +1308,7 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                               onTap: () {
+                                controllerAbsensi.isAbsenIstirahat.value = false;
                                 print(
                                     'ini sisa kontrak ${AppData.informasiUser![0].sisaKontrak}');
                                 if (AppData.informasiUser![0].sisaKontrak
@@ -1799,6 +1808,7 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                               onTap: () {
+                                controllerAbsensi.isAbsenIstirahat.value = false;
                                 if (controller.pendingSignoutApr.value) {
                                   UtilsAlert.showToast(
                                       "Menunggu status absensi anda di approve");
@@ -2155,7 +2165,7 @@ class _DashboardState extends State<Dashboard> {
                       ],
                     ),
                   ],
-                )
+                ),
               // : SizedBox(),
     
           // _isVisible
@@ -2424,8 +2434,305 @@ class _DashboardState extends State<Dashboard> {
           //         ],
           //       )
           //     : Container(),
+        Visibility(
+              visible: controller.isVisibleAbsenIstirahat(),
+              child: Column(
+                children: [
+                  const Divider(
+                    height: 0,
+                    thickness: 1,
+                  ),
+                  cardAbsenIstirahat(),
+                ],
+              ),
+            ),
         ],
       ),
+    );
+  }
+
+  Widget cardAbsenIstirahat() {
+    return Row(
+      mainAxisSize: MainAxisSize.min, // Membuat tinggi card sesuai content
+      children: [
+        Expanded(
+          child: InkWell(
+            onTap: () {
+              if (controller.signinTime.value == "00:00:00") {
+                UtilsAlert.showToast("Anda harus absen masuk terlebih dahulu");
+              } else if (controller.breakoutTime.value != "00:00:00") {
+                UtilsAlert.showToast(
+                    "Anda harus absen mulai kerja terlebih dahulu");
+              } else if (controller.breakinTime.value != "00:00:00" &&
+                  controller.breakoutTime.value != "00:00:00") {
+                UtilsAlert.showToast("Absen Istirahat hanya sekali saja");
+              } else if (controller.signoutTime.value != "00:00:00") {
+                UtilsAlert.showToast("Anda sudah absen pulang");
+              } else {
+                var dataUser = AppData.informasiUser;
+                var faceRecog = dataUser![0].face_recog;
+                print("facee recog ${GetStorage().read('face_recog')}");
+
+                if (GetStorage().read('face_recog') == true ||
+                    controllerAbsensi.regType.value == 1 ||
+                    controllerAbsensi.regType.value == 2) {
+                  print("masuk sini");
+                  var statusCamera = Permission.camera.status;
+                  statusCamera.then((value) {
+                    var statusLokasi = Permission.location.status;
+                    statusLokasi.then((value2) async {
+                      if (value != PermissionStatus.granted ||
+                          value2 != PermissionStatus.granted) {
+                        UtilsAlert.showToast(
+                            "Anda harus aktifkan kamera dan lokasi anda");
+                        controller.widgetButtomSheetAktifCameraIstirahat(
+                            type: 'loadfirst');
+                      } else {
+                        controllerAbsensi.titleAbsen.value = "Absen Istirahat";
+                        controllerAbsensi.typeAbsen.value = 2;
+                        controllerAbsensi.isAbsenIstirahat.value = true;
+
+                        if (controllerAbsensi.regType.value == 1) {
+                          print("masuk 1");
+                          Get.to(AbsensiLocation(
+                            status: "masuk",
+                          ));
+                        } else if (controllerAbsensi.regType.value == 0) {
+                          print("masuk masuk 2");
+                          Get.to(FaceDetectorView(
+                            status: "masuk",
+                          ));
+                        } else {
+                          Get.to(AbsenIstirahatMasukKeluar(
+                              status: "Absen Istirahat"));
+                        }
+                      }
+                    });
+                  });
+                } else {
+                  controllerAbsensi.widgetButtomSheetFaceRegistrattion();
+                }
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  // topLeft: Radius.circular(15),
+                  bottomLeft: Radius.circular(15),
+                ),
+                color: controller.breakoutTime.value != "00:00:00" ||
+                        controller.signinTime.value == "00:00:00" ||
+                        controller.signoutTime.value != "00:00:00"
+                    ? Constanst.colorNonAktif
+                    : Constanst.colorWhite,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.restaurant,
+                    color: controller.breakoutTime.value != "00:00:00" ||
+                            controller.signinTime.value == "00:00:00" ||
+                            controller.signoutTime.value != "00:00:00"
+                        ? const Color.fromARGB(168, 166, 167, 158)
+                        : Constanst.color4,
+                    // size: 26,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Istirahat',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: controller.breakoutTime.value !=
+                                            "00:00:00" ||
+                                        controller.signinTime.value ==
+                                            "00:00:00" ||
+                                        controller.signoutTime.value !=
+                                            "00:00:00"
+                                    ? const Color.fromARGB(168, 166, 167, 158)
+                                    : Constanst.fgPrimary,
+                              ),
+                            ),
+                            const SizedBox(width: 25),
+                            // const Spacer(),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: controller.breakoutTime.value !=
+                                          "00:00:00" ||
+                                      controller.signinTime.value ==
+                                          "00:00:00" ||
+                                      controller.signoutTime.value != "00:00:00"
+                                  ? const Color.fromARGB(168, 166, 167, 158)
+                                  : Constanst.fgPrimary,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Obx(
+                          () => Text(
+                            controller.breakoutTime.value != "00:00:00"
+                                ? controller.breakoutTime.value
+                                : '_ _:_ _:_ _',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: controller.breakoutTime.value !=
+                                          "00:00:00" ||
+                                      controller.signinTime.value ==
+                                          "00:00:00" ||
+                                      controller.signoutTime.value != "00:00:00"
+                                  ? const Color.fromARGB(168, 166, 167, 158)
+                                  : Constanst.fgPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // Bagian "Keluar"
+        Expanded(
+          child: InkWell(
+            onTap: () {
+              if (controller.breakoutTime.value == "00:00:00") {
+                UtilsAlert.showToast(
+                    "Anda harus absen istirahat terlebih dahulu");
+              } else if (controller.breakinTime.value != "00:00:00" &&
+                  controller.breakoutTime.value != "00:00:00") {
+                UtilsAlert.showToast("Absen Istirahat hanya sekali saja");
+              } else if (controller.signoutTime.value != "00:00:00") {
+                UtilsAlert.showToast("Anda sudah absen pulang");
+              } else {
+                var dataUser = AppData.informasiUser;
+                var faceRecog = dataUser![0].face_recog;
+
+                if (GetStorage().read('face_recog') == true ||
+                    controllerAbsensi.regType.value == 1 ||
+                    controllerAbsensi.regType.value == 2) {
+                  controllerAbsensi.titleAbsen.value = "Absen Mulai Kerja";
+                  controllerAbsensi.typeAbsen.value = 1;
+                  controllerAbsensi.isAbsenIstirahat.value = true;
+
+                  if (controllerAbsensi.regType.value == 1) {
+                    print("tes absen rrr");
+                    Get.to(AbsensiLocation(
+                      status: "keluar",
+                    ));
+                  } else if (controllerAbsensi.regType.value == 0) {
+                    print("tes absen pppp");
+                    Get.to(FaceDetectorView(
+                      status: "keluar",
+                    ));
+                  } else {
+                    Get.to(
+                        AbsenIstirahatMasukKeluar(status: "Absen Mulai Kerja"));
+                  }
+                } else {
+                  controllerAbsensi.widgetButtomSheetFaceRegistrattion();
+                }
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  // topRight: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
+                ),
+                color: controller.breakinTime.value != "00:00:00" ||
+                        controller.breakoutTime.value == "00:00:00" ||
+                        controller.signoutTime.value != "00:00:00"
+                    ? Constanst.colorNonAktif
+                    : Constanst.colorWhite,
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.work,
+                    color: controller.breakinTime.value != "00:00:00" ||
+                            controller.breakoutTime.value == "00:00:00" ||
+                            controller.signoutTime.value != "00:00:00"
+                        ? const Color.fromARGB(168, 166, 167, 158)
+                        : Constanst.color5,
+                    // size: 26,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "Mulai Kerja",
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: controller.breakinTime.value !=
+                                            "00:00:00" ||
+                                        controller.breakoutTime.value ==
+                                            "00:00:00" ||
+                                        controller.signoutTime.value !=
+                                            "00:00:00"
+                                    ? const Color.fromARGB(168, 166, 167, 158)
+                                    : Constanst.fgPrimary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: controller.breakinTime.value !=
+                                          "00:00:00" ||
+                                      controller.breakoutTime.value ==
+                                          "00:00:00" ||
+                                      controller.signoutTime.value != "00:00:00"
+                                  ? const Color.fromARGB(168, 166, 167, 158)
+                                  : Constanst.fgPrimary,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          controller.breakinTime.value != "00:00:00"
+                              ? controller.breakinTime.value
+                              : '_ _:_ _:_ _',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            color: controller.breakinTime.value != "00:00:00" ||
+                                    controller.breakoutTime.value ==
+                                        "00:00:00" ||
+                                    controller.signoutTime.value != "00:00:00"
+                                ? const Color.fromARGB(168, 166, 167, 158)
+                                : Constanst.fgPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -2802,6 +3109,79 @@ class _DashboardState extends State<Dashboard> {
               ),
             ],
           ),
+
+          const SizedBox(
+            height: 8,
+          ),
+
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Constanst.colorStateInfoBorder,
+                width: 1.0,
+              ),
+              borderRadius: Constanst.borderStyle2,
+            ),
+            child: Material(
+              borderRadius: Constanst.borderStyle2,
+              color: Constanst.infoLight1,
+              child: InkWell(
+                customBorder: RoundedRectangleBorder(
+                  borderRadius: Constanst.borderStyle2,
+                ),
+                onTap: () {
+                  Get.to(Monitoring());
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 10.0, 4.0, 10.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Iconsax.folder_open5,
+                            color: Constanst.infoLight,
+                            size: 26,
+                          ),
+                          const SizedBox(width: 4),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Monitoring",
+                                style: GoogleFonts.inter(
+                                    color: Constanst.fgPrimary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                "pantau aktivitas pegawai",
+                                style: GoogleFonts.inter(
+                                    color: Constanst.fgPrimary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Constanst.fgSecondary,
+                        size: 18,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          
         ],
       ),
     );

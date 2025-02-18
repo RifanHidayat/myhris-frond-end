@@ -70,6 +70,8 @@ import 'package:siscom_operasional/screen/peraturan/detail_peraturan.dart';
 import 'package:siscom_operasional/screen/peraturan/detail_peraturan_dasboard.dart';
 import 'package:siscom_operasional/screen/pph21/pphh21.dart';
 import 'package:siscom_operasional/screen/slip_gaji/slip_gaji.dart';
+import 'package:siscom_operasional/screen/surat_peringatan.dart';
+import 'package:siscom_operasional/screen/teguran_lisan.dart';
 import 'package:siscom_operasional/screen/verify_password_payroll.dart';
 import 'package:siscom_operasional/services/request.dart';
 import 'package:siscom_operasional/utils/api.dart';
@@ -93,6 +95,9 @@ class DashboardController extends GetxController {
 
   RxString signoutTime = "".obs;
   RxString signinTime = "".obs;
+  var breakoutTime = "".obs;
+  var breakinTime = "".obs;
+  var trx = "".obs;
   var status = "".obs;
   var wfhstatus = false.obs;
   var approveStatus = "".obs;
@@ -407,6 +412,12 @@ class DashboardController extends GetxController {
   //   );
   // }
 
+  bool isVisibleAbsenIstirahat() {
+    return AppData.informasiUser![0].tipeAbsen.toString() == "3" &&
+        !wfhstatus.value &&
+        trx.value.toUpperCase() != "TLM";
+  }
+
   bool _isLateSignin(String signinTime, String jamKerja) {
     return signinTime.compareTo(jamKerja) > 0;
   }
@@ -424,6 +435,139 @@ class DashboardController extends GetxController {
 
     return updatedTimeStr;
   }
+
+  void widgetButtomSheetAktifCameraIstirahat({type, typewfh}) {
+    showModalBottomSheet(
+      context: Get.context!,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            type == "checkTracking"
+                                ? const SizedBox()
+                                : Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 5),
+                                    child:
+                                        Image.asset("assets/vector_camera.png"),
+                                  ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5, right: 5),
+                              child: Image.asset("assets/vector_map.png"),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        type == "checkTracking"
+                            ? const SizedBox(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "Aktifkan Lokasi",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      "Di latar belakang",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const Text(
+                                "Aktifkan Kamera dan Lokasi",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        type == "checkTracking"
+                            ? const Text(
+                                "SAM HRIS mengumpulkan data lokasi untuk mengaktifkan Absensi & Tracking bahkan jika aplikasi ditutup atau tidak digunakan.",
+                                textAlign: TextAlign.center,
+                              )
+                            : const Text(
+                                "Aplikasi ini memerlukan akses pada kamera dan lokasi pada perangkat Anda",
+                                textAlign: TextAlign.center,
+                              ),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        TextButtonWidget(
+                          title: "Lanjutkan",
+                          onTap: () async {
+                            if (type == "checkTracking") {
+                              Get.back();
+                              // await controllerAbsensi.deteksiFakeGps(context);
+                              if (controllerAbsensi.statusDeteksi.value ==
+                                      false &&
+                                  controllerAbsensi.statusDeteksi2.value ==
+                                      false) {
+                                controllerAbsensi.kirimDataAbsensiIstirahat(
+                                    typewfh: typewfh);
+                              } else if (controllerAbsensi
+                                          .statusDeteksi.value ==
+                                      false &&
+                                  controllerAbsensi.statusDeteksi2.value ==
+                                      true) {
+                                if (context.mounted) {
+                                  controllerAbsensi.popUpRefresh(context);
+                                }
+                              }
+                            } else {
+                              Navigator.pop(context);
+                              await Permission.camera.request();
+                              await Permission.location.request();
+                            }
+                          },
+                          colorButton: Constanst.colorButton1,
+                          colortext: Constanst.colorWhite,
+                          border: BorderRadius.circular(15.0),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 30,
+            )
+          ],
+        );
+      },
+    );
+  }
+
 
   Future<void> showDialogHistoryTerlambat() async {
     await controllerAbsensi.loadHistoryAbsenUser();
@@ -1266,6 +1410,8 @@ class DashboardController extends GetxController {
               AppData.statusAbsen = false;
               signoutTime.value = '00:00:00';
               signinTime.value = '00:00:00';
+              breakinTime.value = '00:00:00';
+              breakoutTime.value = '00:00:00';
               controllerAbsensi.absenStatus.value = false;
               dashboardStatusAbsen.value = false;
             } else {
@@ -1281,6 +1427,13 @@ class DashboardController extends GetxController {
 
               signoutTime.value = data[0]['signout_time'].toString();
               signinTime.value = data[0]['signin_time'].toString();
+              breakinTime.value = data[0]['breakin_time'].toString() != "null"
+                  ? data[0]['breakin_time'].toString()
+                  : "00:00:00";
+              breakoutTime.value = data[0]['breakout_time'].toString() != "null"
+                  ? data[0]['breakout_time'].toString()
+                  : "00:00:00";
+              trx.value = data[0]['trx'].toString() ?? "";
               print("hasil signinTime ${signinTime.value}");
               print("hasil signinTime ${status.value}");
             }
@@ -2550,7 +2703,8 @@ class DashboardController extends GetxController {
             lamaBekerja: element['lama_bekerja'],
             lamaBekerjaFormat: element['lama_bekerja_format'],
             branchId: element['branch_id'],
-            tipeAbsen: element['tipe_absen']
+            tipeAbsen: element['tipe_absen'],
+            periodeAwal: element['periode_awal'],
           );
           print('ini branch id ${element['branch_id']}');
           getData.add(data);
@@ -2574,10 +2728,6 @@ class DashboardController extends GetxController {
       }
       //   Api().validateAuth(res.statusCode );
     });
-  }
-  bool isVisibleAbsenIstirahat() {
-    return AppData.informasiUser![0].tipeAbsen.toString() == "3" &&
-        !wfhstatus.value;
   }
 
   Future<void> updateWorkTime() async {
@@ -3390,7 +3540,12 @@ class DashboardController extends GetxController {
       }
     } else if (url == "lainnya") {
       widgetButtomSheetMenuLebihDetail();
-    } else {
+    } else if (url == 'sp'){
+      Get.to(SuratPeringatan());
+    } else if (url == 'tl'){
+      Get.to(TeguranLisan());
+    }
+    else {
       UtilsAlert.showToast("Tahap Development");
     }
   }

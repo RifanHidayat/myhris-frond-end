@@ -100,7 +100,7 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                                 posisi: list.posisi.toString(),
                                 nomor: list.nomor_surat.toString(),
                                 hal: list.hal.toString(),
-                                tglSrt: list.tgl_surat.toString(),
+                                tglSrt: list.eff_date.toString(),
                                 pelanggaran: list.alasan.toString(),
                                 alasan: list.alasan.toString(),
                                 diterbitkan: list.diterbitkan_oleh.toString(),
@@ -287,7 +287,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                             children: [
                               SizedBox(height: 20),
                               Text(
-                                'Jakarta, ${DateFormat('dd MMMM yyyy').format(DateTime.parse(tglSrt.toString()))}',
+                                'Jakarta, ${formatDate(tglSrt.toString())}',
                                 style: TextStyle(fontSize: 12.0),
                               ),
                               Text(
@@ -310,7 +310,7 @@ class SuratPeringatanDetail extends StatelessWidget {
 
   String formatDate(String dateString) {
     DateTime dateTime = DateTime.parse(dateString);
-    String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+    String formattedDate = DateFormat('dd MMMM yyyy', 'id_ID').format(dateTime);
     return formattedDate;
   }
 }

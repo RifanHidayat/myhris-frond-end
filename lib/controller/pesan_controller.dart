@@ -17,6 +17,7 @@ import 'package:siscom_operasional/screen/pesan/detail_persetujuan_klaim.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_lembur.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_payroll.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_surat_peringatan.dart';
+import 'package:siscom_operasional/screen/pesan/detail_persetujuan_teguran_lisan.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/pesan/detail_persetujuan_wfh.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_absensi.dart';
@@ -904,7 +905,7 @@ class PesanController extends GetxController {
         url == 'Teguran Lisan') {
       loadAndNavigate(
         'Teguran Lisan',
-        () => DetailPersetujuanSuratPeringatan(
+        () => DetailPersetujuanTeguranLisan(
             emId: emIdPengaju,
             title: 'Teguran Lisan',
             idxDetail: idx,

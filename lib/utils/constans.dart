@@ -341,40 +341,40 @@ class Constanst {
   }
 
   static String bulanIndo(String bulan) {
-    if (bulan == "January") {
+    if (bulan == "January" || bulan == "01" || bulan == "1") {
       bulan = "Jan";
       // bulan = "Januari";
-    } else if (bulan == "February") {
+    } else if (bulan == "February" || bulan == "02" || bulan == "2") {
       bulan = "Feb";
       // bulan = "Februari";
-    } else if (bulan == "March") {
+    } else if (bulan == "March" || bulan == "03" || bulan == "3") {
       bulan = "Mar";
       // bulan = "Maret";
-    } else if (bulan == "April") {
+    } else if (bulan == "April" || bulan == "04" || bulan == "4") {
       bulan = "Apr";
       // bulan = "April";
-    } else if (bulan == "May") {
+    } else if (bulan == "May" || bulan == "05" || bulan == "5") {
       bulan = "Mei";
       // bulan = "Mei";
-    } else if (bulan == "June") {
+    } else if (bulan == "June" || bulan == "06" || bulan == "6") {
       bulan = "Jun";
       // bulan = "Juni";
-    } else if (bulan == "July") {
+    } else if (bulan == "July" || bulan == "07" || bulan == "7") {
       bulan = "Jul";
       // bulan = "Juli";
-    } else if (bulan == "August") {
+    } else if (bulan == "August" || bulan == "08" || bulan == "8") {
       bulan = "Agu";
       // bulan = "Agustus";
-    } else if (bulan == "September") {
+    } else if (bulan == "September" || bulan == "09" || bulan == "9") {
       bulan = "Sep";
       // bulan = "September";
-    } else if (bulan == "October") {
+    } else if (bulan == "October" || bulan == "10") {
       bulan = "Okt";
       // bulan = "Oktober";
-    } else if (bulan == "November") {
+    } else if (bulan == "November" || bulan == "11") {
       bulan = "Nov";
       // bulan = "November";
-    } else if (bulan == "December") {
+    } else if (bulan == "December" || bulan == "12") {
       bulan = "Des";
       // bulan = "Desember";
     } else {

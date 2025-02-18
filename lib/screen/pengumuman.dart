@@ -8,7 +8,6 @@ import 'package:siscom_operasional/screen/detail_polling.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class PengumumanScreen extends StatefulWidget {
   const PengumumanScreen({super.key});
@@ -167,7 +166,7 @@ class _PengumumanScreenState extends State<PengumumanScreen> {
                             onTap: () {
                               if (view == 0){
                                 controller.updateDataNotif(id);
-                                controller.getPengumuman();
+                                // controller.getPengumuman();
                               }
                               // UtilsAlert.showToast(peraturan['type']);
                               if (type == "polling") {

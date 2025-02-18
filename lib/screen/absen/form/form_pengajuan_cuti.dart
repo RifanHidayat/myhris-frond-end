@@ -35,6 +35,7 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
     // controller.loadDataTypeCuti();
     print("data biaya ${widget.dataForm![0]}");
     if (widget.dataForm![1] == true) {
+      controller.messageApi.value = '';
       controller.dariTanggal.value.text = widget.dataForm![0]['start_date'];
       controller.sampaiTanggal.value.text = widget.dataForm![0]['end_date'];
       controller.startDate.value = widget.dataForm![0]['start_date'];
@@ -42,7 +43,8 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
       controller.alasan.value.text = widget.dataForm![0]['reason'];
       controller.atten_date_edit.value = widget.dataForm![0]['atten_date'];
       controller.typeIdEdit.value = widget.dataForm![0]['typeid'];
-      controller.namaFileUpload.value = widget.dataForm![0]['leave_files'] ?? '' ;
+      controller.namaFileUpload.value =
+          widget.dataForm![0]['leave_files'] ?? '';
       controller.statusForm.value = true;
       controller.idEditFormCuti.value = "${widget.dataForm![0]['id']}";
       controller.emDelegationEdit.value =
@@ -76,10 +78,9 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
         }
       }
 
-      
-        // controller.tanggalSelectedEdit.value = getDummy;
-      
+      // controller.tanggalSelectedEdit.value = getDummy;
     } else {
+      controller.messageApi.value = '';
       controller.startDate.value = "";
       controller.endDate.value = "";
       controller.alasan.value.text = "";
@@ -149,6 +150,40 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
+                      controller.messageApi.value == ''
+                          ? SizedBox()
+                          : Column(
+                            children: [
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: Constanst.colorBGRejected,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Iconsax.info_circle,
+                                        color: Constanst.colorStateDangerBorder,
+                                        size: 26,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          controller.messageApi.value,
+                                          textAlign: TextAlign.left,
+                                          style: GoogleFonts.inter(
+                                              fontWeight: FontWeight.w400,
+                                              color: Constanst.fgSecondary,
+                                              fontSize: 14),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 16.0)
+                            ],
+                          ),
                       Container(
                         decoration: BoxDecoration(
                             borderRadius:
@@ -212,18 +247,23 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
               child: TextButtonWidget(
                 title: "Kirim",
                 onTap: () {
+                  controller.focus.unfocus();
                   print('ini cutLeave ${controller.cutLeave.value}');
                   print('ini limit ${controller.limitCuti.value}');
                   print('tanggal selected ${controller.tanggalSelected.value}');
-                  print('tanggal selected edit ${controller.tanggalSelectedEdit.value}');
+                  print(
+                      'tanggal selected edit ${controller.tanggalSelectedEdit.value}');
                   print('tanggal start ${controller.startDate.value}');
                   print('tanggal end ${controller.endDate.value}');
-                  print('tanggal selected edit ${controller.tanggalSelectedEdit.value}');
+                  print(
+                      'tanggal selected edit ${controller.tanggalSelectedEdit.value}');
                   print('date selected ${controller.dateSelected.value}');
+                  controller.messageApi.value = '';
                   if (controller.dateSelected.value == 2 ||
                       controller.dateSelected.value.toString() == "2") {
                     //--------------------menggunakan range---------------------------
                     if (controller.startDate.value.isEmpty) {
+                      controller.messageApi.value = "Tanggal mulai harus disi";
                       UtilsAlert.showToast("Tanggal mulai harus disi");
                       return;
                     } else if (controller.endDate.value.isEmpty) {
@@ -270,12 +310,14 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                       if (difference.inDays + 1 > controller.jumlahCuti.value) {
                         if (controller.allowMinus.value == 1) {
                         } else {
+                          controller.messageApi.value = "Total hari melewati sisa cuti";
                           UtilsAlert.showToast("Total hari melewati sisa cuti");
                           return;
                         }
                       }
                     } else {
                       if (difference.inDays + 1 > controller.limitCuti.value) {
+                        controller.messageApi.value = "Total hari melewati sisa cuti";
                         UtilsAlert.showToast("Total hari melewati batas limit");
                         return;
                       }
@@ -286,16 +328,18 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                         .add(DateTime.parse(controller.startDate.value));
                     controller.tanggalSelected.value
                         .add(DateTime.parse(controller.endDate.value));
-                        print('kemari 1');
+                    print('kemari 1');
                     controller.validasiKirimPengajuan();
                     // Print the result
                   } else {
                     //mengugunakan multiple date
 
                     if (controller.startDate.value.isEmpty) {
+                      controller.messageApi.value = "Tanggal mulai harus disi";
                       UtilsAlert.showToast("Tanggal mulai harus disi");
                       return;
                     } else if (controller.endDate.value.isEmpty) {
+                      // controller.messageApi.value = "Tanggal mulai harus disi";
                       UtilsAlert.showToast("Tanggal selesai harus disi");
                       return;
                     }
@@ -322,9 +366,10 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                           if ((controller.jumlahCuti.value -
                                   controller.cutiTerpakai.value) <
                               controller.tanggalSelectedEdit.value.length) {
+                                controller.messageApi.value = "Tanggal yang dipilih melebihi sisa cuti";
                             UtilsAlert.showToast(
                                 "Tanggal yang dipilih melebihi sisa cuti ");
-                                return;
+                            return;
                           } else {
                             print('kemari 2');
                             controller.validasiKirimPengajuan();
@@ -336,9 +381,10 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                       } else {
                         if ((controller.limitCuti.value) <
                             controller.tanggalSelectedEdit.value.length) {
+                              controller.messageApi.value = "Tanggal yang dipilih melebihi sisa cuti";
                           UtilsAlert.showToast(
                               "Tanggal yang dipilih melebihi sisa cuti");
-                              return;
+                          return;
                         } else {
                           print('kemari 4');
                           controller.validasiKirimPengajuan();
@@ -350,9 +396,10 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                           if ((controller.jumlahCuti.value -
                                   controller.cutiTerpakai.value) <
                               controller.tanggalSelected.value.length) {
+                                controller.messageApi.value = "Tanggal yang dipilih melebihi sisa cuti";
                             UtilsAlert.showToast(
                                 "Tanggal yang dipilih melebihi sisa cuti");
-                                return;
+                            return;
                           } else {
                             print('kemari 5');
                             controller.validasiKirimPengajuan();
@@ -364,9 +411,10 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                       } else {
                         if ((controller.limitCuti.value) <
                             controller.tanggalSelected.value.length) {
+                              controller.messageApi.value = "Tanggal yang dipilih melebihi sisa cuti";
                           UtilsAlert.showToast(
                               "Tanggal yang dipilih melebihi sisa cuti");
-                              return;
+                          return;
                         } else {
                           print('kemari 7');
                           controller.validasiKirimPengajuan();
@@ -771,56 +819,56 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                           controller.startDate.value =
                               DateFormat('yyyy-MM-dd').format(time).toString();
                           DateTime tempStartDate = DateTime.parse(
-                            DateFormat('yyyy-MM-dd')
-                                .format(DateFormat('yyyy-MM-dd')
-                                    .parse(controller.startDate.value))
-                                .toString());
-                        DateTime tempEndDate = DateTime.parse(
-                            DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(
-                                    controller.endDate.value.toString()))
-                                .toString());
-                        // Define two DateTime objects representing the two dates
-                        DateTime today = DateTime.now();
-                        DateTime onlyDate =
-                            DateTime(today.year, today.month, today.day);
-                        DateTime date1 = DateTime(tempStartDate.year,
-                            tempStartDate.month, tempStartDate.day);
-                        DateTime date2 = DateTime(tempEndDate.year,
-                            tempEndDate.month, tempEndDate.day);
-                        print('ini now ${onlyDate}');
-                        print('ini date1 $date1');
+                              DateFormat('yyyy-MM-dd')
+                                  .format(DateFormat('yyyy-MM-dd')
+                                      .parse(controller.startDate.value))
+                                  .toString());
+                          DateTime tempEndDate = DateTime.parse(
+                              DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.parse(
+                                      controller.endDate.value.toString()))
+                                  .toString());
+                          // Define two DateTime objects representing the two dates
+                          DateTime today = DateTime.now();
+                          DateTime onlyDate =
+                              DateTime(today.year, today.month, today.day);
+                          DateTime date1 = DateTime(tempStartDate.year,
+                              tempStartDate.month, tempStartDate.day);
+                          DateTime date2 = DateTime(tempEndDate.year,
+                              tempEndDate.month, tempEndDate.day);
+                          print('ini now ${onlyDate}');
+                          print('ini date1 $date1');
 
-                        // Calculate the difference between the two dates
-                        Duration difference = date1.difference(onlyDate);
-                        print(
-                            'ini durasi izin : ${controller.durasiIzin.value}');
-                        print('ini diferent cuti : $difference');
-                        controller.durasiCutiMelahirkan.value =
-                            difference.inDays;
-                        // controller.tanggalSelected.value = [];
-                        controller.tanggalSelectedEdit.value.clear();
-                        controller.tanggalSelected.value.clear();
-                        for (var i = tempStartDate;
-                            i.isBefore(tempEndDate) ||
-                                i.isAtSameMomentAs(tempEndDate);
-                            i = i.add(Duration(days: 1))) {
-                          controller.tanggalSelected.value.add(i);
-                          controller.tanggalSelectedEdit.value.add(i);
-                        }
-                        if (controller.startDate.value ==
-                            controller.endDate.value) {
-                          controller.tanggalSelected.clear();
-                          controller.tanggalSelected.value
-                              .add(controller.startDate.value);
-                          controller.tanggalSelectedEdit.clear();
-                          controller.tanggalSelectedEdit.value
-                              .add(controller.startDate.value);
-                        }
+                          // Calculate the difference between the two dates
+                          Duration difference = date1.difference(onlyDate);
+                          print(
+                              'ini durasi izin : ${controller.durasiIzin.value}');
+                          print('ini diferent cuti : $difference');
+                          controller.durasiCutiMelahirkan.value =
+                              difference.inDays;
+                          // controller.tanggalSelected.value = [];
+                          controller.tanggalSelectedEdit.value.clear();
+                          controller.tanggalSelected.value.clear();
+                          for (var i = tempStartDate;
+                              i.isBefore(tempEndDate) ||
+                                  i.isAtSameMomentAs(tempEndDate);
+                              i = i.add(Duration(days: 1))) {
+                            controller.tanggalSelected.value.add(i);
+                            controller.tanggalSelectedEdit.value.add(i);
+                          }
+                          if (controller.startDate.value ==
+                              controller.endDate.value) {
+                            controller.tanggalSelected.clear();
+                            controller.tanggalSelected.value
+                                .add(controller.startDate.value);
+                            controller.tanggalSelectedEdit.clear();
+                            controller.tanggalSelectedEdit.value
+                                .add(controller.startDate.value);
+                          }
 
-                        controller.loadDataTypeCuti(
-                            durasi: controller.durasiCutiMelahirkan.value
-                                .toString());
+                          controller.loadDataTypeCuti(
+                              durasi: controller.durasiCutiMelahirkan.value
+                                  .toString());
                           print("$time");
                         }
                       },
@@ -1761,6 +1809,7 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
                   ),
                   TextFormField(
                     controller: controller.alasan.value,
+                    focusNode: controller.focus,
                     decoration: const InputDecoration(
                       hintText: 'Tulis catatan disini',
                       border: InputBorder.none,

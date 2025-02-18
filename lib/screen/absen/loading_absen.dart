@@ -9,6 +9,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:siscom_operasional/controller/absen_controller.dart';
 import 'package:siscom_operasional/scanner_widget.dart';
+import 'package:siscom_operasional/screen/absen/absen_istirahat_masuk_keluar.dart';
 import 'package:siscom_operasional/screen/absen/absen_masuk_keluar.dart';
 import 'package:siscom_operasional/screen/absen/absen_verify_password.dart';
 import 'package:siscom_operasional/screen/absen/facee_id_detection.dart';
@@ -240,6 +241,118 @@ class _LoadingAbsenState extends State<LoadingAbsen>
                                                     : "Absen Keluar",
                                               )),
                                     );
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width:
+                                        MediaQuery.of(context).size.width - 40,
+                                    margin:
+                                        EdgeInsets.only(left: 20, right: 20),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                            width: 1,
+                                            color: Constanst.colorWhite)),
+                                    child: Center(
+                                      child: Text(
+                                        "Lanjutkan",
+                                        style: TextStyle(
+                                            color: Constanst.colorWhite,
+                                            fontSize: 14.0),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  height: 40,
+                                  width: MediaQuery.of(context).size.width - 40,
+                                  margin: EdgeInsets.only(left: 20, right: 20),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                          width: 1,
+                                          color: Constanst.colorWhite)),
+                                  child: Center(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (abseController.gagalAbsen.value >=
+                                            3) {
+                                          Get.off(AbsenVrifyPassword(
+                                            status: widget.statusAbsen,
+                                            type: "",
+                                          ));
+                                        } else {
+                                          Get.back();
+                                          abseController.facedDetection(
+                                              status: "detection",
+                                              absenStatus: widget.statusAbsen,
+                                              type: "1");
+                                          // Get.off(FaceDetectorView(
+                                          //   status: widget.statusAbsen,
+                                          // ));
+                                          // cont
+                                        }
+                                      },
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Iconsax.refresh,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            "Coba Lagi",
+                                            style: TextStyle(
+                                                color: Constanst.colorWhite,
+                                                fontSize: 14.0),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                    }))),
+            Positioned(
+                bottom: 20,
+                child: Align(
+                    alignment: Alignment.center,
+                    child: Obx(() {
+                      return abseController.absenSuccess.value == ""
+                          ? Container()
+                          : abseController.absenSuccess.value == "1"
+                              ? InkWell(
+                                  onTap: () {
+                                    if (abseController.isAbsenIstirahat.value) {
+                                      Navigator.push(
+                                        Get.context!,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AbsenIstirahatMasukKeluar(
+                                                  status:
+                                                      widget.status == 'masuk'
+                                                          ? "Absen Istirahat"
+                                                          : "Absen Mulai Kerja",
+                                                )),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        Get.context!,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AbsenMasukKeluar(
+                                                  status: widget.statusAbsen ==
+                                                          'masuk'
+                                                      ? "Absen Masuk"
+                                                      : "Absen Keluar",
+                                                )),
+                                      );
+                                    }
                                   },
                                   child: Container(
                                     height: 40,

@@ -599,6 +599,9 @@ class _PesanState extends State<Pesan> {
                                               controller
                                                   .aksilihatNotif(idNotif);
                                             }
+                                            print('ini id detail notifikasi ${idDetail.toString()}');
+                                            print('ini id detail notifikasi ${emId.toString()}');
+                                            print('ini id detail notifikasi ${emIdPengaju.toString()}');
                                             controller.routeApprovalNotif(
                                               title: titleNotif,
                                               emIdPengaju:

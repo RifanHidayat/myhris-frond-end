@@ -561,12 +561,16 @@ class _PersetujuanSuratPeringatanState extends State<PersetujuanSuratPeringatan>
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "rejected by  - $namaApprove1",
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        color: Constanst.fgPrimary,
-                        fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      "rejected by  - $namaApprove1",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
                 ],
               ),
@@ -611,12 +615,16 @@ class _PersetujuanSuratPeringatanState extends State<PersetujuanSuratPeringatan>
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "Approved by  - $namaApprove1",
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        color: Constanst.fgPrimary,
-                        fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      "Approved by  - $namaApprove1",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

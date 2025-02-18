@@ -36,6 +36,7 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
     controller.loadCutiUser();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.dataForm![1] == true) {
+        controller.messageApi.value = '';
         var convertDariTanggal = widget.dataForm![0]['start_date'];
         var convertSampaiTanggal = widget.dataForm![0]['end_date'];
 
@@ -135,6 +136,7 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
           }
         }
       } else {
+        controller.messageApi.value = '';
         controller.startDate.value = '';
         controller.showDurationIzin.value = false;
         controller.showTipe.value = false;
@@ -212,7 +214,41 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    // Obx(() => controller.showDurationIzin.value == true?
+                    controller.messageApi.value == ''
+                        ? SizedBox()
+                        : Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.colorBGRejected,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle,
+                                      color: Constanst.colorStateDangerBorder,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        controller.messageApi.value,
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 16.0)
+                            ],
+                          ),
+
                     Container(
                       decoration: BoxDecoration(
                           borderRadius:
@@ -308,7 +344,8 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                   //     print('ini te');
                   //   }
                   // }
-
+                  controller.focus.unfocus();
+                  controller.messageApi.value = '';
                   if (controller.inputTime.value == 1) {
                     controller.jamAjuan.value = controller.sampaiJamAjuan.value;
                   }
@@ -320,6 +357,7 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                     if (controller.jumlahIzin.value >= 0) {
                       print("jumlah izin ${controller.jumlahIzin.value}");
                       if (controller.percentIzin.value >= 1) {
+                        controller.messageApi.value = "Pemakaian izin telah melewati batas maksimal";
                         UtilsAlert.showToast(
                             "Pemakaian izin telah melewati batas maksimal");
                       } else {
@@ -331,8 +369,10 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                             print('ini total ${totalTerpakai}');
                             print(
                                 'ini total ${controller.tanggalSelected.value.length}');
+                                controller.messageApi.value = "Pemakaian izin telah melewati batas maksimal";
+                        
                             UtilsAlert.showToast(
-                                "Pemakaian izin telah melewati batas maksimal1");
+                                "Pemakaian izin telah melewati batas maksimal");
                           } else {
                             print('kemari 1');
                             controller
@@ -349,12 +389,13 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                       controller.validasiKirimPengajuan(widget.dataForm![1]);
                     }
                   } else {
-                    
                     if (controller.showDurationIzin.value == true) {
                       var totalTerpakai =
                           controller.tanggalSelected.value.length;
                       if (totalTerpakai > controller.limitIzin.value) {
                         print("jumlah izin ${controller.limitIzin.value}");
+                        controller.messageApi.value = "Pemakaian izin telah melewati batas maksimal";
+                        
                         UtilsAlert.showToast(
                             "Pemakaian izin telah melewati batas maksimal");
                       } else {
@@ -744,7 +785,7 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                           Duration difference = date1.difference(onlyDate);
                           controller.durasiIzin.value = difference.inDays;
                           controller.tanggalSelected.value.clear();
-                        controller.tanggalSelectedEdit.value.clear();
+                          controller.tanggalSelectedEdit.value.clear();
                           for (var i = tempStartDate;
                               i.isBefore(tempEndDate) ||
                                   i.isAtSameMomentAs(tempEndDate);
@@ -1644,6 +1685,7 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
               ),
               TextFormField(
                 controller: controller.alasan.value,
+                focusNode: controller.focus,
                 decoration: const InputDecoration(
                   hintText: 'Tulis catatan disini',
                   border: InputBorder.none,

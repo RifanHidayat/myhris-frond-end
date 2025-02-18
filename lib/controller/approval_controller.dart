@@ -440,6 +440,8 @@ class ApprovalController extends GetxController {
             'file': element['req_file'] ?? "",
             'dari_jam': element['dari_jam'],
             'sampai_jam': element['sampai_jam'],
+            'breakout_time': element['breakout_time'],
+            'breakin_time': element['breakin_time'],
             'deskripsi': element['uraian'],
             'nomor_ajuan': element['nomor_ajuan'],
             'em_report_to': element['em_report_to'],
@@ -462,7 +464,7 @@ class ApprovalController extends GetxController {
           };
           listData.value.add(data);
           listDataAll.value.add(data);
-          print("data body 2 ${valueBody['data']}");
+          print("data body list data ${listData}");
         }
         listData.value.sort(
             (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
@@ -2536,7 +2538,7 @@ class ApprovalController extends GetxController {
           Get.back();
           Get.back();
           Get.back();
-          UtilsAlert.showToast('Berhasil menyetujui pengajuan employee');
+          UtilsAlert.showToast(valueBody['message']);
 
           return true;
         } else {

@@ -22,14 +22,14 @@ class Api {
 
   // static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
-   //static var basicUrl = "http://mobilehris.siscom.id:3009/";
+  //  static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
 
   // API DEV
      static var basicUrl = "http://kantor.membersis.com:2627/";
 //
   // API LOCAL
-  // static var basicUrl = "http://192.168.20.227:2627/";
+  // static var basicUrl = "http://192.168.20.20:2627/";
 //
 
   static var urlImage = 'https://imagehris.siscom.id:4431';
@@ -213,7 +213,7 @@ class ApiRequest {
   // static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API LOCAL
-  // static var basicUrl = "http://192.168.20.227:2627/";
+  // static var basicUrl = "http://192.168.20.20:2627/";
 
   // API DEV
    static var basicUrl = "http://kantor.membersis.com:2627/";
@@ -222,6 +222,12 @@ class ApiRequest {
     'Authorization': basicAuth,
     'Content-type': 'application/json',
     'Accept': 'application/json',
+    'em_id': AppData.informasiUser == null ||
+            AppData.informasiUser == "null" ||
+            AppData.informasiUser == "" ||
+            AppData.informasiUser!.isEmpty
+        ? ""
+        : AppData.informasiUser![0].em_id
     // 'token': AppData.setFcmToken,
     // 'em_id': 'SIS202305048'
   };
@@ -236,7 +242,7 @@ class ApiRequest {
   Future<http.Response> get() async {
     print("Hostname ${headers}");
     if (temParams != null) {
-      headers.addAll(temParams);
+      params.addAll(temParams);
     }
     params.addAll({
       "startPeriode": AppData.startPeriode,
@@ -247,7 +253,7 @@ class ApiRequest {
     });
     print(basicUrl + url);
     return await http
-        .get(Uri.parse(basicUrl + url).replace(queryParameters: headers),
+        .get(Uri.parse(basicUrl + url).replace(queryParameters: params),
             headers: headers)
         .timeout(Duration(minutes: 3));
   }
@@ -287,7 +293,7 @@ class ApiRequest {
     });
     print(basicUrl + url);
     return await http
-        .patch(Uri.parse(basicUrl + url).replace(queryParameters: headers),
+        .patch(Uri.parse(basicUrl + url).replace(queryParameters: params),
             body: jsonEncode(body), headers: headers)
         .timeout(Duration(minutes: 2));
   }
@@ -310,7 +316,7 @@ class ApiRequest {
     });
     print(basicUrl + url);
     return await http
-        .delete(Uri.parse(basicUrl + url).replace(queryParameters: headers),
+        .delete(Uri.parse(basicUrl + url).replace(queryParameters: params),
             body: jsonEncode(body), headers: headers)
         .timeout(Duration(minutes: 3));
   }
