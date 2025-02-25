@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:siscom_operasional/controller/api_controller.dart';
 import 'package:siscom_operasional/controller/auth_controller.dart';
 import 'package:siscom_operasional/controller/dashboard_controller.dart';
+import 'package:siscom_operasional/controller/internet_controller.dart';
 import 'package:siscom_operasional/controller/tracking_controller.dart';
 import 'package:siscom_operasional/model/user_model.dart';
 import 'package:siscom_operasional/screen/akun/edit_personal_data.dart';
@@ -28,6 +29,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 class SettingController extends GetxController {
   var fotoUser = File("").obs;
   final controllerTracking = Get.put(TrackingController());
+  final internetController = Get.put(InternetController());
   Rx<List<String>> jenisKelaminDropdown = Rx<List<String>>([]);
   Rx<List<String>> golonganDarahDropdown = Rx<List<String>>([]);
 
@@ -379,20 +381,29 @@ class SettingController extends GetxController {
             positiveBtnPressed: () async {
               AppData.isLogin = false;
               UtilsAlert.loadingSimpanData(context, "Tunggu Sebentar...");
-              aksiEditLastLogin();
-              //fungsi stopTracking
-              controllerTracking.bagikanlokasi.value = "tidak aktif";
-              // await LocationDao().clear();
-              // await _getLocations();
-              // await BackgroundLocationTrackerManager.stopTracking();
-              // final service = FlutterBackgroundService();
-              // FlutterBackgroundService().invoke("setAsBackground");
+              if (internetController.isConnected.value) {
+                aksiEditLastLogin();
+                //fungsi stopTracking
+                controllerTracking.bagikanlokasi.value = "tidak aktif";
+                // await LocationDao().clear();
+                // await _getLocations();
+                // await BackgroundLocationTrackerManager.stopTracking();
+                // final service = FlutterBackgroundService();
+                // FlutterBackgroundService().invoke("setAsBackground");
 
-              // service.invoke("stopService");
-              controllerTracking.stopService();
-              controllerTracking.isTrackingLokasi.value = false;
-              print(
-                  "stopTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
+                // service.invoke("stopService");
+                controllerTracking.stopService();
+                controllerTracking.isTrackingLokasi.value = false;
+                print(
+                    "stopTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
+              } else {
+                UtilsAlert.showToast('yes berhasil logout offline');
+                print('yes berhasil logout offline');
+                Navigator.pop(Get.context!);
+                _stopForegroundTask();
+                Get.offAll(Login());
+                AppData.isLogin = false;
+              }
             },
           ),
         );
@@ -570,7 +581,7 @@ class SettingController extends GetxController {
         this.loading.refresh();
         this.statusLoadingSubmitLaporan.refresh();
         this.infoEmployee.refresh();
-      } else{
+      } else {
         print('error ${res.body}');
       }
     }).catchError((e) {

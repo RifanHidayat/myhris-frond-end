@@ -432,7 +432,8 @@ class ApprovalController extends GetxController {
             'delegasi': element['em_delegation'],
             'nama_approve1': element['approve_by'],
             'nama_approve2': element['approve2_by'],
-            'waktu_pengajuan': element['atten_date'],
+            'waktu_pengajuan': element['tgl_ajuan'],
+            'atten_date': element['atten_date'],
             'catatan': element['reason'],
             'type': 'absensi',
             'category': element['category'],
@@ -730,7 +731,6 @@ class ApprovalController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         for (var element in valueBody['data']) {
-          
           var data = {
             'nomor': element['nomor'],
             'nama': element['nama'],
@@ -746,7 +746,7 @@ class ApprovalController extends GetxController {
     });
   }
 
-  Future<void>searchTeguranLisan(em_id) async{
+  Future<void> searchTeguranLisan(em_id) async {
     searchTl.value.clear();
     Map<String, dynamic> body = {
       'em_id': em_id,
@@ -758,7 +758,6 @@ class ApprovalController extends GetxController {
         var valueBody = jsonDecode(res.body);
         print('ini tl $valueBody');
         for (var element in valueBody['data']) {
-          
           var data = {
             'nomor': element['nomor'],
             'nama': element['nama'],
@@ -874,9 +873,6 @@ class ApprovalController extends GetxController {
         dataEditFinal.add(element);
       }
     }
-    if (statusPemgajuanSP.value == 'potong_cuti') {
-      cariEmployee(dataEditFinal);
-    }
     Map<String, dynamic> body = {
       'nomor_ajuan': detailData[0]['nomor_ajuan'].toString(),
       'em_id': AppData.informasiUser![0].em_id,
@@ -884,7 +880,9 @@ class ApprovalController extends GetxController {
       'status': pilihan == 'Tolak' ? 'Rejected' : 'Approve',
       'id': detailData[0]['id'].toString(),
       'alasan': alasanReject.value.text,
-      'konsekuesi': statusPemgajuanSP.value == '' ? 'none' : statusPemgajuanSP.value
+      'tipe_sp': detailData[0]['nama'].toString(),
+      'konsekuesi':
+          statusPemgajuanSP.value == '' ? 'none' : statusPemgajuanSP.value
     };
     print("body approval 1 ${body.toString()}");
     var connect = Api.connectionApi("post", body, "surat_peringatan/approval");
@@ -898,6 +896,9 @@ class ApprovalController extends GetxController {
         Get.back();
         Get.back();
         Get.back();
+        if (statusPemgajuanSP.value == 'potong_cuti') {
+          cariEmployee(dataEditFinal);
+        }
         startLoadData(
             'Surat Peringatan', "${dt.month}", "${dt.year}", 'persetujuan');
       }
@@ -1319,7 +1320,9 @@ class ApprovalController extends GetxController {
             double taskPercentage =
                 double.tryParse(task['persentase'].toString()) ?? 0.0;
             totalPercentage += taskPercentage;
-            totalPercent.value = (totalPercentage / listTask.length);
+            totalPercent.value = double.parse(
+                (totalPercentage / listTask.length).toStringAsFixed(2));
+            ;
           }
           listTask.refresh();
           taskControllers.refresh();
@@ -1801,7 +1804,8 @@ class ApprovalController extends GetxController {
           double.tryParse(task['persentase'].toString()) ?? 0.0;
       totalPercentage += taskPercentage;
     }
-    totalPercent.value = (totalPercentage / listTask.length);
+    totalPercent.value =
+        double.parse((totalPercentage / listTask.length).toStringAsFixed(2));
     print('total persen $totalPercent');
     var alasanRejectShow = alasanReject.value.text != ""
         ? ", Alasan pengajuan di tolak = ${alasanReject.value.text}"
@@ -1815,12 +1819,12 @@ class ApprovalController extends GetxController {
         'start_date': dataEditFinal[0]['start_date'],
         'end_date': dataEditFinal[0]['end_date'],
         'leave_duration': dataEditFinal[0]['leave_duration'],
-        'apply_date': applyDate1,
-        'apply_by': applyBy1,
-        'apply_id': applyId1,
-        'apply2_date': applyDate2,
-        'apply2_by': applyBy2,
-        'apply2_id': applyId2,
+        'approve_date': applyDate1,
+        'approve_by': applyBy1,
+        'approve_id': applyId1,
+        'approve2_date': applyDate2,
+        'approve2_by': applyBy2,
+        'approve2_id': applyId2,
         'alasan_reject': alasanReject.value.text,
         'reason': dataEditFinal[0]['reason'],
         'leave_status': statusPengajuan,
@@ -2366,6 +2370,9 @@ class ApprovalController extends GetxController {
     int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
     int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
 
+    print('ini total menit1 ${totalMinutes1}');
+    print('ini total menit ${totalMinutes2}');
+
     //alur normal
     if (totalMinutes1 < totalMinutes2) {
       startTime.value = AppData.informasiUser![0].startTime;
@@ -2564,6 +2571,46 @@ class ApprovalController extends GetxController {
         var valueBody = jsonDecode(res.body);
         var getEmidEmployee = valueBody['data'][0]['em_id'];
         potongCuti(dataEditFinal, getEmidEmployee);
+        insertProd3(dataEditFinal, getEmidEmployee);
+      }
+    });
+  }
+
+  void insertProd3(dataEditFinal, getEmidEmployee) {
+    print('ini data finalllll gokill ${dataEditFinal}');
+
+    String namaPengajuan =
+        dataEditFinal[0]['nama_penagjuan'].toString().toLowerCase();
+    String type;
+
+    if (namaPengajuan.startsWith('sakit')) {
+      type = 'S';
+    } else if (namaPengajuan.startsWith('izin')) {
+      type = 'I';
+    } else if (namaPengajuan.startsWith('cuti')) {
+      type = 'C';
+    } else {
+      type = namaPengajuan[0].toUpperCase();
+    }
+
+    String tanggalSekarang = DateTime.now().toIso8601String().split('T')[0];
+
+    var body = {
+      'type': type,
+      'nomor_ajuan': dataEditFinal[0]['nomor_ajuan'],
+      'tanggal_ajuan': dataEditFinal[0]['atten_date'],
+      'tanggal': tanggalSekarang,
+      'nourut': '0001',
+      'em_id': getEmidEmployee,
+      'absen': dataEditFinal[0]['leave_duration'],
+      'flag': '2'
+    };
+    print(body);
+    var connect = Api.connectionApi("post", body, "masuk_prod3");
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        UtilsAlert.showToast("${valueBody['message']}");
       }
     });
   }

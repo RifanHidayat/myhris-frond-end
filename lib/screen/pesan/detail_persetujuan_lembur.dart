@@ -173,171 +173,112 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
         ),
       ),
       builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.75,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(
-                  height: 15,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 8, top: 2),
-                        child: Text(
-                          "Catatan",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: Constanst.borderStyle1,
-                            border: Border.all(
-                                width: 1.0,
-                                color: Color.fromARGB(255, 211, 205, 205))),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 8, bottom: 8),
-                          child: TextField(
-                            cursorColor: Colors.black,
-                            controller: controller.alasan2.value,
-                            maxLines: null,
-                            maxLength: 225,
-                            autofocus: true,
-                            decoration: new InputDecoration(
-                                border: InputBorder.none, hintText: ""),
-                            keyboardType: TextInputType.multiline,
-                            textInputAction: TextInputAction.done,
-                            style: TextStyle(
-                                fontSize: 12.0,
-                                height: 2.0,
-                                color: Colors.black),
+        return DraggableScrollableSheet(
+            initialChildSize: 0.8, // 80% layar
+            minChildSize: 0.5, // Bisa mengecil
+            maxChildSize: 1.0, // Bisa full screen
+            expand: false,
+            builder: (context, scrollController) {
+              return SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 8, top: 2),
+                            child: Text(
+                              "Catatan",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  child: Text('List Task'),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ...controller.listTask.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        var task = entry.value;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 15.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text("${index + 1}. ${task['task']}",
-                                          style: GoogleFonts.inter(
-                                            color: Constanst.fgPrimary,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16,
-                                          )),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Divider(
-                                        height: 0,
-                                        thickness: 1,
-                                        color: Constanst.fgBorder,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: Constanst.borderStyle1,
+                                border: Border.all(
+                                    width: 1.0,
+                                    color: Color.fromARGB(255, 211, 205, 205))),
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 8, bottom: 8),
+                              child: TextField(
+                                cursorColor: Colors.black,
+                                controller: controller.alasan2.value,
+                                maxLines: null,
+                                maxLength: 225,
+                                autofocus: true,
+                                decoration: new InputDecoration(
+                                    border: InputBorder.none, hintText: ""),
+                                keyboardType: TextInputType.multiline,
+                                textInputAction: TextInputAction.done,
+                                style: TextStyle(
+                                    fontSize: 12.0,
+                                    height: 2.0,
+                                    color: Colors.black),
                               ),
-                              SizedBox(width: 10),
-                              widget.dinilai == "N"
-                                  ? SizedBox()
-                                  : SizedBox(
-                                      width: 50,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 24.0),
+                      child: Row(
+                        children: [
+                          Text('List Task'),
+                          Spacer(),
+                          Text('Score'),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ...controller.listTask.asMap().entries.map((entry) {
+                            int index = entry.key;
+                            var task = entry.value;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 15.0),
                                       child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
-                                          TextFormField(
-                                            controller: controller
-                                                .taskControllers[index],
-                                            decoration: InputDecoration(
-                                              hintText: '0%',
-                                              border: InputBorder.none,
-                                            ),
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly, // Hanya angka
-                                              LengthLimitingTextInputFormatter(
-                                                  3),
-                                            ],
-                                            onChanged: (value) {
-                                              if (value.isNotEmpty) {
-                                                int input = int.parse(value);
-                                                // if (input < 1) {
-                                                //   controller
-                                                //       .taskControllers[index]
-                                                //       .text = '1';
-                                                //   controller
-                                                //           .taskControllers[index]
-                                                //           .selection =
-                                                //       TextSelection
-                                                //           .fromPosition(
-                                                //     TextPosition(
-                                                //         offset: controller
-                                                //             .taskControllers[
-                                                //                 index]
-                                                //             .text
-                                                //             .length),
-                                                //   );
-                                                // } else
-                                                if (input > 100) {
-                                                  controller
-                                                      .taskControllers[index]
-                                                      .text = '100';
-                                                  controller
-                                                          .taskControllers[index]
-                                                          .selection =
-                                                      TextSelection
-                                                          .fromPosition(
-                                                    TextPosition(
-                                                        offset: controller
-                                                            .taskControllers[
-                                                                index]
-                                                            .text
-                                                            .length),
-                                                  );
-                                                }
-                                              }
-                                            },
+                                          Text("${index + 1}. ${task['task']}",
+                                              style: GoogleFonts.inter(
+                                                color: Constanst.fgPrimary,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                              )),
+                                          SizedBox(
+                                            height: 10,
                                           ),
                                           Divider(
                                             height: 0,
@@ -347,50 +288,125 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                         ],
                                       ),
                                     ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButtonWidget(
-                    title: "Kirim Persentase task",
-                    onTap: () {
-                      if (controller.alasan2.value.text.isNotEmpty) {
-                        if (controller.taskControllers.any(
-                            (taskController) => taskController.text.isEmpty)) {
-                          UtilsAlert.showToast(
-                              "Harap isi semua nilai presentase terlebih dahulu");
-                        } else {
-                          for (int i = 0;
-                              i < controller.taskControllers.length;
-                              i++) {
-                            controller.listTask[i]['persentase'] =
-                                controller.taskControllers[i].text;
-                          }
-                          print(
-                              "ini listTask setelah di edit ${controller.listTask}");
+                                  ),
+                                  SizedBox(width: 10),
+                                  widget.dinilai == "N"
+                                      ? SizedBox()
+                                      : SizedBox(
+                                          width: 50,
+                                          child: Column(
+                                            children: [
+                                              TextFormField(
+                                                controller: controller
+                                                    .taskControllers[index],
+                                                decoration: InputDecoration(
+                                                  hintText: '0%',
+                                                  border: InputBorder.none,
+                                                ),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly, // Hanya angka
+                                                  LengthLimitingTextInputFormatter(
+                                                      3),
+                                                ],
+                                                onChanged: (value) {
+                                                  if (value.isNotEmpty) {
+                                                    int input =
+                                                        int.parse(value);
+                                                    // if (input < 1) {
+                                                    //   controller
+                                                    //       .taskControllers[index]
+                                                    //       .text = '1';
+                                                    //   controller
+                                                    //           .taskControllers[index]
+                                                    //           .selection =
+                                                    //       TextSelection
+                                                    //           .fromPosition(
+                                                    //     TextPosition(
+                                                    //         offset: controller
+                                                    //             .taskControllers[
+                                                    //                 index]
+                                                    //             .text
+                                                    //             .length),
+                                                    //   );
+                                                    // } else
+                                                    if (input > 100) {
+                                                      controller
+                                                          .taskControllers[
+                                                              index]
+                                                          .text = '100';
+                                                      controller
+                                                              .taskControllers[
+                                                                  index]
+                                                              .selection =
+                                                          TextSelection
+                                                              .fromPosition(
+                                                        TextPosition(
+                                                            offset: controller
+                                                                .taskControllers[
+                                                                    index]
+                                                                .text
+                                                                .length),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              ),
+                                              Divider(
+                                                height: 0,
+                                                thickness: 1,
+                                                color: Constanst.fgBorder,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextButtonWidget(
+                        title: "Kirim Persentase task",
+                        onTap: () {
+                          if (controller.alasan2.value.text.isNotEmpty) {
+                            if (controller.taskControllers.any(
+                                (taskController) =>
+                                    taskController.text.isEmpty)) {
+                              UtilsAlert.showToast(
+                                  "Harap isi semua nilai presentase terlebih dahulu");
+                            } else {
+                              for (int i = 0;
+                                  i < controller.taskControllers.length;
+                                  i++) {
+                                controller.listTask[i]['persentase'] =
+                                    controller.taskControllers[i].text;
+                              }
+                              print(
+                                  "ini listTask setelah di edit ${controller.listTask}");
 
-                          Navigator.pop(Get.context!);
-                          validasiMenyetujui(true, em_id);
-                        }
-                      } else {
-                        UtilsAlert.showToast(
-                            "Harap isi alasan terlebih dahulu");
-                      }
-                    },
-                    colorButton: Constanst.colorPrimary,
-                    colortext: Colors.white,
-                    border: BorderRadius.circular(8.0),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
+                              Navigator.pop(Get.context!);
+                              validasiMenyetujui(true, em_id);
+                            }
+                          } else {
+                            UtilsAlert.showToast(
+                                "Harap isi alasan terlebih dahulu");
+                          }
+                        },
+                        colorButton: Constanst.colorPrimary,
+                        colortext: Colors.white,
+                        border: BorderRadius.circular(8.0),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            });
       },
     );
   }
@@ -506,7 +522,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                   children: [
                     Expanded(
                         child: Text(
-                      'Total persentase',
+                      'Total score',
                       style: GoogleFonts.inter(
                         color: Constanst.fgPrimary,
                         fontWeight: FontWeight.w500,
@@ -535,6 +551,8 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
   }
 
   void showBottomAlasanApprove(em_id) {
+    var status = controller.detailData[0]['status'];
+    var approveStatus = controller.detailData[0]['approve_status'];
     showModalBottomSheet(
       context: Get.context!,
       isScrollControlled: true,
@@ -592,7 +610,10 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                           bottom: MediaQuery.of(context).viewInsets.bottom),
                       child: TextField(
                         cursorColor: Colors.black,
-                        controller: controller.alasan1.value,
+                        controller:
+                            status == "Pending" || approveStatus == "Pending"
+                                ? controller.alasan1.value
+                                : controller.alasan2.value,
                         maxLines: null,
                         maxLength: 225,
                         autofocus: true,
@@ -629,12 +650,23 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                         child: TextButtonWidget(
                           title: "Menyetujui",
                           onTap: () {
-                            if (controller.alasan1.value.text != "") {
-                              Navigator.pop(Get.context!);
-                              validasiMenyetujui(true, em_id);
-                            } else {
-                              UtilsAlert.showToast(
-                                  "Harap isi alasan terlebih dahulu");
+                            if (status == "Pending" ||
+                                approveStatus == "Pending") {
+                              if (controller.alasan1.value.text != "") {
+                                Navigator.pop(Get.context!);
+                                validasiMenyetujui(true, em_id);
+                              } else {
+                                UtilsAlert.showToast(
+                                    "Harap isi alasan terlebih dahulu");
+                              }
+                            }else{
+                               if (controller.alasan2.value.text != "") {
+                                Navigator.pop(Get.context!);
+                                validasiMenyetujui(true, em_id);
+                              } else {
+                                UtilsAlert.showToast(
+                                    "Harap isi alasan terlebih dahulu");
+                              }
                             }
                           },
                           colorButton: Constanst.colorPrimary,
@@ -954,9 +986,16 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
               padding: const EdgeInsets.all(16.0),
               child: Obx(
                 () => controller.showButton.value == true &&
-                            (status == "Pending" || approveStatus == "Pending" && delegasi.toString().contains(em_id_user)) 
-                            || (approveStatus == "Approve" && diNilai == "N" && emReport2.toString().contains(em_id_user) && approveStatus2 == 'Pending') ||
-                            (approveStatus == "Pending" && diNilai == "N" && emReport.toString().contains(em_id_user) )
+                            (status == "Pending" ||
+                                approveStatus == "Pending" &&
+                                    delegasi.toString().contains(em_id_user)) ||
+                        (approveStatus == "Approve" &&
+                            diNilai == "N" &&
+                            emReport2.toString().contains(em_id_user) &&
+                            approveStatus2 == 'Pending') ||
+                        (approveStatus == "Pending" &&
+                            diNilai == "N" &&
+                            emReport.toString().contains(em_id_user))
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

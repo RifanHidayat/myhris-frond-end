@@ -989,7 +989,7 @@ class IzinController extends GetxController {
       var valueBody = jsonDecode(connectUpload);
       if (valueBody['status'] == true) {
         UtilsAlert.showToast("Berhasil upload file");
-        Navigator.pop(Get.context!);
+        // Navigator.pop(Get.context!);
         checkNomorAjuan(status);
       } else {
         UtilsAlert.showToast("Gagal kirim file");
@@ -1338,7 +1338,7 @@ class IzinController extends GetxController {
                   status, nomorAjuanTerakhirDalamAntrian);
             }
             if (valueBody['message'] == "date") {
-              Navigator.pop(Get.context!);
+              // Navigator.pop(Get.context!);
               UtilsAlert.showToast(valueBody['error']);
             } else {
               Navigator.pop(Get.context!);

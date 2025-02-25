@@ -180,14 +180,11 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
             positiveBtnPressed: () {
               print("pilihan absensi ${pilihan}");
 
-              print(controller.detailData[0]['leave_status']);
-              // return;
-              //   return ;
-              print(controller.detailData[0]);
               if (controller.detailData[0]['type'] == 'absensi') {
                 print("masuk sini ${controller.detailData[0]['place_in']}");
                 print("masuk sini ${controller.detailData[0]}");
                 print("pilihan absensi ${pilihan}");
+                print('ini kemarikan ');
                 UtilsAlert.loadingSimpanData(
                     Get.context!, "Proses $stringPilihan pengajuan");
 
@@ -198,7 +195,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                     apdDate1:
                         controller.detailData[0]['approve_date'].toString(),
                     date:
-                        controller.detailData[0]['waktu_pengajuan'].toString(),
+                        controller.detailData[0]['atten_date'].toString(),
                     status: styleChose.toString(),
                     checkin: controller.detailData[0]['dari_jam'].toString(),
                     checkout: controller.detailData[0]['sampai_jam'].toString(),
@@ -212,6 +209,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                     id: controller.detailData[0]['id'].toString());
                 return;
               } else {
+                print('kook kesini sih');
                 UtilsAlert.loadingSimpanData(
                     Get.context!, "Proses $stringPilihan pengajuan");
                 controller.aksiMenyetujui(pilihan);

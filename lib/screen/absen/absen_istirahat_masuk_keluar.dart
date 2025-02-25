@@ -772,7 +772,7 @@ class _AbsenIstirahatMasukKeluarState extends State<AbsenIstirahatMasukKeluar> {
                                             bottom: 12,
                                             left: 20,
                                             right: 20),
-                                        child: Text('OK, Absen sekarang'),
+                                        child: Text('OK, Absen sekarang Ya'),
                                       ),
                                     ),
                                   ),

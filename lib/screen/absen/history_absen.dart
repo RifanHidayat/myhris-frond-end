@@ -168,7 +168,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                         filterData(),
                                         const SizedBox(height: 8),
                                         UtilsAlert.infoContainer(
-                                            "${AppData.informasiUser![0].beginPayroll} ${controller.beginPayroll.value} sd ${AppData.informasiUser![0].endPayroll} ${controller.endPayroll.value} ${controller.tahunSelectedSearchHistory.value}"),
+                                            "${AppData.informasiUser![0].beginPayroll} ${controller.beginPayroll.value} sd ${controller.lastDate.value} ${controller.endPayroll.value} ${controller.tahunSelectedSearchHistory.value}"),
                                         const SizedBox(height: 12),
                                         // Row(
                                         //   children: [
@@ -930,11 +930,16 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
               var data = controller.pengajuanAbsensi[index];
               var nomorAjuan =
                   controller.pengajuanAbsensi.value[index]['nomor_ajuan'];
+              
         
               var namaTypeAjuan = controller.pengajuanAbsensi.value[index]['name'];
               // Parse the input date string
               DateTime atten_date =
                   DateFormat('yyyy-MM-dd').parse(data['atten_date']);
+              DateTime tgl_ajuan =
+                  DateFormat('yyyy-MM-dd').parse(data['tgl_ajuan']);
+              String formatDateAjuan =
+                  DateFormat('dd MMM yyyy', 'id').format(tgl_ajuan);
               // Format the date using the Indonesian month format
               String formatAttenDate =
                   DateFormat('dd MMM yyyy', 'id').format(atten_date);
@@ -957,7 +962,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextLabell(
-                            text: formatAttenDate,
+                            text: formatDateAjuan,
                             weight: FontWeight.w500,
                             size: 16.0,
                             color: Constanst.fgPrimary,

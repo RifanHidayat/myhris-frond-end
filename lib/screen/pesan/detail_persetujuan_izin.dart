@@ -297,7 +297,7 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
                                         height: 16,
                                       ),
                                       TextLabell(
-                                        text: "Kosekuensi",
+                                        text: "Konsekuensi",
                                         size: 12,
                                         weight: FontWeight.bold,
                                       ),
@@ -759,7 +759,7 @@ class _DetailPersetujuanIzinState extends State<DetailPersetujuanIzin> {
                                 : Column(
                                     children: [
                                       TextLabell(
-                                        text: "Kosekuensi",
+                                        text: "Konsekuensi",
                                         size: 12,
                                         weight: FontWeight.bold,
                                       ),

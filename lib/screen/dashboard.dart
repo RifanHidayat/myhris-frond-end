@@ -22,6 +22,7 @@ import 'package:siscom_operasional/controller/bpjs.dart';
 import 'package:siscom_operasional/controller/chat_controller.dart';
 import 'package:siscom_operasional/controller/dashboard_controller.dart';
 import 'package:siscom_operasional/controller/global_controller.dart';
+import 'package:siscom_operasional/controller/internet_controller.dart';
 import 'package:siscom_operasional/controller/pengumuman_controller.dart';
 import 'package:siscom_operasional/controller/peraturan_perusahaan_controller.dart';
 import 'package:siscom_operasional/controller/pesan_controller.dart';
@@ -87,6 +88,7 @@ class _DashboardState extends State<Dashboard> {
   final tabbController = Get.put(TabbController());
   final authController = Get.put(AuthController());
   final chatController = Get.put(ChatController());
+  final internetController = Get.put(InternetController());
 
   var intervalTracking = "";
   final WebSocketChannel channel =
@@ -932,116 +934,27 @@ class _DashboardState extends State<Dashboard> {
             ),
 
             AppData.informasiUser![0].em_image == ""
-                ? Row(
-                    children: [
-                      // Padding(
-                      //   padding: const EdgeInsets.only(right: 5),
-                      //   child: SizedBox(
-                      //     width: 20,
-                      //     height: 20,
-                      //     child: Obx(() {
-                      //       return Container(
-                      //         decoration: BoxDecoration(
-                      //           color: authController.isConnected.value
-                      //               ? Constanst.color5
-                      //               : Constanst.color4,
-                      //           borderRadius: BorderRadius.circular(20),
-                      //         ),
-                      //       );
-                      //     }),
-                      //   ),
-                      // ),
-                      // InkWell(
-                      //   onTap: () {
-                      //     Get.to(HistoryChat());
-                      //   },
-                      //   child: Padding(
-                      //       padding: EdgeInsets.only(right: 5),
-                      //       child: Container(
-                      //         width: 30,
-                      //         height: 30,
-                      //         child: Stack(
-                      //           children: [
-                      //             CircleAvatar(
-                      //               radius: 7,
-                      //               backgroundColor: Colors.red,
-                      //               child: TextLabell(
-                      //                 text: chatController.jumlahChat.value
-                      //                     .toString(),
-                      //                 color: Colors.black,
-                      //               ),
-                      //             ),
-                      //             Image.asset(
-                      //               'assets/chat.png',
-                      //               width: 20,
-                      //               height: 20,
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       )),
-                      // ),
-                      SvgPicture.asset(
-                        'assets/avatar_default.svg',
-                        width: 50,
-                        // _isVisible ? 50 : 42,
-                        height: 50
-                        // _isVisible ? 50 : 42,
-                      ),
-                    ],
-                  )
+                ? Column(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/avatar_default.svg',
+                      width: 50,
+                      // _isVisible ? 50 : 42,
+                      height: 50
+                      // _isVisible ? 50 : 42,
+                    ),
+                    SizedBox(height: 4),
+                        Container(
+                          height: 12,
+                          width: 12,
+                          color: internetController.isConnected.value ? Colors.green : Colors.red
+                        )
+                  ],
+                )
                 : Padding(
                     padding: const EdgeInsets.only(left: 16.0),
-                    child: Row(
+                    child: Column(
                       children: [
-                        // Padding(
-                        //   padding: const EdgeInsets.only(right: 5),
-                        //   child: SizedBox(
-                        //     width: 18,
-                        //     height: 18,
-                        //     child: Obx(() {
-                        //       return Container(
-                        //         decoration: BoxDecoration(
-                        //           color: authController.isConnected.value
-                        //               ? Constanst.color5
-                        //               : Constanst.color4,
-                        //           borderRadius: BorderRadius.circular(20),
-                        //         ),
-                        //       );
-                        //     }),
-                        //   ),
-                        // ),
-                        // InkWell(
-                        //   onTap: () {
-                        //     Get.to(HistoryChat());
-                        //   },
-                        //   child: Padding(
-                        //       padding: EdgeInsets.only(right: 5),
-                        //       child: Container(
-                        //         width: 30,
-                        //         height: 30,
-                        //         child: Stack(
-                        //           children: [
-                        //             Obx(
-                        //               () => CircleAvatar(
-                        //                 radius: 7,
-                        //                 backgroundColor: Colors.red,
-                        //                 child: TextLabell(
-                        //                   text: chatController.jumlahChat.value
-                        //                       .toString(),
-                        //                   color: Colors.white,
-                        //                   weight: FontWeight.bold,
-                        //                 ),
-                        //               ),
-                        //             ),
-                        //             Image.asset(
-                        //               'assets/chat.png',
-                        //               width: 20,
-                        //               height: 20,
-                        //             ),
-                        //           ],
-                        //         ),
-                        //       )),
-                        // ),
                         CircleAvatar(
                           radius: 25, // Image radius
                           child: ClipOval(
@@ -1074,6 +987,12 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                         ),
+                        SizedBox(height: 4),
+                        Container(
+                          height: 12,
+                          width: 12,
+                          color: internetController.isConnected.value ? Colors.green : Colors.red
+                        )
                       ],
                     ),
                   ),
@@ -1291,6 +1210,7 @@ class _DashboardState extends State<Dashboard> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        //ini absen masuk
                         Expanded(
                           flex: 165,
                           child: Material(
@@ -1427,26 +1347,26 @@ class _DashboardState extends State<Dashboard> {
                                           if (!validasiAbsenMasukUser) {
                                             print("masuk sini");
                                           } else {
-                                            // if (!authController
-                                            //     .isConnected.value) {
-                                            //   if (controller
-                                            //           .absenOfflineStatus
-                                            //           .value ==
-                                            //       true) {
-                                            //     UtilsAlert.showToast(
-                                            //         "Menunggu status absensi anda di approve");
-                                            //     return;
-                                            //   } else {
-                                            //     controllerAbsensi.titleAbsen
-                                            //         .value = "Absen masuk";
-                                            //     controllerAbsensi
-                                            //         .typeAbsen.value = 1;
-                                            //     controller
-                                            //         .widgetButtomSheetOfflineAbsen(
-                                            //             title: "Absen masuk",
-                                            //             status: "masuk");
-                                            //   }
-                                            // } else {
+                                            if (!internetController
+                                                .isConnected.value) {
+                                              if (controller
+                                                      .absenOfflineStatus
+                                                      .value ==
+                                                  true) {
+                                                UtilsAlert.showToast(
+                                                    "Menunggu status absensi anda di approve");
+                                                return;
+                                              } else {
+                                                controllerAbsensi.titleAbsen
+                                                    .value = "Absen masuk";
+                                                controllerAbsensi
+                                                    .typeAbsen.value = 1;
+                                                controller
+                                                    .widgetButtomSheetOfflineAbsen(
+                                                        title: "Absen masuk",
+                                                        status: "masuk");
+                                              }
+                                            } else {
                                             controllerAbsensi.titleAbsen
                                                 .value = "Absen masuk";
     
@@ -1522,7 +1442,7 @@ class _DashboardState extends State<Dashboard> {
                                             //   //   // controllerAbsensi.absenSelfie();
                                             //   // }
                                             // });
-                                            // }
+                                            }
                                           }
                                         }
                                       });
@@ -1655,83 +1575,83 @@ class _DashboardState extends State<Dashboard> {
                                                       ],
                                                     ),
                                                   )
-                                                : Container(),
-                                            // (controller.absenOfflineStatus
-                                            //                 .value &&
-                                            //             absenControllre
-                                            //                 .absenStatus
-                                            //                 .value) ||
-                                            //         controller
-                                            //             .pendingSigninApr
-                                            //             .value
-                                            //     ? Padding(
-                                            //         padding:
-                                            //             const EdgeInsets.only(
-                                            //                 top: 4.0),
-                                            //         child: Row(
-                                            //           mainAxisAlignment:
-                                            //               MainAxisAlignment
-                                            //                   .spaceBetween,
-                                            //           crossAxisAlignment:
-                                            //               CrossAxisAlignment
-                                            //                   .center,
-                                            //           children: [
-                                            //             // Icon(
-                                            //             //   Iconsax.timer,
-                                            //             //   color: Constanst
-                                            //             //       .color3,
-                                            //             //   size: 15,
-                                            //             // ),
-                                            //             // SizedBox(width: 2),
-                                            //             Obx(
-                                            //               () => Row(
-                                            //                 children: [
-                                            //                   Text(
-                                            //                     // controller
-                                            //                     //     .status.value,
-                                            //                     controller
-                                            //                             .textPendingMasuk
-                                            //                             .value
-                                            //                         ? "Pending Absensi"
-                                            //                         : "Pending Approval",
-                                            //                     style:
-                                            //                         GoogleFonts
-                                            //                             .inter(
-                                            //                       fontWeight:
-                                            //                           FontWeight
-                                            //                               .w500,
-                                            //                       fontSize: 9,
-                                            //                       color: Constanst
-                                            //                           .color4,
-                                            //                     ),
-                                            //                   ),
-                                            //                   Visibility(
-                                            //                     visible: controller
-                                            //                         .textPendingMasuk
-                                            //                         .value,
-                                            //                     child: Row(
-                                            //                       children: [
-                                            //                         const SizedBox(
-                                            //                           width:
-                                            //                               2,
-                                            //                         ),
-                                            //                         Icon(
-                                            //                           Iconsax
-                                            //                               .clock,
-                                            //                           size: 8,
-                                            //                           color: Constanst
-                                            //                               .color4,
-                                            //                         ),
-                                            //                       ],
-                                            //                     ),
-                                            //                   ),
-                                            //                 ],
-                                            //               ),
-                                            //             ),
-                                            //           ],
-                                            //         ),
-                                            //       )
-                                            //     : Container()
+                                                : 
+                                            (controller.absenOfflineStatus
+                                                            .value &&
+                                                        absenControllre
+                                                            .absenStatus
+                                                            .value) ||
+                                                    controller
+                                                        .pendingSigninApr
+                                                        .value
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 4.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        // Icon(
+                                                        //   Iconsax.timer,
+                                                        //   color: Constanst
+                                                        //       .color3,
+                                                        //   size: 15,
+                                                        // ),
+                                                        // SizedBox(width: 2),
+                                                        Obx(
+                                                          () => Row(
+                                                            children: [
+                                                              Text(
+                                                                // controller
+                                                                //     .status.value,
+                                                                controller
+                                                                        .textPendingMasuk
+                                                                        .value
+                                                                    ? "Pending Absensi"
+                                                                    : "Pending Approval",
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .inter(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 9,
+                                                                  color: Constanst
+                                                                      .color4,
+                                                                ),
+                                                              ),
+                                                              Visibility(
+                                                                visible: controller
+                                                                    .textPendingMasuk
+                                                                    .value,
+                                                                child: Row(
+                                                                  children: [
+                                                                    const SizedBox(
+                                                                      width:
+                                                                          2,
+                                                                    ),
+                                                                    Icon(
+                                                                      Iconsax
+                                                                          .clock,
+                                                                      size: 8,
+                                                                      color: Constanst
+                                                                          .color4,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : Container()
                                           ],
                                         ),
                                       ],
@@ -1788,6 +1708,7 @@ class _DashboardState extends State<Dashboard> {
                             width: 1,
                           ),
                         ),
+                        // ini absen keluar
                         Expanded(
                           flex: 165,
                           child: Material(
@@ -1823,29 +1744,29 @@ class _DashboardState extends State<Dashboard> {
                                   UtilsAlert.showToast(
                                       "Abeen WFH beluum di approve");
                                 } else {
-                                  // if (!authController.isConnected.value) {
-                                  //   // if (controller
-                                  //   //         .absenOfflineStatusDua.value ==
-                                  //   //     true) {
-                                  //   //   UtilsAlert.showToast(
-                                  //   //       "Menunggu status absensi anda di approve");
-                                  //   //   return;
-                                  //   // } else {
-                                  //   controllerAbsensi.getPlaceCoordinate();
-                                  //   controllerAbsensi.titleAbsen.value =
-                                  //       "Absen Keluar";
-                                  //   controllerAbsensi.typeAbsen.value = 2;
-                                  //   controller.widgetButtomSheetOfflineAbsen(
-                                  //       title: "Absen Keluar",
-                                  //       status: "keluar");
-                                  //   // }
-                                  // } else {
-                                  // if (controller.absenOfflineStatus.value ==
-                                  //     true) {
-                                  //   UtilsAlert.showToast(
-                                  //       "Menunggu status absensi anda di approve");
-                                  //   return;
-                                  // }
+                                  if (!internetController.isConnected.value) {
+                                    // if (controller
+                                    //         .absenOfflineStatusDua.value ==
+                                    //     true) {
+                                    //   UtilsAlert.showToast(
+                                    //       "Menunggu status absensi anda di approve");
+                                    //   return;
+                                    // } else {
+                                    controllerAbsensi.getPlaceCoordinate();
+                                    controllerAbsensi.titleAbsen.value =
+                                        "Absen Keluar";
+                                    controllerAbsensi.typeAbsen.value = 2;
+                                    controller.widgetButtomSheetOfflineAbsen(
+                                        title: "Absen Keluar",
+                                        status: "keluar");
+                                    // }
+                                  } else {
+                                  if (controller.absenOfflineStatus.value ==
+                                      true) {
+                                    UtilsAlert.showToast(
+                                        "Menunggu status absensi anda di approve");
+                                    return;
+                                  }
                                   // gua tandain nih yak
     
                                   var dataUser = AppData.informasiUser;
@@ -1899,7 +1820,7 @@ class _DashboardState extends State<Dashboard> {
                                                 title: "Peringatan",
                                                 content:
                                                     "Anda yakin ingin pulang lebih cepat?",
-                                                positiveBtnText: "Yah",
+                                                positiveBtnText: "Iya",
                                                 negativeBtnText: "Kembali",
                                                 style: 1,
                                                 buttonStatus: 1,
@@ -1944,7 +1865,7 @@ class _DashboardState extends State<Dashboard> {
                                     controllerAbsensi
                                         .widgetButtomSheetFaceRegistrattion();
                                   }
-                                  // }
+                                  }
                                 }
                               },
                               child: Padding(
@@ -2064,84 +1985,84 @@ class _DashboardState extends State<Dashboard> {
                                                   ? Container(
                                                       height: 20,
                                                     )
-                                                  : Container(),
-                                              // (controller.absenOfflineStatus
-                                              //                 .value &&
-                                              //             !absenControllre
-                                              //                 .absenStatus
-                                              //                 .value) ||
-                                              //         controller
-                                              //             .pendingSignoutApr
-                                              //             .value
-                                              //     ? Padding(
-                                              //         padding:
-                                              //             const EdgeInsets
-                                              //                 .only(top: 4.0),
-                                              //         child: Row(
-                                              //           mainAxisAlignment:
-                                              //               MainAxisAlignment
-                                              //                   .spaceBetween,
-                                              //           crossAxisAlignment:
-                                              //               CrossAxisAlignment
-                                              //                   .center,
-                                              //           children: [
-                                              //             // Icon(
-                                              //             //   Iconsax.timer,
-                                              //             //   color: Constanst
-                                              //             //       .color3,
-                                              //             //   size: 15,
-                                              //             // ),
-                                              //             // SizedBox(width: 2),
-                                              //             Obx(
-                                              //               () => Row(
-                                              //                 children: [
-                                              //                   Text(
-                                              //                     // controller
-                                              //                     //     .status.value,
-                                              //                     controller
-                                              //                             .textPendingKeluar
-                                              //                             .value
-                                              //                         ? "Pending Absensi"
-                                              //                         : "Pending Approval",
-                                              //                     style: GoogleFonts
-                                              //                         .inter(
-                                              //                       fontWeight:
-                                              //                           FontWeight
-                                              //                               .w500,
-                                              //                       fontSize:
-                                              //                           9,
-                                              //                       color: Constanst
-                                              //                           .color4,
-                                              //                     ),
-                                              //                   ),
-                                              //                   Visibility(
-                                              //                     visible: controller
-                                              //                         .textPendingKeluar
-                                              //                         .value,
-                                              //                     child: Row(
-                                              //                       children: [
-                                              //                         const SizedBox(
-                                              //                           width:
-                                              //                               2,
-                                              //                         ),
-                                              //                         Icon(
-                                              //                           Iconsax
-                                              //                               .clock,
-                                              //                           size:
-                                              //                               8,
-                                              //                           color:
-                                              //                               Constanst.color4,
-                                              //                         ),
-                                              //                       ],
-                                              //                     ),
-                                              //                   ),
-                                              //                 ],
-                                              //               ),
-                                              //             ),
-                                              //           ],
-                                              //         ),
-                                              //       )
-                                              //     : Container()
+                                                  : 
+                                              (controller.absenOfflineStatusOut
+                                                              .value &&
+                                                          !absenControllre
+                                                              .absenStatus
+                                                              .value) ||
+                                                      controller
+                                                          .pendingSignoutApr
+                                                          .value
+                                                  ? Padding(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(top: 4.0),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          // Icon(
+                                                          //   Iconsax.timer,
+                                                          //   color: Constanst
+                                                          //       .color3,
+                                                          //   size: 15,
+                                                          // ),
+                                                          // SizedBox(width: 2),
+                                                          Obx(
+                                                            () => Row(
+                                                              children: [
+                                                                Text(
+                                                                  // controller
+                                                                  //     .status.value,
+                                                                  controller
+                                                                          .textPendingKeluar
+                                                                          .value
+                                                                      ? "Pending Absensi"
+                                                                      : "Pending Approval",
+                                                                  style: GoogleFonts
+                                                                      .inter(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontSize:
+                                                                        9,
+                                                                    color: Constanst
+                                                                        .color4,
+                                                                  ),
+                                                                ),
+                                                                Visibility(
+                                                                  visible: controller
+                                                                      .textPendingKeluar
+                                                                      .value,
+                                                                  child: Row(
+                                                                    children: [
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            2,
+                                                                      ),
+                                                                      Icon(
+                                                                        Iconsax
+                                                                            .clock,
+                                                                        size:
+                                                                            8,
+                                                                        color:
+                                                                            Constanst.color4,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  : Container()
                                             ],
                                           ),
                                         ],
@@ -2759,7 +2680,10 @@ class _DashboardState extends State<Dashboard> {
                       customBorder: RoundedRectangleBorder(
                         borderRadius: Constanst.borderStyle2,
                       ),
-                      onTap: () => controller.widgetButtomSheetFormPengajuan(),
+                      onTap: (){
+                        internetController.isConnected.value ? controller.widgetButtomSheetFormPengajuan()
+                        : UtilsAlert.showDialogCheckInternet();
+                      },
                       child: Padding(
                         padding:
                             const EdgeInsets.fromLTRB(8.0, 10.0, 4.0, 10.0),
@@ -2839,7 +2763,9 @@ class _DashboardState extends State<Dashboard> {
                                   borderRadius: Constanst.borderStyle2,
                                 ),
                                 onTap: () {
-                                  controller.widgetButtomSheetFormLaporan();
+                                  internetController.isConnected.value
+                                  ?controller.widgetButtomSheetFormLaporan()
+                                  :UtilsAlert.showDialogCheckInternet();
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(
@@ -2928,9 +2854,9 @@ class _DashboardState extends State<Dashboard> {
                         borderRadius: Constanst.borderStyle2,
                       ),
                       onTap: () {
-                        print('ini APPBranch : ${AppData.selectBranch}');
-                        // controllerPeraturan.fetchPeraturan();
-                        Get.to(PeraturanPerusahaanScreen());
+                        internetController.isConnected.value
+                        ? Get.to(PeraturanPerusahaanScreen())
+                        : UtilsAlert.showDialogCheckInternet();
                       },
                       child: Padding(
                         padding:
@@ -3005,7 +2931,12 @@ class _DashboardState extends State<Dashboard> {
                       customBorder: RoundedRectangleBorder(
                         borderRadius: Constanst.borderStyle2,
                       ),
-                      onTap: () => Get.to(const PengumumanScreen()),
+                      onTap: () {
+                        internetController.isConnected.value
+                        ?
+                        Get.to(const PengumumanScreen())
+                        : UtilsAlert.showDialogCheckInternet();
+                      },
                       child: Padding(
                         padding:
                             const EdgeInsets.fromLTRB(8.0, 10.0, 4.0, 10.0),
@@ -3130,7 +3061,10 @@ class _DashboardState extends State<Dashboard> {
                   borderRadius: Constanst.borderStyle2,
                 ),
                 onTap: () {
-                  Get.to(Monitoring());
+                  internetController.isConnected.value
+                  ?
+                  Get.to(Monitoring())
+                  : UtilsAlert.showDialogCheckInternet();
                 },
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8.0, 10.0, 4.0, 10.0),
@@ -3334,10 +3268,10 @@ class _DashboardState extends State<Dashboard> {
                 padding: const EdgeInsets.only(right: 12),
                 child: InkWell(
                   onTap: () async {
-                    // authController.isConnected.value
-                    //     ?
-                    controller.widgetButtomSheetMenuLebihDetail();
-                    // : UtilsAlert.showDialogCheckInternet();
+                    internetController.isConnected.value
+                    ?
+                    controller.widgetButtomSheetMenuLebihDetail()
+                    : UtilsAlert.showDialogCheckInternet();
                   },
                   highlightColor: Colors.white,
                   child: Column(
@@ -3405,12 +3339,13 @@ class _DashboardState extends State<Dashboard> {
                                                         ? 30.0
                                                         : 30.0),
                         child: InkWell(
-                          onTap: () => // authController.isConnected.value
-                              // ?
+                          onTap: () => 
+                          internetController.isConnected.value
+                              ?
                               controller.routePageDashboard(
                                   controller.menuShowInMain[idxMenu]['url'],
-                                  null),
-                          // : UtilsAlert.showDialogCheckInternet(),
+                                  null)
+                          : UtilsAlert.showDialogCheckInternet(),
                           highlightColor: Colors.white,
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,

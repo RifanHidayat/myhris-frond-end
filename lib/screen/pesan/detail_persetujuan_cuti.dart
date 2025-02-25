@@ -297,7 +297,7 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                         height: 16,
                                       ),
                                       TextLabell(
-                                        text: "Kosekuensi",
+                                        text: "Konsekuensi",
                                         size: 12,
                                         weight: FontWeight.bold,
                                       ),
@@ -762,7 +762,7 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                                 : Column(
                                     children: [
                                       TextLabell(
-                                        text: "Kosekuensi",
+                                        text: "Konsekuensi",
                                         size: 12,
                                         weight: FontWeight.bold,
                                       ),

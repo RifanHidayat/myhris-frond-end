@@ -2299,97 +2299,97 @@ class AbsenController extends GetxController {
     //  }
   }
 
-  // void widgetButtomSheetLanjutkanOffline({type, typewfh}) {
-  //   showModalBottomSheet(
-  //     context: Get.context!,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(
-  //         top: Radius.circular(20.0),
-  //       ),
-  //     ),
-  //     builder: (context) {
-  //       return Column(
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           const SizedBox(
-  //             height: 30,
-  //           ),
-  //           Padding(
-  //             padding: const EdgeInsets.only(left: 16, right: 16),
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.center,
-  //               children: [
-  //                 Center(
-  //                   child: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.center,
-  //                     children: [
-  //                       // Padding(
-  //                       //   padding: const EdgeInsets.only(left: 5, right: 5),
-  //                       //   child: Image.asset("assets/vector_map.png"),
-  //                       // ),
-  //                       const CircleAvatar(
-  //                         backgroundColor: Colors.red,
-  //                         maxRadius: 30.0,
-  //                         child: Icon(
-  //                           Iconsax.info_circle,
-  //                           color: Colors.white,
-  //                           size: 25,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 20),
-  //                       const Text(
-  //                         "Peringatan Absensi Offline",
-  //                         style: TextStyle(
-  //                             fontWeight: FontWeight.bold, fontSize: 16),
-  //                       ),
-  //                       const SizedBox(height: 15),
-  //                       const Text(
-  //                         "Anda memilih Absensi Offline, absensi offline membutuhkan approval",
-  //                         textAlign: TextAlign.center,
-  //                       ),
-  //                       const SizedBox(height: 30),
-  //                       TextButtonWidget(
-  //                         title: "Lanjutkan",
-  //                         onTap: () async {
-  //                           if (type == "offlineAbsensi") {
-  //                             print('kesini');
-  //                             Get.back();
-  //                             await deteksiFakeGps(context);
-  //                             if (statusDeteksi.value == false &&
-  //                                 statusDeteksi2.value == false) {
-  //                               kirimDataAbsensiOffline(typewfh: typewfh);
-  //                             } else if (statusDeteksi.value == false &&
-  //                                 statusDeteksi2.value == true) {
-  //                               if (context.mounted) {
-  //                                 popUpRefresh(Get.context!);
-  //                               }
-  //                             }
-  //                           } else {
-  //                             Navigator.pop(context);
-  //                             // await Permission.camera.request();
-  //                             // await Permission.location.request();
-  //                           }
-  //                         },
-  //                         colorButton: Constanst.colorButton1,
-  //                         colortext: Constanst.colorWhite,
-  //                         border: BorderRadius.circular(15.0),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 )
-  //               ],
-  //             ),
-  //           ),
-  //           const SizedBox(
-  //             height: 30,
-  //           )
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+  void widgetButtomSheetLanjutkanOffline({type, typewfh}) {
+    showModalBottomSheet(
+      context: Get.context!,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Padding(
+                        //   padding: const EdgeInsets.only(left: 5, right: 5),
+                        //   child: Image.asset("assets/vector_map.png"),
+                        // ),
+                        const CircleAvatar(
+                          backgroundColor: Colors.red,
+                          maxRadius: 30.0,
+                          child: Icon(
+                            Iconsax.info_circle,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          "Peringatan Absensi Offline",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Anda memilih Absensi Offline, absensi offline membutuhkan approval",
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 30),
+                        TextButtonWidget(
+                          title: "Lanjutkan",
+                          onTap: () async {
+                            if (type == "offlineAbsensi") {
+                              // print('kesini');
+                              // Get.back();
+                              // await deteksiFakeGps(context);
+                              if (statusDeteksi.value == false &&
+                                  statusDeteksi2.value == false) {
+                                kirimDataAbsensiOffline(typewfh: typewfh);
+                              } else if (statusDeteksi.value == false &&
+                                  statusDeteksi2.value == true) {
+                                if (context.mounted) {
+                                  popUpRefresh(Get.context!);
+                                }
+                              }
+                            } else {
+                              Navigator.pop(context);
+                              // await Permission.camera.request();
+                              // await Permission.location.request();
+                            }
+                          },
+                          colorButton: Constanst.colorButton1,
+                          colortext: Constanst.colorWhite,
+                          border: BorderRadius.circular(15.0),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 30,
+            )
+          ],
+        );
+      },
+    );
+  }
 
   void popUpRefresh(BuildContext context) async {
     showGeneralDialog(
@@ -2430,126 +2430,126 @@ class AbsenController extends GetxController {
     );
   }
 
-  // void kirimDataAbsensiOffline({typewfh}) async {
-  //   var latLangAbsen = "${latUser.value},${langUser.value}";
+  void kirimDataAbsensiOffline({typewfh}) async {
+    var latLangAbsen = "${latUser.value},${langUser.value}";
 
-  //   //     absenStatus.value = false;
-  //   // AppData.statusAbsen = false;
-  //   // AppData.dateLastAbsen = tanggalUserFoto.value;
-  //   var statusPosisi = await validasiRadius();
-  //   if (statusPosisi == true) {
-  //     if (typeAbsen.value == 1) {
-  //       absenStatus.value = true;
-  //       AppData.statusAbsen = true;
-  //       AppData.dateLastAbsen = tanggalUserFoto.value;
+    //     absenStatus.value = false;
+    // AppData.statusAbsen = false;
+    // AppData.dateLastAbsen = tanggalUserFoto.value;
+    var statusPosisi = await validasiRadius();
+    if (statusPosisi == true) {
+      if (typeAbsen.value == 1) {
+        absenStatus.value = true;
+        AppData.statusAbsen = true;
+        AppData.dateLastAbsen = tanggalUserFoto.value;
 
-  //       Map<String, dynamic> absensi = {
-  //         'em_id': AppData.informasiUser![0].em_id,
-  //         'atten_date': tanggalUserFoto.value,
-  //         'signing_time': timeString.value,
-  //         'place_in': selectedType.value,
-  //         'signin_longlat': latLangAbsen,
-  //         'signin_note': deskripsiAbsen.value.text,
-  //         'signin_addr': alamatUserFoto.value,
-  //         'signout_time': "",
-  //         'place_out': "",
-  //         'signout_longlat': "",
-  //         'signout_note': "",
-  //         'signout_addr': "",
-  //         'signout_pict': "",
-  //         'signin_pict': base64fotoUser.value,
-  //       };
+        Map<String, dynamic> absensi = {
+          'em_id': AppData.informasiUser![0].em_id,
+          'atten_date': tanggalUserFoto.value,
+          'signing_time': timeString.value,
+          'place_in': selectedType.value,
+          'signin_longlat': latLangAbsen,
+          'signin_note': deskripsiAbsen.value.text,
+          'signin_addr': alamatUserFoto.value,
+          'signout_time': "",
+          'place_out': "",
+          'signout_longlat': "",
+          'signout_note': "",
+          'signout_addr': "",
+          'signout_pict': "",
+          'signin_pict': base64fotoUser.value,
+        };
 
-  //       AppData.signingTime = timeString.value;
-  //       AppData.statusAbsenOffline = true;
-  //       AppData.signoutTime = "";
-  //       AppData.textPendingMasuk = true;
+        AppData.signingTime = timeString.value;
+        AppData.statusAbsenOffline = true;
+        AppData.signoutTime = "";
+        AppData.textPendingMasuk = true;
 
-  //       SqliteDatabaseHelper().deleteAbsensi().then((_) {
-  //         SqliteDatabaseHelper().insertAbsensi(absensi, () {
-  //           authController.kirims.value = false;
-  //           Get.to(BerhasilAbsensi(
-  //             dataBerhasil: [
-  //               titleAbsen.value,
-  //               timeString.value,
-  //               typeAbsen.value,
-  //               intervalControl.value,
-  //             ],
-  //           ));
-  //         }, (error) {
-  //           // Tampilkan error jika insertAbsensi gagal
-  //           Get.snackbar("Error", error);
-  //         });
-  //       }).catchError((error) {
-  //         // Jika terjadi kesalahan pada penghapusan absensi
-  //         Get.snackbar("Error", "Gagal menghapus absensi: $error");
-  //       });
-  //     } else {
-  //       absenStatus.value = false;
-  //       AppData.statusAbsen = false;
-  //       AppData.dateLastAbsen = tanggalUserFoto.value;
+        SqliteDatabaseHelper().deleteAbsensi().then((_) {
+          SqliteDatabaseHelper().insertAbsensi(absensi, () {
+            // authController.kirims.value = false;
+            Get.to(BerhasilAbsensi(
+              dataBerhasil: [
+                titleAbsen.value,
+                timeString.value,
+                typeAbsen.value,
+                intervalControl.value,
+              ],
+            ));
+          }, (error) {
+            // Tampilkan error jika insertAbsensi gagal
+            Get.snackbar("Error", error);
+          });
+        }).catchError((error) {
+          // Jika terjadi kesalahan pada penghapusan absensi
+          Get.snackbar("Error", "Gagal menghapus absensi: $error");
+        });
+      } else {
+        absenStatus.value = false;
+        AppData.statusAbsen = false;
+        AppData.dateLastAbsen = tanggalUserFoto.value;
 
-  //       AppData.signoutTime = timeString.value;
-  //       AppData.statusAbsenOffline = true;
-  //       AppData.textPendingKeluar = true;
+        AppData.signoutTime = timeString.value;
+        AppData.statusAbsenOffline = true;
+        AppData.textPendingKeluar = true;
 
-  //       var absenMasukKeluarOffline = await SqliteDatabaseHelper().getAbsensi();
+        var absenMasukKeluarOffline = await SqliteDatabaseHelper().getAbsensi();
 
-  //       if (absenMasukKeluarOffline != null) {
-  //         SqliteDatabaseHelper().updateAbsensi({
-  //           'signout_time': timeString.value,
-  //           'place_out': selectedType.value,
-  //           'signout_longlat': latLangAbsen,
-  //           'signout_pict': base64fotoUser.value,
-  //           'signout_note': deskripsiAbsen.value.text,
-  //           'signout_addr': alamatUserFoto.value,
-  //         }).then((rowsUpdated) {
-  //           authController.kirims.value == false;
-  //           Get.to(BerhasilAbsensi(
-  //             dataBerhasil: [
-  //               titleAbsen.value,
-  //               timeString.value,
-  //               typeAbsen.value,
-  //               intervalControl.value
-  //             ],
-  //           ));
-  //         });
-  //       } else {
-  //         Map<String, dynamic> absensi = {
-  //           'em_id': AppData.informasiUser![0].em_id,
-  //           'atten_date': tanggalUserFoto.value,
-  //           'signing_time': "",
-  //           'place_in': "",
-  //           'signin_longlat': "",
-  //           'signin_note': "",
-  //           'signin_addr': "",
-  //           'signout_time': timeString.value,
-  //           'place_out': selectedType.value,
-  //           'signout_longlat': latLangAbsen,
-  //           'signout_pict': base64fotoUser.value,
-  //           'signout_note': deskripsiAbsen.value.text,
-  //           'signout_addr': alamatUserFoto.value,
-  //           'signin_pict': "",
-  //         };
+        if (absenMasukKeluarOffline != null) {
+          SqliteDatabaseHelper().updateAbsensi({
+            'signout_time': timeString.value,
+            'place_out': selectedType.value,
+            'signout_longlat': latLangAbsen,
+            'signout_pict': base64fotoUser.value,
+            'signout_note': deskripsiAbsen.value.text,
+            'signout_addr': alamatUserFoto.value,
+          }).then((rowsUpdated) {
+            // authController.kirims.value == false;
+            Get.to(BerhasilAbsensi(
+              dataBerhasil: [
+                titleAbsen.value,
+                timeString.value,
+                typeAbsen.value,
+                intervalControl.value
+              ],
+            ));
+          });
+        } else {
+          Map<String, dynamic> absensi = {
+            'em_id': AppData.informasiUser![0].em_id,
+            'atten_date': tanggalUserFoto.value,
+            'signing_time': "",
+            'place_in': "",
+            'signin_longlat': "",
+            'signin_note': "",
+            'signin_addr': "",
+            'signout_time': timeString.value,
+            'place_out': selectedType.value,
+            'signout_longlat': latLangAbsen,
+            'signout_pict': base64fotoUser.value,
+            'signout_note': deskripsiAbsen.value.text,
+            'signout_addr': alamatUserFoto.value,
+            'signin_pict': "",
+          };
 
-  //         SqliteDatabaseHelper().insertAbsensi(absensi, () {
-  //           authController.kirims.value = false;
-  //           Get.to(BerhasilAbsensi(
-  //             dataBerhasil: [
-  //               titleAbsen.value,
-  //               timeString.value,
-  //               typeAbsen.value,
-  //               intervalControl.value,
-  //             ],
-  //           ));
-  //         }, (error) {
-  //           // Tampilkan error jika insertAbsensi gagal
-  //           Get.snackbar("Error", error);
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
+          SqliteDatabaseHelper().insertAbsensi(absensi, () {
+            // authController.kirims.value = false;
+            Get.to(BerhasilAbsensi(
+              dataBerhasil: [
+                titleAbsen.value,
+                timeString.value,
+                typeAbsen.value,
+                intervalControl.value,
+              ],
+            ));
+          }, (error) {
+            // Tampilkan error jika insertAbsensi gagal
+            Get.snackbar("Error", error);
+          });
+        }
+      }
+    }
+  }
 
   void getCheckMock() async {
     try {
@@ -2633,8 +2633,9 @@ class AbsenController extends GetxController {
   }
 
   var date = DateTime.now().obs;
-  var beginPayroll = DateFormat('MMMM').format(DateTime.now()).obs;
-  var endPayroll = DateFormat('MMMM').format(DateTime.now()).obs;
+  var beginPayroll = DateFormat('MMMM', 'id').format(DateTime.now()).obs;
+  var endPayroll = DateFormat('MMMM', 'id').format(DateTime.now()).obs;
+  var lastDate = DateFormat('dd').format(DateTime(DateTime.now().year, DateTime.now().month + 1, 0)).obs;
 
   Future<void> loadHistoryAbsenUser() async {
     print("masuk sini terbaru new");
@@ -4584,7 +4585,7 @@ class AbsenController extends GetxController {
       'tahun':
           DateFormat('yyyy').format(DateTime.parse(tglAjunan.value.toString()))
     };
-    print(body);
+    print('ini body bos $body}');
     var connect = Api.connectionApi("post", body, "employee-attendance");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
@@ -4593,7 +4594,10 @@ class AbsenController extends GetxController {
         if (data.isNotEmpty) {
           checkinAjuan.value = data[0]['signin_time'];
           checkoutAjuan.value = data[0]['signout_time'];
-        } else {}
+        } else {
+          checkinAjuan.value = '';
+          checkoutAjuan.value = '';
+        }
       }
     });
   }
@@ -4658,8 +4662,6 @@ class AbsenController extends GetxController {
     absenKeluarLongLat.clear();
     absenKeluarLongLatRest.clear();
     absenLongLatMasukRest.clear();
-    // isChecked.value = false;
-    // isChecked2.value = false;
     // tglAjunan.value = "";
     // checkinAjuan.value = "";
     // checkoutAjuan.value = "";
@@ -4804,6 +4806,14 @@ class AbsenController extends GetxController {
     placeCoordinateCheckin.clear();
     placeCoordinateCheckout.clear();
     imageAjuan.value = "";
+    checkinIstiahat.value = '';
+    checkoutIstirahat.value = '';
+    placeCoordinateCheckinRest.clear();
+    placeCoordinateCheckoutRest.clear();
+    isChecked.value = false;
+    isChecked2.value = false;
+    isChecked3.value = false;
+    isChecked4.value = false;
   }
 
   void kirimNotifikasiToReportTo(
