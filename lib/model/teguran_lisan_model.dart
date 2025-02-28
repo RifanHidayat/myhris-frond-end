@@ -106,6 +106,7 @@ class TeguranLisanModel {
       'posisi': posisi,
       'is_view': isView,
       'hal':hal,
+      'yang_menerbitkan': diterbitkan_oleh,
       'pelanggaran': pelanggaran,
       'nomor_surat': nomor_surat
     };
@@ -147,7 +148,7 @@ class TeguranLisanModel {
         isView: map['is_view'],
         hal: map['hal'],
         pelanggaran: map['pelanggaran'],
-        diterbitkan_oleh: map['diterbitkan_oleh'],
+        diterbitkan_oleh: map['yang_menerbitkan'],
         nomor_surat: map['nomor_surat']
         );
   }

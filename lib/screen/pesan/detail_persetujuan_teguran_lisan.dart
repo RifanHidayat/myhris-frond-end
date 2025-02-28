@@ -157,7 +157,6 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
   }
 
   String formatDate(String dateString) {
-    
     DateTime dateTime = DateTime.parse(dateString);
 
     // Format the DateTime object to 'yyyy-MM-dd'
@@ -245,9 +244,10 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
   void initState() {
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
-    controller.fetchAlasan(widget.idxDetail);
+    controller.fetchAlasanTeguranLisan(widget.idxDetail);
     super.initState();
     var emId = AppData.informasiUser![0].em_id;
+    print('ini idxDetail ${controller.detailData}');
 
     if (controllerGlobal.valuePolaPersetujuan.value.toString() == "1") {
       if (controller.detailData[0]['nama_approve1'] == "" ||
@@ -545,28 +545,31 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                                                 ),
                                               ),
                                         const SizedBox(width: 12),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${controller.detailData[0]['nama_pengaju']}",
-                                              style: GoogleFonts.inter(
-                                                  color: Constanst.fgPrimary,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 16),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              controller.detailData[0]
-                                                      ['nama_divisi'] ??
-                                                  "".toString(),
-                                              style: GoogleFonts.inter(
-                                                  color: Constanst.fgSecondary,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14),
-                                            ),
-                                          ],
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${controller.detailData[0]['nama_pengaju']}",
+                                                style: GoogleFonts.inter(
+                                                    color: Constanst.fgPrimary,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                controller.detailData[0]
+                                                        ['nama_divisi'] ??
+                                                    "".toString(),
+                                                style: GoogleFonts.inter(
+                                                    color:
+                                                        Constanst.fgSecondary,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -679,7 +682,7 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                                       ),
                                     ),
                                     Text(
-                                      "Catatan",
+                                      "Temuan Pelanggaran",
                                       style: GoogleFonts.inter(
                                           color: Constanst.fgSecondary,
                                           fontWeight: FontWeight.w400,
@@ -687,7 +690,7 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      "${controller.detailData[0]['uraian'] ?? "-"}",
+                                      "${controller.detailData[0]['catatan'] ?? "-"}",
                                       style: GoogleFonts.inter(
                                           color: Constanst.fgPrimary,
                                           fontWeight: FontWeight.w500,
@@ -698,7 +701,6 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                                                 null
                                         ? const SizedBox()
                                         : fileWidget(),
-
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           top: 6.0, bottom: 12.0),
@@ -722,58 +724,72 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                             SizedBox(
                               height: 16,
                             ),
-                            TextLabell(
-                              text: "Temuan Pelanggaran",
-                              size: 14,
-                              weight: FontWeight.bold,
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(top: 12),
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        width: 1,
-                                        color: Constanst.greyLight100)),
-                                child: Column(
-                                  children: List.generate(
-                                      controller.listAlasan.length, (index) {
-                                    var data = controller.listAlasan[index];
-                                    return Container(
-                                      padding: EdgeInsets.only(top: 8),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 5,
-                                                child: TextLabell(
-                                                    size: 14,
-                                                    text: "${index + 1}. "),
-                                              ),
-                                              Expanded(
-                                                flex: 99,
-                                                child: TextLabell(
-                                                    size: 14,
-                                                    text: "${data['name']}"),
-                                              ),
-                                            ],
-                                          ),
-                                          Divider(
-                                            color: Constanst.greyLight100,
-                                          )
-                                        ],
+                            controller.listAlasan.isEmpty
+                                ? SizedBox()
+                                : Column(
+                                    children: [
+                                      TextLabell(
+                                        text: "Konsekuensi",
+                                        size: 14,
+                                        weight: FontWeight.bold,
                                       ),
-                                    );
-                                  }),
-                                ),
-                              ),
-                            )
+                                      Container(
+                                        padding: EdgeInsets.only(top: 12),
+                                        child: Container(
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                  width: 1,
+                                                  color:
+                                                      Constanst.greyLight100)),
+                                          child: Column(
+                                            children: List.generate(
+                                                controller.listAlasan.length,
+                                                (index) {
+                                              var data =
+                                                  controller.listAlasan[index];
+                                              return Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 8),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Expanded(
+                                                          flex: 5,
+                                                          child: TextLabell(
+                                                              size: 14,
+                                                              text:
+                                                                  "${index + 1}. "),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 99,
+                                                          child: TextLabell(
+                                                              size: 14,
+                                                              text:
+                                                                  "${data['name']}"),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Divider(
+                                                      color: Constanst
+                                                          .greyLight100,
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                           ],
                         ),
                       ),
@@ -912,6 +928,7 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
       ),
     );
   }
+
   void viewLampiranAjuan(value) async {
     var urlViewGambar =
         Api.UrlfotoAbsen.toString().trim() + value.toString().trim();

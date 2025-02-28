@@ -328,8 +328,8 @@ class _PesanState extends State<Pesan> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Container(
-                    height: 22,
-                    width: 22,
+                    height: 25,
+                    width: 25,
                     decoration: BoxDecoration(
                         color: Constanst.colorStateDangerBg,
                         borderRadius: const BorderRadius.all(
@@ -342,14 +342,17 @@ class _PesanState extends State<Pesan> {
                     child: Center(
                       child: Obx(
                         () => Text(
-                          "${controller.jumlahNotifikasiBelumDibaca.value}"
-                                      .length >
-                                  2
-                              ? '${"${controller.jumlahNotifikasiBelumDibaca.value}".substring(0, 2)}+'
+                          controller.jumlahNotifikasiBelumDibaca.value >
+                                  99
+                              ? "99+"
                               : "${controller.jumlahNotifikasiBelumDibaca.value}",
                           style: GoogleFonts.inter(
                               color: Constanst.colorStateOnDangerBg,
-                              fontSize: 12,
+                              fontSize: 
+                              controller.jumlahNotifikasiBelumDibaca.value >
+                                  99
+                                  ? 10
+                                  : 12,
                               fontWeight: FontWeight.w500),
                         ),
                       ),
@@ -596,6 +599,9 @@ class _PesanState extends State<Pesan> {
                                               controller
                                                   .aksilihatNotif(idNotif);
                                             }
+                                            print('ini id detail notifikasi ${idDetail.toString()}');
+                                            print('ini id detail notifikasi ${emId.toString()}');
+                                            print('ini id detail notifikasi ${emIdPengaju.toString()}');
                                             controller.routeApprovalNotif(
                                               title: titleNotif,
                                               emIdPengaju:

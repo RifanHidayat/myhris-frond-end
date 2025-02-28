@@ -15,6 +15,7 @@ import 'package:siscom_operasional/model/teguran_lisan_model.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:siscom_operasional/utils/constans.dart';
+import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class SuratPeringatanController extends GetxController {
   var peringatanlist = <Peringatan>[].obs;
@@ -24,8 +25,9 @@ class SuratPeringatanController extends GetxController {
   var listAlasan = [].obs;
   var diterbitkan = ''.obs;
   var bulan = ''.obs;
-
-  var jumlahNotifikasiBelumDibaca = 0.obs;
+  var notifSuratPeringatan = 0.obs;
+  var notifTeguranLisan = 0.obs;
+  // var jumlahNotifikasiBelumDibaca = 0.obs;
 
   @override
   void onInit() {
@@ -99,7 +101,7 @@ class SuratPeringatanController extends GetxController {
           List data = jsonDecode(response.body)['data'];
           peringatanlist.value = Peringatan.fromJsonToList(data);
           isLoading.value = false;
-          print('ini peringatanlist $data');
+          print('ini peringatanlist ${data}');
         } else {
           print('gagal dapet surat peringatan ${response.code}');
         }
@@ -109,6 +111,7 @@ class SuratPeringatanController extends GetxController {
 
   void getDetail(id) async {
     isLoadingAlasan.value = true;
+    listAlasan.clear();
     var connect = Api.connectionApi('get', {}, "surat-peringatan/$id");
     connect.then(
       (dynamic response) {
@@ -133,27 +136,34 @@ class SuratPeringatanController extends GetxController {
       final response = await connect;
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        jumlahNotifikasiBelumDibaca.value = data['data'] ?? 0;
-        jumlahNotifikasiBelumDibaca.refresh();
-        print("Jumlah Notifikasi: ${jumlahNotifikasiBelumDibaca.value}");
+        notifSuratPeringatan.value = data['unread_count'] ?? 0;
+        notifSuratPeringatan.refresh();
+        print("Jumlah Notifikasi: ${data}");
       } else {
-        print("Error Gagal mengambil jumlah notifikasi.");
+        UtilsAlert.showToast(response.body['message']);
       }
     } catch (e) {
       print("Error Terjadi kesalahan: $e");
     }
   }
 
-  void updateDataNotif(data) {
+  void updateDataNotifSp(id_letter, em_id) {
     Map<String, dynamic> body = {
-      "id": data,
+      "em_id": em_id,
+      'letter_id': id_letter
     };
+
+    print(body);
+
     var connect =
-        Api.connectionApi("post", body, "surat_peringatan/count/save");
+        Api.connectionApi("post", body, "surat_peringatan_status");
     connect.then((dynamic res) async {
       if (res.statusCode == 200) {
-        jumlahNotifikasiBelumDibaca.refresh();
+        notifSuratPeringatan.refresh();
         print("berhasil ganti status notif");
+        UtilsAlert.showToast(res.body['message'].toString());
+      } else{
+        UtilsAlert.showToast(res.body['message'].toString());
       }
     });
   }
@@ -177,6 +187,7 @@ class SuratPeringatanController extends GetxController {
   
   void getDetailTeguran(id) async {
     isLoadingAlasan.value = true;
+    listAlasan.clear();
     var connect = Api.connectionApi('get', {}, "teguran_lisan/$id");
     connect.then(
       (dynamic response) {
@@ -194,6 +205,43 @@ class SuratPeringatanController extends GetxController {
     );
   }
 
+  void updateDataNotifTl(id_letter, em_id) {
+    Map<String, dynamic> body = {
+      "em_id": em_id,
+      'letter_id': id_letter
+    };
+
+    print(body);
+
+    var connect =
+        Api.connectionApi("post", body, "teguran_lisan_status");
+    connect.then((dynamic res) async {
+      if (res.statusCode == 200) {
+        notifTeguranLisan.refresh();
+        print("berhasil ganti status notif");
+        UtilsAlert.showToast(res.body['message'].toString());
+      } else{
+        UtilsAlert.showToast(res.body['message'].toString());
+      }
+    });
+  }
+
+  void getJumlahNotifikasiTl() async {
+    try {
+      var connect = Api.connectionApi('get', {}, "teguran_lisan/count");
+      final response = await connect;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        notifTeguranLisan.value = data['unread_count'] ?? 0;
+        notifTeguranLisan.refresh();
+        print("Jumlah Notifikasi: ${data}");
+      } else {
+        UtilsAlert.showToast(response.body['message']);
+      }
+    } catch (e) {
+      print("Error Terjadi kesalahan: $e");
+    }
+  }
   
   Future<void> generateAndOpenPdf(int selectedId) async {
     final pdf = pw.Document();

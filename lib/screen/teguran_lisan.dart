@@ -24,12 +24,12 @@ class _TeguranLisanState extends State<TeguranLisan> {
   void initState() {
     super.initState();
     controller.getTeguran();
-    controller.getJumlahNotifikasi();
+    controller.getJumlahNotifikasiTl();
   }
 
   void _onRefresh() async {
     controller.getTeguran();
-    controller.getJumlahNotifikasi();
+    controller.getJumlahNotifikasiTl();
     refreshController.refreshCompleted();
   }
 
@@ -85,24 +85,24 @@ class _TeguranLisanState extends State<TeguranLisan> {
                         trailing: Icon(Icons.arrow_forward_ios),
                         // subtitle: Text(formatDate(list.approve_date)),
                         onTap: () {
-                          // if (list.isView == 0) {
-                          //   controller.updateDataNotif(list.id);
-                          //   controller.getPeringatan();
-                          // }
+                          if (list.isView == 0) {
+                            controller.updateDataNotifTl(list.id, list.em_id);
+                            controller.getTeguran();
+                          }
 
                           print('ini teguran list data : ${list}');
-                          controller.infoIds(list.diterbitkan_oleh);
+                          // controller.infoIds(list.diterbitkan_oleh);
                           controller.getDetailTeguran(list.id);
                           // UtilsAlert.showToast(list.id);
                           Get.to(() => SuratTeguranDetail(
                                 sp: list.sp,
                                 nama: list.nama,
                                 posisi: list.posisi,
-                                nomor: list.nomor_surat,
-                                hal: list.hal,
-                                tglSrt: list.tgl_surat,
+                                nomor: list.nomor_surat.toString(),
+                                hal: list.hal.toString(),
+                                tglSrt: list.eff_date,
                                 pelanggaran: list.pelanggaran,
-                                diterbitkan: list.diterbitkan_oleh,
+                                diterbitkan: list.diterbitkan_oleh.toString(),
                               ));
                         },
                       );
@@ -176,7 +176,7 @@ class SuratTeguranDetail extends StatelessWidget {
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              '$nomor',
+                              'NO : ${nomor == 'null' ? '-' : nomor}',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),
@@ -214,12 +214,24 @@ class SuratTeguranDetail extends StatelessWidget {
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
-                        height: 15,
+                        height: 8,
                       ), 
-                      Text(
-                        '3. ${controller.listAlasan[0]['name']}',
-                        textAlign: TextAlign.start,
-                      ),
+                      controller.listAlasan.isEmpty
+                          ? SizedBox()
+                          : Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                              children: List.generate(
+                                controller.listAlasan.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    '${index + 3}. ${controller.listAlasan[index]['name']}',
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ),
+                              ),
+                            ),
                       SizedBox(
                         height: 15,
                       ), 
@@ -232,6 +244,7 @@ class SuratTeguranDetail extends StatelessWidget {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Column(
                             children: [
@@ -243,12 +256,12 @@ class SuratTeguranDetail extends StatelessWidget {
                                     fontSize: 16),
                               ),
                               SizedBox(
-                                height: 35,
+                                height: 47,
                               ),
                               Text(
-                                controller.diterbitkan.value,
-                                style: TextStyle(
-                                    fontSize: 12),
+                                diterbitkan == 'null' ? '' : diterbitkan,
+                                // style: TextStyle(
+                                //     fontSize: 12),
                               ),
                             ],
                           ),
@@ -256,7 +269,8 @@ class SuratTeguranDetail extends StatelessWidget {
                             children: [
                               SizedBox(height: 20),
                               Text(
-                                'Jakarta, ${DateFormat('dd MMMM yyyy').format(DateTime.parse(tglSrt.toString()))}',
+                                // tglSrt,
+                                'Jakarta, ${formatDate(tglSrt)}',
                                 style: TextStyle(
                                     fontSize: 12.0),
                               ),
@@ -266,7 +280,7 @@ class SuratTeguranDetail extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12.0),
                               ),
-                              SizedBox(height: 25),
+                              SizedBox(height: 50),
                               Text('$nama'),
                             ],
                           ),
@@ -280,7 +294,7 @@ class SuratTeguranDetail extends StatelessWidget {
 
   String formatDate(String dateString) {
     DateTime dateTime = DateTime.parse(dateString);
-    String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+    String formattedDate = DateFormat('dd MMMM yyyy', 'id_ID').format(dateTime);
     return formattedDate;
   }
 }

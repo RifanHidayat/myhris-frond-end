@@ -10,6 +10,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:siscom_operasional/controller/absen_controller.dart';
 import 'package:siscom_operasional/controller/dashboard_controller.dart';
+import 'package:siscom_operasional/controller/internet_controller.dart';
 import 'package:siscom_operasional/screen/absen/camera_view_location.dart';
 import 'package:siscom_operasional/screen/dashboard.dart';
 import 'package:siscom_operasional/screen/init_screen.dart';
@@ -36,6 +37,7 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
   final panelController = PanelController();
   final controller = Get.put(AbsenController());
   final controllerDashboard = Get.put(DashboardController());
+  final internetController = Get.put(InternetController());
   FocusNode myfocus = FocusNode();
 
   Completer<GoogleMapController> _controller = Completer();
@@ -759,40 +761,42 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                       onPressed: () async {
                                         // await controller.offlineToOnline();
                                         // await controller.getPlaceCoordinate1();
-                                        // if (controller.coordinate.value ==
-                                        //     true) {
-                                        //   UtilsAlert
-                                        //       .showCheckOfflineAbsensiKesalahanServer(
-                                        //           positiveBtnPressed: () {
-                                        //     Get.back();
-                                        //     controller.selectedType.value
-                                        //                     .toString() ==
-                                        //                 "WFH" &&
-                                        //             widget.status ==
-                                        //                 "Absen Masuk"
-                                        //         ? controllerDashboard
-                                        //             .widgetButtomSheetWfh()
-                                        //         : controller
-                                        //             .widgetButtomSheetLanjutkanOffline(
-                                        //                 type: 'offlineAbsensi');
-                                        //   });
-                                        // } else if (!authController
-                                        //     .isConnected.value) {
-                                        //   UtilsAlert.showCheckOfflineAbsensi(
-                                        //       positiveBtnPressed: () {
-                                        //     Get.back();
-                                        //     controller.selectedType.value
-                                        //                     .toString() ==
-                                        //                 "WFH" &&
-                                        //             widget.status ==
-                                        //                 "Absen Masuk"
-                                        //         ? controllerDashboard
-                                        //             .widgetButtomSheetWfh()
-                                        //         : controller
-                                        //             .widgetButtomSheetLanjutkanOffline(
-                                        //                 type: 'offlineAbsensi');
-                                        //   });
-                                        // } else {
+                                        if (controller.coordinate.value ==
+                                            true) {
+                                          print('ini skenario ke 1');
+                                          UtilsAlert
+                                              .showCheckOfflineAbsensiKesalahanServer(
+                                                  positiveBtnPressed: () {
+                                            Get.back();
+                                            controller.selectedType.value
+                                                            .toString() ==
+                                                        "WFH" &&
+                                                    widget.status ==
+                                                        "Absen Masuk"
+                                                ? controllerDashboard
+                                                    .widgetButtomSheetWfh()
+                                                : controller
+                                                    .widgetButtomSheetLanjutkanOffline(
+                                                        type: 'offlineAbsensi');
+                                          });
+                                        } else if (!internetController
+                                            .isConnected.value) {
+                                          print('ini skenario ke 2');
+                                          UtilsAlert.showCheckOfflineAbsensi(
+                                              positiveBtnPressed: () {
+                                            Get.back();
+                                            controller.selectedType.value
+                                                            .toString() ==
+                                                        "WFH" &&
+                                                    widget.status ==
+                                                        "Absen Masuk"
+                                                ? controllerDashboard
+                                                    .widgetButtomSheetWfh()
+                                                : controller
+                                                    .widgetButtomSheetLanjutkanOffline(
+                                                        type: 'offlineAbsensi');
+                                          });
+                                        } else {
                                         final packageInfo =
                                             await PackageInfo.fromPlatform();
                                         //for (var package in packageInfo) {
@@ -809,7 +813,7 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                             : controllerDashboard
                                                 .widgetButtomSheetAktifCamera(
                                                     type: 'checkTracking');
-                                        // }
+                                          }
                                         // Mendapatkan informasi paket aplikasi pihak ketiga
                                       },
                                       child: const Padding(
@@ -818,7 +822,7 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                             bottom: 12,
                                             left: 20,
                                             right: 20),
-                                        child: Text('OK, Absen sekarang Yak'),
+                                        child: Text('OK, Absen sekarang Ya'),
                                       ),
                                     ),
                                   ),

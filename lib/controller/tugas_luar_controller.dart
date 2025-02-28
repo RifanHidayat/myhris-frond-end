@@ -1046,7 +1046,7 @@ class TugasLuarController extends GetxController {
       if (res.statusCode == 200) {
         globalCt.kirimNotifikasiFcm(
             title: typeNotifFcm, message: desk_ct, tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1083,7 +1083,7 @@ class TugasLuarController extends GetxController {
       if (res.statusCode == 200) {
         // globalCt.kirimNotifikasiFcm(
         //     title: typeNotifFcm, message: desk_ct, tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }

@@ -607,8 +607,29 @@ class _PersetujuanAbsensiState extends State<PersetujuanAbsensi>
 
     if (leave_status == "Rejected") {
       return Container(
-        child: namaApprove1 == ""
-            ? const SizedBox()
+        child: namaApprove2 == ""
+            ? Row(
+                children: [
+                  Icon(
+                    Iconsax.close_circle,
+                    color: Colors.red,
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "Rejected by  - $namaApprove1",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              )
             : Row(
                 children: [
                   Icon(
@@ -618,12 +639,16 @@ class _PersetujuanAbsensiState extends State<PersetujuanAbsensi>
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "rejected by  - $namaApprove1",
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        color: Constanst.fgPrimary,
-                        fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      "Rejected by  - $namaApprove2",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
                 ],
               ),
@@ -673,28 +698,18 @@ class _PersetujuanAbsensiState extends State<PersetujuanAbsensi>
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "Approved by  - $namaApprove1",
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        color: Constanst.fgPrimary,
-                        fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      "Approved by  - $namaApprove1",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
                 ],
-              ),
-      );
-    }
-
-    if (leave_status == "Rejected") {
-      return Container(
-        child: namaApprove1 == ""
-            ? const SizedBox()
-            : Text(
-                "Rejected by  - $namaApprove1",
-                style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w500,
-                    color: Constanst.fgPrimary,
-                    fontSize: 16),
               ),
       );
     }
@@ -713,12 +728,16 @@ class _PersetujuanAbsensiState extends State<PersetujuanAbsensi>
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "Approved 2 by  - $namaApprove2",
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        color: Constanst.fgPrimary,
-                        fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      "Approved 2 by  - $namaApprove2",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w500,
+                          color: Constanst.fgPrimary,
+                          fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    ),
                   ),
                 ],
               ),

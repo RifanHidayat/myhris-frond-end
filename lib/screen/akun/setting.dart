@@ -66,7 +66,7 @@ class _SettingState extends State<Setting> {
 
   void _checkversion() async {
     final newVersion = NewVersionPlus(
-      androidId: 'com.siscom.siscomhris',
+      androidId: 'com.siscom.siscomhrisnew',
     );
 
     final status = await newVersion.getVersionStatus();
@@ -1239,7 +1239,7 @@ class _SettingState extends State<Setting> {
                               size: 24,
                             ),
                             Visibility(
-                              visible: suratController.jumlahNotifikasiBelumDibaca.value
+                              visible: suratController.notifSuratPeringatan.value
                                       .toString() !=
                                   "0",
                               child: Positioned(
@@ -1261,11 +1261,11 @@ class _SettingState extends State<Setting> {
                                   child: Center(
                                     child: Obx(
                                       () => Text(
-                                        "${suratController.jumlahNotifikasiBelumDibaca.value}"
+                                        "${suratController.notifSuratPeringatan.value}"
                                                     .length >
                                                 2
-                                            ? '${"${suratController.jumlahNotifikasiBelumDibaca.value}".substring(0, 2)}+'
-                                            : "${suratController.jumlahNotifikasiBelumDibaca.value}",
+                                            ? '${"${suratController.notifSuratPeringatan.value}".substring(0, 2)}+'
+                                            : "${suratController.notifSuratPeringatan.value}",
                                         style: GoogleFonts.inter(
                                           color: Constanst.colorStateOnDangerBg,
                                           fontSize: 10,
@@ -1326,7 +1326,7 @@ class _SettingState extends State<Setting> {
                               size: 24,
                             ),
                             Visibility(
-                              visible: suratController.jumlahNotifikasiBelumDibaca.value
+                              visible: suratController.notifTeguranLisan.value
                                       .toString() !=
                                   "0",
                               child: Positioned(
@@ -1348,11 +1348,11 @@ class _SettingState extends State<Setting> {
                                   child: Center(
                                     child: Obx(
                                       () => Text(
-                                        "${suratController.jumlahNotifikasiBelumDibaca.value}"
+                                        "${suratController.notifTeguranLisan.value}"
                                                     .length >
                                                 2
-                                            ? '${"${suratController.jumlahNotifikasiBelumDibaca.value}".substring(0, 2)}+'
-                                            : "${suratController.jumlahNotifikasiBelumDibaca.value}",
+                                            ? '${"${suratController.notifTeguranLisan.value}".substring(0, 2)}+'
+                                            : "${suratController.notifTeguranLisan.value}",
                                         style: GoogleFonts.inter(
                                           color: Constanst.colorStateOnDangerBg,
                                           fontSize: 10,

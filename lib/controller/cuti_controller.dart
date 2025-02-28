@@ -26,9 +26,10 @@ class CutiController extends GetxController {
   var dariTanggal = TextEditingController().obs;
   var sampaiTanggal = TextEditingController().obs;
   var alasan = TextEditingController().obs;
+  var focus = FocusNode();
   var cari = TextEditingController().obs;
   var departemen = TextEditingController().obs;
-   var showTipe = false.obs;
+  var showTipe = false.obs;
 
   var filePengajuan = File("").obs;
   var startDate = "".obs;
@@ -42,11 +43,12 @@ class CutiController extends GetxController {
   var departementAkses = [].obs;
   var allNameLaporanCuti = [].obs;
   var allNameLaporanCutiCopy = [].obs;
-  var tanggalSelectedEdit = <DateTime>[].obs;
+  var tanggalSelectedEdit = [].obs;
   var durasiCutiMelahirkan = 0.obs;
+  var messageApi = ''.obs;
   Rx<List<String>> allEmployeeDelegasi = Rx<List<String>>([]);
   Rx<List<String>> allTipeFormCutiDropdown = Rx<List<String>>([]);
-  var showStatus=false.obs;
+  var showStatus = false.obs;
   var isRequiredFile = '0'.obs;
 
   var limitCuti = 0.obs;
@@ -235,11 +237,12 @@ class CutiController extends GetxController {
     UtilsAlert.showLoadingIndicator(Get.context!);
     print("load data cuti");
     allTipeFormCutiDropdown.value.clear();
+    selectedTypeCuti.value = '';
     allTipe.value.clear();
     //  UtilsAlert.showLoadingIndicator(Get.context!);
 
-
-  var body = {'durasi': '${durasi}'};
+    var body = {'durasi': '${durasi}'};
+    print('ini body cuti tipe : $body');
     var connect = Api.connectionApi("post", body, "cuti-tipe");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
@@ -263,37 +266,43 @@ class CutiController extends GetxController {
 
           allTipe.value.add(data);
         }
-        if (allTipe.value.length>0){
-           if (statusForm.value == false) {
+        if (allTipe.value.length > 0) {
           var getFirst = allTipe.value.first;
-          selectedTypeCuti.value = getFirst['name'];
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
-          Get.back();
-        } else {
-          var getFirst = allTipe.value
-              .firstWhere((element) => element['id'] == typeIdEdit.value);
-          selectedTypeCuti.value = getFirst['name'];
 
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
+          if (!statusForm.value) {
+            selectedTypeCuti.value = getFirst['name'].toString();
+            dateSelected.value = getFirst['select_date'];
+            allowMinus.value = getFirst['allow_minus'];
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            isBackDate.value = getFirst['back_date'].toString();
+            cutLeave.value = getFirst['cut_leave'];
+            limitCuti.value = getFirst['leave_day'];
             Get.back();
-        }
+          } else {
+            var getFirstEdit = allTipe.value.firstWhere(
+              (element) => element['id'] == typeIdEdit.value,
+              orElse: () =>
+                  getFirst, 
+            );
 
- showStatus.value=true;
-  showTipe.value = true;
+            selectedTypeCuti.value = getFirstEdit['name'].toString();
+            dateSelected.value = getFirstEdit['select_date'];
+            allowMinus.value = getFirstEdit['allow_minus'];
+            isRequiredFile.value = getFirstEdit['upload_file'].toString();
+            isBackDate.value = getFirstEdit['back_date'].toString();
+            cutLeave.value = getFirstEdit['cut_leave'];
+            limitCuti.value = getFirstEdit['leave_day'];
+            Get.back();
+          }
 
-        }else{
-          showStatus.value=false;
-           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
-             showTipe.value = false;
-             Get.back();
+          showStatus.value = true;
+          showTipe.value = true;
+        } else {
+          showStatus.value = false;
+          UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+          showTipe.value = false;
+          Get.back();
         }
-       
 
         this.allTipe.refresh();
         this.selectedTypeCuti.refresh();
@@ -303,16 +312,14 @@ class CutiController extends GetxController {
     });
   }
 
-
-  void loadDataTypeCutiEdit({durasi,detailData}) {
+  void loadDataTypeCutiEdit({durasi, detailData}) {
     UtilsAlert.showLoadingIndicator(Get.context!);
-    print("load data cuti");
+    print("load data cuti $durasi");
     allTipeFormCutiDropdown.value.clear();
     allTipe.value.clear();
     //  UtilsAlert.showLoadingIndicator(Get.context!);
 
-
-  var body = {'durasi': '${durasi}'};
+    var body = {'durasi': '${durasi}'};
     var connect = Api.connectionApi("post", body, "cuti-tipe");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
@@ -336,40 +343,43 @@ class CutiController extends GetxController {
 
           allTipe.value.add(data);
         }
-        if (allTipe.value.length>0){
-           if (statusForm.value == false) {
-          var getFirst = allTipe.value.first;
-          selectedTypeCuti.value = getFirst['name'];
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
-          Get.back();
-        } else {
-          var getFirst = allTipe.value
-              .firstWhere((element) => element['id'] == typeIdEdit.value);
-          selectedTypeCuti.value = getFirst['name'];
-
-          dateSelected.value = getFirst['select_date'];
-          allowMinus.value = getFirst['allow_minus'];
-          isRequiredFile.value = getFirst['upload_file'].toString();
-          isBackDate.value = getFirst['back_date'].toString();
+        if (allTipe.value.length > 0) {
+          if (statusForm.value == false) {
+            var getFirst = allTipe.value.first;
+            selectedTypeCuti.value = getFirst['name'];
+            dateSelected.value = getFirst['select_date'];
+            allowMinus.value = getFirst['allow_minus'];
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            isBackDate.value = getFirst['back_date'].toString();
+            limitCuti.value = getFirst['leave_day'];
+            cutLeave.value = getFirst['cut_leave'];
             Get.back();
-        }
+          } else {
+            var getFirst = allTipe.value
+                .firstWhere((element) => element['id'] == typeIdEdit.value);
+            selectedTypeCuti.value = getFirst['name'];
 
- showStatus.value=true;
-  showTipe.value = true;
-    Get.to(FormPengajuanCuti(
-                                    dataForm: [detailData, true],
-                                  ));
-                                  // Get.back();
-        }else{
-          showStatus.value=false;
-           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
-             showTipe.value = false;
-             Get.back();
+            dateSelected.value = getFirst['select_date'];
+            allowMinus.value = getFirst['allow_minus'];
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            isBackDate.value = getFirst['back_date'].toString();
+            limitCuti.value = getFirst['leave_day'];
+            cutLeave.value = getFirst['cut_leave'];
+            Get.back();
+          }
+
+          showStatus.value = true;
+          showTipe.value = true;
+          Get.to(FormPengajuanCuti(
+            dataForm: [detailData, true],
+          ));
+          // Get.back();
+        } else {
+          showStatus.value = false;
+          UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
+          showTipe.value = false;
+          Get.back();
         }
-       
 
         this.allTipe.refresh();
         this.selectedTypeCuti.refresh();
@@ -378,8 +388,6 @@ class CutiController extends GetxController {
       }
     });
   }
-
-
 
   void loadDataTypeCuti1() {
     // print("load data cuti");
@@ -470,7 +478,7 @@ class CutiController extends GetxController {
     });
   }
 
-   void loadDataAjuanCutiEdit({durasi,data}) {
+  void loadDataAjuanCutiEdit({durasi, data}) {
     AlllistHistoryAjuan.value.clear();
     listHistoryAjuan.value.clear();
     stringLoading.value = "Memuat Data...";
@@ -621,16 +629,13 @@ class CutiController extends GetxController {
 
     // }else{
 
-    if (em_id=="" ){
-
-    }else{
-       var getData =
-        allEmployee.value.firstWhere((element) => element["em_id"] == em_id);
-    selectedDelegasi.value = getData["full_name"];
-    this.selectedDelegasi.refresh();
-
+    if (em_id == "") {
+    } else {
+      var getData =
+          allEmployee.value.firstWhere((element) => element["em_id"] == em_id);
+      selectedDelegasi.value = getData["full_name"];
+      this.selectedDelegasi.refresh();
     }
-   
 
     //}
     print("data employee ${em_id},${allEmployee.value}");
@@ -681,7 +686,7 @@ class CutiController extends GetxController {
             this.statusHitungCuti.refresh();
           } else {
             jumlahCuti.value = totalDay;
-            cutLeave.value = 1;
+            // cutLeave.value = 1;
             cutiTerpakai.value = terpakai;
             this.jumlahCuti.refresh();
             this.cutiTerpakai.refresh();
@@ -738,10 +743,9 @@ class CutiController extends GetxController {
   void validasiKirimPengajuan() async {
     if (isRequiredFile.value == "1" && uploadFile.value == false) {
       UtilsAlert.showToast("Form unggah file harus di isi");
-    } else if (alasan.value.text == ""){
+    } else if (alasan.value.text == "") {
       UtilsAlert.showToast("Form Catatan Harus di isi");
-    }
-    else {
+    } else {
       var hitung = jumlahCuti.value - cutiTerpakai.value;
 
       if (hitung <= 0 || hitung == 0) {
@@ -836,64 +840,55 @@ class CutiController extends GetxController {
   }
 
   void urutkanTanggalSelected() {
-    var hasilConvert = [];
     var tampungStringTanggal = "";
-    print('ini tanggal ${tanggalSelected}');
-    if (statusForm.value == true) {
-      if (tanggalSelectedEdit.value.isNotEmpty) {
-        tanggalSelectedEdit.value.forEach((element) {
-          var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(DateTime.parse(element.toString()));
-          hasilConvert.add(formatted);
-        });
-        hasilConvert.sort((a, b) {
-          return DateTime.parse(a).compareTo(DateTime.parse(b));
-        });
-        var getFirst = hasilConvert.first;
-        var getLast = hasilConvert.last;
-        dariTanggal.value.text = getFirst;
-        sampaiTanggal.value.text = getLast;
-        durasiIzin.value = hasilConvert.length;
-        hasilConvert.forEach((element) {
-          if (tampungStringTanggal == "") {
-            tampungStringTanggal = element;
-          } else {
-            tampungStringTanggal = "$tampungStringTanggal,$element";
-          }
-        });
-        stringSelectedTanggal.value = tampungStringTanggal;
-        this.dariTanggal.refresh();
-        this.sampaiTanggal.refresh();
-        this.durasiIzin.refresh();
-        this.stringSelectedTanggal.refresh();
-      }
-    } else {
-      if (tanggalSelected.value.isNotEmpty) {
-        tanggalSelected.value.forEach((element) {
-          var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(DateTime.parse(element.toString()));
-          hasilConvert.add(formatted);
-        });
-        hasilConvert.sort((a, b) {
-          return DateTime.parse(a).compareTo(DateTime.parse(b));
-        });
-        var getFirst = hasilConvert.first;
-        var getLast = hasilConvert.last;
-        dariTanggal.value.text = getFirst;
-        sampaiTanggal.value.text = getLast;
-        durasiIzin.value = hasilConvert.length;
-        hasilConvert.forEach((element) {
-          if (tampungStringTanggal == "") {
-            tampungStringTanggal = element;
-          } else {
-            tampungStringTanggal = "$tampungStringTanggal,$element";
-          }
-        });
-        stringSelectedTanggal.value = tampungStringTanggal;
-        this.dariTanggal.refresh();
-        this.sampaiTanggal.refresh();
-        this.durasiIzin.refresh();
-        this.stringSelectedTanggal.refresh();
+    print('ini tanggal: $tanggalSelected');
+    print('ini tanggal: $tanggalSelectedEdit');
+
+    // Menentukan daftar tanggal yang akan diproses
+    List<dynamic> tanggalDiproses =
+        statusForm.value ? tanggalSelected.value : tanggalSelected.value;
+
+    if (tanggalDiproses.isNotEmpty) {
+      // Konversi ke DateTime dan hapus duplikasi
+      List<DateTime> hasilConvert = tanggalDiproses
+          .map((element) => element is DateTime
+              ? element
+              : DateTime.parse(element.toString()))
+          .toSet()
+          .toList();
+
+      // Urutkan tanggal
+      hasilConvert.sort((a, b) => a.compareTo(b));
+
+      if (hasilConvert.isNotEmpty) {
+        DateTime dari = hasilConvert.first;
+        DateTime sampai = hasilConvert.last;
+
+        // Generate semua tanggal dalam rentang tersebut
+        List<String> semuaTanggal = [];
+        for (DateTime date = dari;
+            date.isBefore(sampai.add(Duration(days: 1)));
+            date = date.add(Duration(days: 1))) {
+          semuaTanggal.add(DateFormat('yyyy-MM-dd').format(date));
+        }
+
+        // Set hasil ke variabel yang sesuai
+        dariTanggal.value.text = DateFormat('yyyy-MM-dd').format(dari);
+        sampaiTanggal.value.text = DateFormat('yyyy-MM-dd').format(sampai);
+        durasiIzin.value = semuaTanggal.length;
+        stringSelectedTanggal.value = semuaTanggal.join(',');
+
+        // Debugging
+        print("Dari tanggal: ${dariTanggal.value.text}");
+        print("Sampai tanggal: ${sampaiTanggal.value.text}");
+        print("Durasi izin: ${durasiIzin.value}");
+        print("String selected tanggal: ${stringSelectedTanggal.value}");
+
+        // Refresh semua nilai
+        dariTanggal.refresh();
+        sampaiTanggal.refresh();
+        durasiIzin.refresh();
+        stringSelectedTanggal.refresh();
       }
     }
   }
@@ -925,8 +920,8 @@ class CutiController extends GetxController {
         'leave_type': 'FULLDAY',
         'start_date': startDate.value,
         'end_date': endDate.value,
-        'leave_duration': durasiCutiMelahirkan.value,
-        'date_selected': '',
+        'leave_duration': durasiIzin.value,
+        'date_selected': stringSelectedTanggal.value,
         'apply_date': '',
         'reason': alasan.value.text,
         'leave_status': 'Pending',
@@ -943,8 +938,8 @@ class CutiController extends GetxController {
         'em_id': '$getEmid',
         'typeid': validasiTipeSelected,
         'nomor_ajuan': getNomorAjuanTerakhir,
-       // 'leave_type': 'Full Day',
-          'leave_type': 'FULLDAY',
+        // 'leave_type': 'Full Day',
+        'leave_type': 'FULLDAY',
         'start_date': dariTanggal.value.text,
         'end_date': sampaiTanggal.value.text,
         'leave_duration': durasiIzin.value,
@@ -958,7 +953,9 @@ class CutiController extends GetxController {
         'ajuan': '1',
         'created_by': getEmid,
         'menu_name': 'Cuti',
-        'apply_status': "Pending"
+        'apply_status': "Pending",
+        'total_cuti': jumlahCuti.toInt(),
+        'cut_leave': cutLeave.value
       };
     }
 
@@ -1021,14 +1018,20 @@ class CutiController extends GetxController {
               dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
             ));
           } else {
+            print('ini value body cuti ${valueBody}');
             if (valueBody['message'] == "ulang") {
               var nomorAjuanTerakhirDalamAntrian =
                   valueBody['data'][0]['nomor_ajuan'];
               checkNomorAjuanDalamAntrian(nomorAjuanTerakhirDalamAntrian);
+            } else if (valueBody['message'] == 'gagal ambil data') {
+              Navigator.pop(Get.context!);
+              messageApi.value = "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD";
+              // UtilsAlert.showToast(
+              //     "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
             } else {
               Navigator.pop(Get.context!);
-              UtilsAlert.showToast(
-                  "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
+              messageApi.value = valueBody['message'];
+              // UtilsAlert.showToast(valueBody['message']);
             }
           }
         }
@@ -1038,10 +1041,11 @@ class CutiController extends GetxController {
       body['cari'] = idEditFormCuti.value;
       body['activity_name'] =
           "Edit Pengajuan Cuti. Tanggal Pengajuan = $convertTanggalBikinPengajuan";
+      print('ini body edit cuti $body');
       var connect = Api.connectionApi("post", body, "edit-emp_leave");
       connect.then((dynamic res) {
+        var valueBody = jsonDecode(res.body);
         if (res.statusCode == 200) {
-          var valueBody = jsonDecode(res.body);
           Navigator.pop(Get.context!);
 
           var pesan1 = "Pengajuan ${selectedTypeCuti.value} berhasil di edit";
@@ -1056,6 +1060,10 @@ class CutiController extends GetxController {
           Get.offAll(BerhasilPengajuan(
             dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
           ));
+        }else{
+          Navigator.pop(Get.context!);
+          messageApi.value = valueBody['message'];
+              // UtilsAlert.showToast(valueBody['message']);
         }
       });
     }
@@ -1084,7 +1092,7 @@ class CutiController extends GetxController {
             title: typeNotifFcm,
             message: description,
             tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1118,7 +1126,7 @@ class CutiController extends GetxController {
         //     title: typeNotifFcm,
         //     message: description,
         //     tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1366,7 +1374,8 @@ class CutiController extends GetxController {
                       ),
                     ),
                   ],
-                )
+                ),
+                SizedBox(height: 16.0)
               ],
             ),
           ),
@@ -1539,12 +1548,24 @@ class CutiController extends GetxController {
   void showDetailRiwayat(detailData, apply_by, alasanReject) {
     var nomorAjuan = detailData['nomor_ajuan'];
     var tanggalMasukAjuan = detailData['atten_date'];
+    var tanggalMasukAjuanDate = DateTime.parse(detailData['atten_date']);
     var namaTypeAjuan = detailData['name'];
     var tanggalAjuanDari = detailData['start_date'];
     var tanggalAjuanSampai = detailData['end_date'];
+    var tanggalAjuanDariDate = DateTime.parse(detailData['start_date']);
     var alasan = detailData['reason'];
     var durasi = detailData['leave_duration'];
     var typeAjuan = detailData['leave_status'];
+    var tanggalMasuk = DateTime(tanggalMasukAjuanDate.year,
+        tanggalMasukAjuanDate.month, tanggalMasukAjuanDate.day);
+    var tanggalDari = DateTime(tanggalAjuanDariDate.year,
+        tanggalAjuanDariDate.month, tanggalAjuanDariDate.day);
+
+    Duration difference = tanggalDari.difference(tanggalMasuk);
+    print('ini data diferent ${difference.inDays}');
+    print('ini data diferent ${tanggalMasuk}');
+    print('ini data diferent ${tanggalDari}');
+    print('ini data diferent ${difference}');
     if (valuePolaPersetujuan.value == "1") {
       typeAjuan = detailData['leave_status'];
     } else {
@@ -1718,7 +1739,7 @@ class CutiController extends GetxController {
                                       Text(
                                         index == listTanggalTerpilih.length - 1
                                             ? tanggalConvert2
-                                            : '$tanggalConvert, ',
+                                            : '$tanggalConvert,',
                                         style: GoogleFonts.inter(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 16,
@@ -1919,86 +1940,87 @@ class CutiController extends GetxController {
                 ),
                 typeAjuan == "Approve" ||
                         typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
-                    : const SizedBox(height: 16),
-                typeAjuan == "Approve" ||
-                        typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
-                    : Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 40,
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Constanst
-                                      .border, // Set the desired border color
-                                  width: 1.0,
+                        typeAjuan == "Approve 2" ||
+                        typeAjuan == "Rejected"
+                    ? const SizedBox(height: 16)
+                    : Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
+                      child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 40,
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Constanst
+                                        .border, // Set the desired border color
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                borderRadius: BorderRadius.circular(8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    // Get.back();
+                                    batalkanPengajuanCuti(detailData);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Constanst.color4,
+                                      backgroundColor: Constanst.colorWhite,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      elevation: 0,
+                                      // padding: EdgeInsets.zero,
+                                      padding:
+                                          const EdgeInsets.fromLTRB(0, 0, 0, 0)),
+                                  child: Text(
+                                    'Batalkan',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.color4,
+                                        fontSize: 14),
+                                  ),
+                                ),
                               ),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Get.back();
-                                  batalkanPengajuanCuti(detailData);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    foregroundColor: Constanst.color4,
-                                    backgroundColor: Constanst.colorWhite,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: SizedBox(
+                                height: 40,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    print(detailData.toString());
+                                    loadDataTypeCutiEdit(
+                                        durasi: difference.inDays.toString(),
+                                        detailData: detailData);
+                                    // Get.to(FormPengajuanCuti(
+                                    //   dataForm: [detailData, true],
+                                    // ));
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Constanst.colorWhite,
+                                    backgroundColor: Constanst.colorPrimary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     elevation: 0,
-                                    // padding: EdgeInsets.zero,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                                child: Text(
-                                  'Batalkan',
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      color: Constanst.color4,
-                                      fontSize: 14),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: SizedBox(
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  print(detailData.toString());
-                                  loadDataTypeCutiEdit(durasi:durasi,detailData:detailData);
-                                  // Get.to(FormPengajuanCuti(
-                                  //   dataForm: [detailData, true],
-                                  // ));
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Constanst.colorWhite,
-                                  backgroundColor: Constanst.colorPrimary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
                                   ),
-                                  elevation: 0,
-                                  // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
-                                ),
-                                child: Text(
-                                  'Edit',
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      color: Constanst.colorWhite,
-                                      fontSize: 14),
+                                  child: Text(
+                                    'Edit',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.colorWhite,
+                                        fontSize: 14),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
+                          ],
+                        ),
+                    )
               ],
             ),
           ),

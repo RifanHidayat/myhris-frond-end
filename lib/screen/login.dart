@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:siscom_operasional/components/text.dart';
 import 'package:siscom_operasional/components/text_field.dart';
 import 'package:siscom_operasional/controller/auth_controller.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:siscom_operasional/controller/internet_controller.dart';
+import 'package:siscom_operasional/screen/init_screen.dart';
 import 'package:siscom_operasional/screen/lupa_password/list.dart';
 import 'package:siscom_operasional/screen/register.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
@@ -16,6 +19,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class Login extends StatelessWidget {
   final controller = Get.put(AuthController());
+  final internetController = Get.put(InternetController());
 
   @override
   Widget build(BuildContext context) {
@@ -400,8 +404,24 @@ class Login extends StatelessWidget {
                               UtilsAlert.showToast(
                                   "Lengkapi form terlebih dahulu");
                             } else {
-                              // controller.loginUser();
-                              await controller.peraturanPerusahaan();
+                              if (internetController.isConnected.value) {
+                                print('lah kemari lu');
+                                await controller.peraturanPerusahaan();
+                              } else {
+                                String? savedEmail = AppData.emailUser;
+                                String? savedPassword = AppData.passwordUser;
+                                if (savedEmail == controller.email.value.text &&
+                                    savedPassword == controller.password.value.text) {
+                                  // AppData.loginOffline = true;
+                                  AppData.isLogin = true;
+                                  Get.offAll(InitScreen());
+                                  UtilsAlert.showToast(
+                                      "Login offline berhasil");
+                                } else {
+                                  UtilsAlert.showToast(
+                                      "Login offline gagal, data tidak cocok");
+                                }
+                              }
                             }
                           },
                           child: const Center(

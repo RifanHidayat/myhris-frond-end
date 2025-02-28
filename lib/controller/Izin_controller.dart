@@ -1,25 +1,19 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:siscom_operasional/controller/global_controller.dart';
-import 'package:siscom_operasional/model/atasan_model.dart';
 import 'package:siscom_operasional/screen/absen/form/berhasil_pengajuan.dart';
 import 'package:siscom_operasional/screen/absen/form/form_pengajuan_izin.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
-import 'package:siscom_operasional/utils/custom_dialog.dart';
-import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,13 +26,19 @@ class IzinController extends GetxController {
   var jamAjuan = TextEditingController().obs;
   var sampaiJamAjuan = TextEditingController().obs;
   var alasan = TextEditingController().obs;
+  var focus = FocusNode();
   var departemen = TextEditingController().obs;
   var izinTerpakai = 0.obs;
   var jumlahIzin = 0.obs;
   var percentIzin = 0.0.obs;
   var showDurationIzin = false.obs;
   var inputTime = 0.obs;
+  var cutLeave = 0.obs;
+  var limitIzin = 0.obs;
+  var outLimit = ''.obs;
+  var lateLimit = ''.obs;
   var showTipeCuti = false.obs;
+  var messageApi = ''.obs;
 
   var typeTap = 0.obs;
   var startDate = ''.obs;
@@ -116,6 +116,7 @@ class IzinController extends GetxController {
   @override
   void onReady() async {
     super.onReady();
+    loadCutiUser();
   }
 
   @override
@@ -282,6 +283,56 @@ class IzinController extends GetxController {
     });
   }
 
+  void loadCutiUser() {
+    print("load cuti user");
+
+    var dataUser = AppData.informasiUser;
+
+    var getEmid = dataUser![0].em_id;
+
+    Map<String, dynamic> body = {
+      'val': 'em_id',
+      'cari': getEmid,
+    };
+    var connect = Api.connectionApi("post", body, "whereOnce-assign_leave");
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        if (valueBody['data'].isNotEmpty) {
+          var totalDay =
+              int.parse(valueBody['data'][0]['total_day'].toString());
+          var terpakai =
+              int.parse(valueBody['data'][0]['terpakai'].toString());
+          print("ini data cuti user ${valueBody['data']}");
+          if (totalDay == 0) {
+            
+          } else {
+            jumlahIzin.value = totalDay;
+            izinTerpakai.value = terpakai;
+            this.jumlahIzin.refresh();
+            this.izinTerpakai.refresh();
+            hitungCuti(totalDay, terpakai);
+          }
+        } else {
+          
+        }
+      }
+    });
+  }
+
+  void hitungCuti(totalDay, terpakai) {
+    var hitung1 = (terpakai / totalDay) * 100;
+    // var convert1 = hitung1.toInt();
+    var convert1 = hitung1;
+    print("conver nilai ${convert1}");
+
+    var convertedValue =
+        double.parse(convert1 > 100 || convert1 < 0 ? "100" : "${convert1}") /
+            100;
+    percentIzin.value = convertedValue;
+    this.percentIzin.refresh();
+  }
+
   Future<bool> loadDataAjuanIzinCategori({id}) async {
     print("masuk sini");
     // AlllistHistoryAjuan.value.clear();
@@ -294,6 +345,7 @@ class IzinController extends GetxController {
       'tahun': tahunSelectedSearchHistory.value,
       'type_id': id.toString()
     };
+    print(body);
     var connect =
         Api.connectionApi("post", body, "emp_leave_load_izin_Kategori");
     await connect.then((dynamic res) {
@@ -304,10 +356,10 @@ class IzinController extends GetxController {
           // loadingString.value =  "Anda tidak memiliki\nRiwayat Pengajuan Izin";
           izinCategory.value = [];
           this.loadingString.refresh();
-          izinTerpakai.value = 0;
+          // izinTerpakai.value = 0;
           return true;
         } else {
-          izinTerpakai.value = valueBody['jumlah_data'];
+          // izinTerpakai.value = valueBody['jumlah_data'];
           izinCategory.value = valueBody['data'];
           return true;
         }
@@ -419,14 +471,14 @@ class IzinController extends GetxController {
     }
   }
 
-void loaDataTipe({durasi}) {
+  void loaDataTipe({durasi}) {
     allTipeFormTidakMasukKerja1.value.clear();
     allTipeFormTidakMasukKerja.value.clear();
     isLoadingzin.value = false;
     showTipe.value = false;
-   selectedDropdownFormTidakMasukKerjaTipe.value = '';
-  
-  showDurationIzin.value=false;
+    selectedDropdownFormTidakMasukKerjaTipe.value = '';
+
+    showDurationIzin.value = false;
     UtilsAlert.showLoadingIndicator(Get.context!);
     allTipe.value.clear();
     Map<String, dynamic> body = {
@@ -456,6 +508,8 @@ void loaDataTipe({durasi}) {
             'upload_file': element['upload_file'],
             'input_time': element['input_time'],
             'back_date': element['backdate'] ?? "0",
+            'late_limit': element['late_limit'],
+            'out_limit': element['out_limit'],
             'ajuan': 2,
             'active': false,
           };
@@ -474,6 +528,8 @@ void loaDataTipe({durasi}) {
             } else {
               inputTime.value = int.parse(allTipe[0]['input_time'].toString());
               isBackdate.value = allTipe[0]['back_date'].toString();
+              cutLeave.value = allTipe[0]['cut_leave'];
+              limitIzin.value = allTipe[0]['leave_day'];
             }
           }
           Get.back();
@@ -489,10 +545,10 @@ void loaDataTipe({durasi}) {
     });
   }
 
- loaDataTipeEdit({durasi,data}) {
-  var datum=data;
+  loaDataTipeEdit({durasi, data}) {
+    var datum = data;
 
-  //  UtilsAlert.showToast(data['name'].toString());
+    //  UtilsAlert.showToast(data['name'].toString());
     allTipeFormTidakMasukKerja1.value.clear();
     allTipeFormTidakMasukKerja.value.clear();
     isLoadingzin.value = false;
@@ -503,13 +559,15 @@ void loaDataTipe({durasi}) {
     Map<String, dynamic> body = {
       'durasi': durasi.toString(),
     };
+    print('body ${body}');
     var connect = Api.connectionApi("post", body, "cuti/type");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         var data = valueBody['data'];
-
-        print("data type sakit new  ${data}");
+        for (var index in data) {
+          print("data type sakit new  ${index['name']}");
+        }
         for (var element in data) {
           allTipeFormTidakMasukKerja1.value
               .add("${element['name']} - ${element['category']}");
@@ -527,6 +585,8 @@ void loaDataTipe({durasi}) {
             'upload_file': element['upload_file'],
             'input_time': element['input_time'],
             'back_date': element['backdate'] ?? "0",
+            'late_limit': element['late_limit'],
+            'out_limit': element['out_limit'],
             'ajuan': 2,
             'active': false,
           };
@@ -540,27 +600,26 @@ void loaDataTipe({durasi}) {
 
         if (allTipeFormTidakMasukKerja.value.length > 0) {
           showTipe.value = true;
-          if (idEditFormTidakMasukKerja == "") {
-            var listFirst = allTipeFormTidakMasukKerja.value.first;
-            selectedDropdownFormTidakMasukKerjaTipe.value = '';
-
-            if (allTipe[0]['input_time'] == null) {
-            } else {
-
-              inputTime.value = int.parse(allTipe[0]['input_time'].toString());
-              isBackdate.value = allTipe[0]['back_date'].toString();
-            }
+          print(datum);
+          print(datum['typeid']);
+          if (datum[1] == false) {
+            print('kag edit');
+          } else {
+            var getFirst = allTipe.value
+                .firstWhere((element) => element['type_id'] == datum['typeid']);
+            isRequiredFile.value = getFirst['upload_file'].toString();
+            limitIzin.value = getFirst['leave_day'];
+            cutLeave.value = getFirst['cut_leave'];
           }
           Get.back();
-         Get.to(FormPengajuanIzin(dataForm: [datum, true],));
-         
-        
+          Get.to(FormPengajuanIzin(
+            dataForm: [datum, true],
+          ));
         } else {
           showTipe.value = false;
           selectedDropdownFormTidakMasukKerjaTipe.value = '';
-         
+
           UtilsAlert.showToast("Data tipe sakit/izi tidak tersedia");
-          
         }
 
         // loadTypeIzin();
@@ -768,6 +827,10 @@ void loaDataTipe({durasi}) {
         selected.add(element);
       }
     }
+
+    print('ini selected ${value}');
+    print('ini selected ${allTipe.value}');
+    print('ini selected ${selected}');
     selectedDropdownFormTidakMasukKerjaTipe.value =
         "${selected[0]['name']} - ${selected[0]['category']}";
     this.selectedDropdownFormTidakMasukKerjaTipe.refresh();
@@ -855,10 +918,17 @@ void loaDataTipe({durasi}) {
   }
 
   void validasiKirimPengajuan(status) {
-    if (uploadFile.value == false && isRequiredFile.value == "1") {
-      UtilsAlert.showToast("Form unggah file harus diisi");
+    if (namaFileUpload.value.isEmpty) {
+      if (uploadFile.value == false && isRequiredFile.value == '1') {
+       UtilsAlert.showToast("Form unggah file harus diisi");
+      return;
+      }
+    }
+    if(selectedDropdownFormTidakMasukKerjaTipe.value.isEmpty){
+      UtilsAlert.showToast("Tipe absensi harus diisi");
       return;
     }
+    
     print("tanggal selecetd ${tanggalSelected.value.isEmpty}");
     print(viewFormWaktu.value);
     if (viewFormWaktu.value == true) {
@@ -919,7 +989,7 @@ void loaDataTipe({durasi}) {
       var valueBody = jsonDecode(connectUpload);
       if (valueBody['status'] == true) {
         UtilsAlert.showToast("Berhasil upload file");
-        Navigator.pop(Get.context!);
+        // Navigator.pop(Get.context!);
         checkNomorAjuan(status);
       } else {
         UtilsAlert.showToast("Gagal kirim file");
@@ -937,7 +1007,7 @@ void loaDataTipe({durasi}) {
   }
 
   void checkNomorAjuan(status) {
-    print(tanggalBikinPengajuan.value);
+    print('ini tanggal bikin pengajuan ${tanggalBikinPengajuan.value}');
     urutkanTanggalSelected(status);
     var convertTanggalBikinPengajuan = status == false
         ? Constanst.convertDateSimpan(tanggalBikinPengajuan.value)
@@ -1109,7 +1179,8 @@ void loaDataTipe({durasi}) {
       if (tanggalSelected.value.isNotEmpty) {
         tanggalSelected.value.forEach((element) {
           var inputFormat = DateFormat('yyyy-MM-dd');
-          String formatted = inputFormat.format(DateTime.parse(element.toString()));
+          String formatted =
+              inputFormat.format(DateTime.parse(element.toString()));
           hasilConvert.add(formatted);
         });
         hasilConvert.sort((a, b) {
@@ -1186,7 +1257,9 @@ void loaDataTipe({durasi}) {
       'leave_files': namaFileUpload.value,
       'ajuan': getAjuanType,
       'type': ' ${selectedDropdownFormTidakMasukKerjaTipe.value}',
-      'apply_status': "Pending"
+      'apply_status': "Pending",
+      'total_cuti': jumlahIzin.value,
+      'cut_leave': cutLeave.value
     };
 
     print("data body izin ${body}");
@@ -1265,17 +1338,19 @@ void loaDataTipe({durasi}) {
                   status, nomorAjuanTerakhirDalamAntrian);
             }
             if (valueBody['message'] == "date") {
-              Navigator.pop(Get.context!);
+              // Navigator.pop(Get.context!);
               UtilsAlert.showToast(valueBody['error']);
             } else {
               Navigator.pop(Get.context!);
-              UtilsAlert.showToast(
-                  "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
+              messageApi.value = "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD";
+              // UtilsAlert.showToast(
+              //     "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
             }
           }
         } else {
           var valueBody = jsonDecode(res.body);
-          UtilsAlert.showToast(valueBody['message']);
+          messageApi.value = valueBody['message'];
+          // UtilsAlert.showToast(valueBody['message']);
           Get.back();
         }
       });
@@ -1304,6 +1379,11 @@ void loaDataTipe({durasi}) {
           Get.offAll(BerhasilPengajuan(
             dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
           ));
+        } else {
+          var valueBody = jsonDecode(res.body);
+          messageApi.value = valueBody['message'];
+          // UtilsAlert.showToast(valueBody['message']);
+          Get.back();
         }
       });
     }
@@ -1332,7 +1412,7 @@ void loaDataTipe({durasi}) {
             title: typeNotifFcm,
             message: description,
             tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1366,7 +1446,7 @@ void loaDataTipe({durasi}) {
         //     title: typeNotifFcm,
         //     message: description,
         //     tokens: fcmTokenDelegasi);
-        UtilsAlert.showToast("Berhasil kirim delegasi");
+        // UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1418,7 +1498,8 @@ void loaDataTipe({durasi}) {
         result.add(element);
       }
     }
-    return result[0]['ajuan'];
+    print('ini validasi type ajuan : ${result}');
+    return result[0]['status'];
   }
 
   String validasiSelectedDelegasi() {
@@ -1587,7 +1668,8 @@ void loaDataTipe({durasi}) {
                       ),
                     ),
                   ],
-                )
+                ),
+                SizedBox(height: 16.0)
               ],
             ),
           ),
@@ -1645,6 +1727,14 @@ void loaDataTipe({durasi}) {
     var inputTime = detailData['input_time'];
     var alasan = detailData['reason'];
     var durasi = detailData['leave_duration'];
+    var tanggalMasukAjuanDate = DateTime.parse(detailData['atten_date']);
+    var tanggalAjuanDariDate = DateTime.parse(detailData['start_date']);
+    var tanggalMasuk = DateTime(tanggalMasukAjuanDate.year,
+        tanggalMasukAjuanDate.month, tanggalMasukAjuanDate.day);
+    var tanggalDari = DateTime(tanggalAjuanDariDate.year,
+        tanggalAjuanDariDate.month, tanggalAjuanDariDate.day);
+
+    Duration difference = tanggalDari.difference(tanggalMasuk);
     var typeAjuan;
     if (valuePolaPersetujuan.value == "1") {
       typeAjuan = detailData['leave_status'];
@@ -2096,24 +2186,26 @@ void loaDataTipe({durasi}) {
                                     size: 22,
                                   ),
                                   const SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Rejected by $approve_by",
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Rejected by $approve_by",
+                                            style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                color: Constanst.fgPrimary,
+                                                fontSize: 14)),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          alasanReject,
                                           style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              color: Constanst.fgPrimary,
-                                              fontSize: 14)),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        alasanReject,
-                                        style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w400,
-                                            color: Constanst.fgSecondary,
-                                            fontSize: 14),
-                                      )
-                                    ],
+                                              fontWeight: FontWeight.w400,
+                                              color: Constanst.fgSecondary,
+                                              fontSize: 14),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ],
                               )
@@ -2184,15 +2276,11 @@ void loaDataTipe({durasi}) {
                 ),
                 typeAjuan == "Approve" ||
                         typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
-                    : const SizedBox(height: 16),
-                typeAjuan == "Approve" ||
-                        typeAjuan == "Approve 1" ||
-                        typeAjuan == "Approve 2"
-                    ? Container()
+                        typeAjuan == "Approve 2" ||
+                        typeAjuan == "Rejected"
+                    ? const SizedBox(height: 16)
                     : Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
+                        padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
                         child: Row(
                           children: [
                             Expanded(
@@ -2239,9 +2327,8 @@ void loaDataTipe({durasi}) {
                                 height: 40,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    loaDataTipeEdit(durasi:detailData['leave_duration'].toString(),data:detailData);
-                                   // print(detailData['']);
-                                    
+                                    loaDataTipeEdit(
+                                        durasi: difference, data: detailData);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     foregroundColor: Constanst.colorWhite,
@@ -2264,7 +2351,7 @@ void loaDataTipe({durasi}) {
                             ),
                           ],
                         ),
-                      )
+                      ),
               ],
             ),
           ),

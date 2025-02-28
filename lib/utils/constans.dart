@@ -169,7 +169,15 @@ class Constanst {
   }
 
   static String convertDate5(String date) {
-    DateTime convert = DateTime.parse(date);
+    List<String> parts = date.split('-');
+    if (parts.length == 3) {
+      parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
+      parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
+    } else {
+      throw FormatException("Invalid date format: $date");
+    }
+    String fixedDate = parts.join('-');
+    DateTime convert = DateTime.parse(fixedDate);
     var bulan = DateFormat('MMMM');
     var hari = DateFormat('dd');
     var tahun = DateFormat('yyyy');
@@ -184,13 +192,13 @@ class Constanst {
 
   static String convertDate6(String date) {
     List<String> parts = date.split('-');
-  if (parts.length == 3) {
-    parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
-    parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
-  } else {
-    throw FormatException("Invalid date format: $date");
-  }
-  String fixedDate = parts.join('-');
+    if (parts.length == 3) {
+      parts[1] = parts[1].padLeft(2, '0'); // Perbaiki bulan
+      parts[2] = parts[2].padLeft(2, '0'); // Perbaiki hari
+    } else {
+      throw FormatException("Invalid date format: $date");
+    }
+    String fixedDate = parts.join('-');
     DateTime convert = DateTime.parse(fixedDate);
     var hari = DateFormat('EEEE');
     var tanggal = DateFormat('dd MMM yyyy', 'id');
@@ -221,11 +229,21 @@ class Constanst {
   }
 
   static String convertDateSimpan(String date) {
-    var inputFormat = DateFormat('dd-MM-yyyy');
-    var inputDate = inputFormat.parse(date);
-    var outputFormat = DateFormat('yyyy-MM-dd');
-    var outputDate = outputFormat.format(inputDate);
-    return outputDate;
+    try {
+      // Jika format sudah "yyyy-MM-dd", langsung return
+      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(date)) {
+        return date;
+      }
+
+      var inputFormat = DateFormat('dd-MM-yyyy');
+      var inputDate = inputFormat.parse(date);
+      var outputFormat = DateFormat('yyyy-MM-dd');
+
+      return outputFormat.format(inputDate);
+    } catch (e) {
+      print('Error parsing date: $e');
+      return '';
+    }
   }
 
   static String convertDateBulanDanTahun(String date) {
@@ -255,7 +273,7 @@ class Constanst {
   static String convertGetMonth(String date) {
     DateTime convert = DateTime.parse(date);
     var outputDate = DateFormat('MMM');
-    return outputDate.format(convert);
+    return bulanIndoLengkap(outputDate.format(convert));
   }
 
   static String hariIndo(String hari) {
@@ -279,41 +297,84 @@ class Constanst {
     return hari;
   }
 
-  static String bulanIndo(String bulan) {
-    if (bulan == "January") {
-      bulan = "Jan";
+  static String bulanIndoLengkap(String bulan) {
+    if (bulan == "Jan") {
+      bulan = "Januari";
       // bulan = "Januari";
-    } else if (bulan == "February") {
-      bulan = "Feb";
+    } else if (bulan == "Feb") {
+      bulan = "Febuari";
       // bulan = "Februari";
-    } else if (bulan == "March") {
-      bulan = "Mar";
+    } else if (bulan == "Mar") {
+      bulan = "Maret";
       // bulan = "Maret";
-    } else if (bulan == "April") {
-      bulan = "Apr";
+    } else if (bulan == "Apr") {
+      bulan = "April";
       // bulan = "April";
-    } else if (bulan == "May") {
+    } else if (bulan == "Mai") {
       bulan = "Mei";
       // bulan = "Mei";
-    } else if (bulan == "June") {
+    } else if (bulan == "Jun") {
+      bulan = "Juni";
+      // bulan = "Juni";
+    } else if (bulan == "Jul") {
+      bulan = "Juli";
+      // bulan = "Juli";
+    } else if (bulan == "Agu") {
+      bulan = "Agustus";
+      // bulan = "Agustus";
+    } else if (bulan == "Sep") {
+      bulan = "September";
+      // bulan = "September";
+    } else if (bulan == "Oct") {
+      bulan = "Okttober";
+      // bulan = "Oktober";
+    } else if (bulan == "Nov") {
+      bulan = "November";
+      // bulan = "November";
+    } else if (bulan == "Dec") {
+      bulan = "Desember";
+      // bulan = "Desember";
+    } else {
+      bulan = bulan;
+    }
+    return bulan;
+  }
+
+  static String bulanIndo(String bulan) {
+    if (bulan == "January" || bulan == "01" || bulan == "1") {
+      bulan = "Jan";
+      // bulan = "Januari";
+    } else if (bulan == "February" || bulan == "02" || bulan == "2") {
+      bulan = "Feb";
+      // bulan = "Februari";
+    } else if (bulan == "March" || bulan == "03" || bulan == "3") {
+      bulan = "Mar";
+      // bulan = "Maret";
+    } else if (bulan == "April" || bulan == "04" || bulan == "4") {
+      bulan = "Apr";
+      // bulan = "April";
+    } else if (bulan == "May" || bulan == "05" || bulan == "5") {
+      bulan = "Mei";
+      // bulan = "Mei";
+    } else if (bulan == "June" || bulan == "06" || bulan == "6") {
       bulan = "Jun";
       // bulan = "Juni";
-    } else if (bulan == "July") {
+    } else if (bulan == "July" || bulan == "07" || bulan == "7") {
       bulan = "Jul";
       // bulan = "Juli";
-    } else if (bulan == "August") {
+    } else if (bulan == "August" || bulan == "08" || bulan == "8") {
       bulan = "Agu";
       // bulan = "Agustus";
-    } else if (bulan == "September") {
+    } else if (bulan == "September" || bulan == "09" || bulan == "9") {
       bulan = "Sep";
       // bulan = "September";
-    } else if (bulan == "October") {
+    } else if (bulan == "October" || bulan == "10") {
       bulan = "Okt";
       // bulan = "Oktober";
-    } else if (bulan == "November") {
+    } else if (bulan == "November" || bulan == "11") {
       bulan = "Nov";
       // bulan = "November";
-    } else if (bulan == "December") {
+    } else if (bulan == "December" || bulan == "12") {
       bulan = "Des";
       // bulan = "Desember";
     } else {

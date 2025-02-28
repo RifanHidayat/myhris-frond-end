@@ -8,7 +8,7 @@ import 'package:siscom_operasional/controller/dashboard_controller.dart';
 import 'package:siscom_operasional/controller/global_controller.dart';
 import 'package:siscom_operasional/screen/absen/camera_view.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_absen.dart';
-import 'package:siscom_operasional/screen/absen/pengajuan%20absen.dart';
+import 'package:siscom_operasional/screen/absen/pengajuan_absen.dart';
 import 'package:siscom_operasional/screen/init_screen.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
@@ -43,6 +43,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
   }
 
   Future<void> refreshData() async {
+    controller.dataPengajuanAbsensi();
     await Future.delayed(const Duration(seconds: 2));
     controller.onReady();
   }
@@ -167,7 +168,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                         filterData(),
                                         const SizedBox(height: 8),
                                         UtilsAlert.infoContainer(
-                                            "${AppData.informasiUser![0].beginPayroll} ${controller.beginPayroll.value} sd ${AppData.informasiUser![0].endPayroll} ${controller.endPayroll.value} ${controller.tahunSelectedSearchHistory.value}"),
+                                            "${AppData.informasiUser![0].beginPayroll} ${controller.beginPayroll.value} sd ${controller.lastDate.value} ${controller.endPayroll.value} ${controller.tahunSelectedSearchHistory.value}"),
                                         const SizedBox(height: 12),
                                         // Row(
                                         //   children: [
@@ -919,234 +920,87 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
   }
 
   Widget listPengajuan() {
-    return ListView.builder(
-        physics: controller.pengajuanAbsensi.value.length <= 10
-            ? const AlwaysScrollableScrollPhysics()
-            : const BouncingScrollPhysics(),
-        itemCount: controller.pengajuanAbsensi.value.length,
-        itemBuilder: (context, index) {
-          var data = controller.pengajuanAbsensi[index];
-          var nomorAjuan =
-              controller.pengajuanAbsensi.value[index]['nomor_ajuan'];
-
-          var namaTypeAjuan = controller.pengajuanAbsensi.value[index]['name'];
-          // Parse the input date string
-          DateTime atten_date =
-              DateFormat('yyyy-MM-dd').parse(data['atten_date']);
-          // Format the date using the Indonesian month format
-          String formatAttenDate =
-              DateFormat('dd MMM yyyy', 'id').format(atten_date);
-
-          return Container(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: InkWell(
-              customBorder: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12))),
-              onTap: () {
-                showBottomDetailPengajuan(context, index);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(width: 1, color: Constanst.fgBorder)),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextLabell(
-                        text: formatAttenDate,
-                        weight: FontWeight.w500,
-                        size: 16.0,
-                        color: Constanst.fgPrimary,
-                      ),
-                      const SizedBox(height: 4),
-                      TextLabell(
-                        text: data['nomor_ajuan'],
-                        weight: FontWeight.w400,
-                        size: 16.0,
-                        color: Constanst.fgSecondary,
-                      ),
-                      const SizedBox(height: 4),
-                      TextLabell(
-                        text:
-                            "Absen Masuk Tanggal $formatAttenDate, ${data['dari_jam']}",
-                        color: Constanst.fgSecondary,
-                        size: 13.0,
-                        weight: FontWeight.w400,
-                      ),
-                      TextLabell(
-                        text:
-                            "Absen Keluar Tanggal $formatAttenDate, ${data['sampai_jam']}",
-                        color: Constanst.fgSecondary,
-                        size: 13.0,
-                        weight: FontWeight.w400,
-                      ),
-                      const SizedBox(height: 12),
-                      Divider(
-                        height: 0,
-                        thickness: 1,
-                        color: Constanst.fgBorder,
-                      ),
-                      const SizedBox(height: 8),
-                      controllerGlobal.valuePolaPersetujuan.value == "1" ||
-                              controllerGlobal.valuePolaPersetujuan.value == 1
-                          ? Container(
-                              child: data['status'].toString().toLowerCase() ==
-                                      "approve".toLowerCase()
-                                  ? Row(
-                                      children: [
-                                        const Icon(
-                                          Iconsax.tick_circle,
-                                          size: 20,
-                                          color: Colors.green,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        TextLabell(
-                                          text:
-                                              "Approved by ${data['approve_by']}",
-                                          color: Constanst.fgPrimary,
-                                          weight: FontWeight.w500,
-                                          size: 14,
-                                        )
-                                      ],
-                                    )
-                                  : data['status'].toString().toLowerCase() ==
-                                          "rejected".toLowerCase()
-                                      ? Row(
-                                          children: [
-                                            const Icon(
-                                              Iconsax.close_circle,
-                                              size: 20,
-                                              color: Colors.red,
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    TextLabell(
-                                                      text:
-                                                          "Rejected by ${data['approve_by']}",
-                                                      color:
-                                                          Constanst.fgPrimary,
-                                                      weight: FontWeight.w500,
-                                                      size: 14,
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    TextLabell(
-                                                      text:
-                                                          "${data['alasan_reject']}",
-                                                      color:
-                                                          Constanst.fgSecondary,
-                                                      weight: FontWeight.w400,
-                                                      size: 14,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        )
-                                      : Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Icon(
-                                              Iconsax.timer,
-                                              size: 20,
-                                              color: Constanst.warning,
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8.0),
-                                                  child: TextLabell(
-                                                    text: "Pending Approval",
-                                                    color: Constanst.fgPrimary,
-                                                    weight: FontWeight.w500,
-                                                    size: 14,
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    print("${namaTypeAjuan}");
-                                                    var dataEmployee = {
-                                                      'nameType': 'Absensi',
-                                                      'nomor_ajuan':
-                                                          '$nomorAjuan',
-                                                    };
-                                                    controllerGlobal
-                                                        .showDataPilihAtasan(
-                                                            dataEmployee);
-                                                  },
-                                                  customBorder:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          100))),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(
-                                                        8.0, 4.0, 8.0, 4.0),
-                                                    child: TextLabell(
-                                                      text:
-                                                          "Konfirmasi via Whatsapp",
-                                                      color:
-                                                          Constanst.infoLight,
-                                                      weight: FontWeight.w400,
-                                                      size: 14,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                            )
-                          : Container(
-                              child: data['status'].toString().toLowerCase() ==
-                                      "approve".toLowerCase()
-                                  ? Row(
-                                      children: [
-                                        Icon(
-                                          Iconsax.timer,
-                                          size: 20,
-                                          color: Constanst.warning,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            TextLabell(
-                                              text: "Pending Approval 2",
-                                              color: Constanst.fgPrimary,
-                                              weight: FontWeight.w500,
-                                              size: 14,
-                                            ),
-                                            TextLabell(
-                                              text:
-                                                  "Approved 1 by ${data['approve_by']}",
-                                              color: Constanst.fgPrimary,
-                                              weight: FontWeight.w500,
-                                              size: 14,
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    )
-                                  : data['status'].toString().toLowerCase() ==
-                                          "approve2".toLowerCase()
+    return Obx(() {
+        return ListView.builder(
+            physics: controller.pengajuanAbsensi.value.length <= 10
+                ? const AlwaysScrollableScrollPhysics()
+                : const BouncingScrollPhysics(),
+            itemCount: controller.pengajuanAbsensi.value.length,
+            itemBuilder: (context, index) {
+              var data = controller.pengajuanAbsensi[index];
+              var nomorAjuan =
+                  controller.pengajuanAbsensi.value[index]['nomor_ajuan'];
+              
+        
+              var namaTypeAjuan = controller.pengajuanAbsensi.value[index]['name'];
+              // Parse the input date string
+              DateTime atten_date =
+                  DateFormat('yyyy-MM-dd').parse(data['atten_date']);
+              DateTime tgl_ajuan =
+                  DateFormat('yyyy-MM-dd').parse(data['tgl_ajuan']);
+              String formatDateAjuan =
+                  DateFormat('dd MMM yyyy', 'id').format(tgl_ajuan);
+              // Format the date using the Indonesian month format
+              String formatAttenDate =
+                  DateFormat('dd MMM yyyy', 'id').format(atten_date);
+        
+              return Container(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: InkWell(
+                  customBorder: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12))),
+                  onTap: () {
+                    showBottomDetailPengajuan(context, index);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(width: 1, color: Constanst.fgBorder)),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextLabell(
+                            text: formatDateAjuan,
+                            weight: FontWeight.w500,
+                            size: 16.0,
+                            color: Constanst.fgPrimary,
+                          ),
+                          const SizedBox(height: 4),
+                          TextLabell(
+                            text: data['nomor_ajuan'],
+                            weight: FontWeight.w400,
+                            size: 16.0,
+                            color: Constanst.fgSecondary,
+                          ),
+                          const SizedBox(height: 4),
+                          TextLabell(
+                            text:
+                                "Absen Masuk Tanggal $formatAttenDate, ${data['dari_jam']}",
+                            color: Constanst.fgSecondary,
+                            size: 13.0,
+                            weight: FontWeight.w400,
+                          ),
+                          TextLabell(
+                            text:
+                                "Absen Keluar Tanggal $formatAttenDate, ${data['sampai_jam']}",
+                            color: Constanst.fgSecondary,
+                            size: 13.0,
+                            weight: FontWeight.w400,
+                          ),
+                          const SizedBox(height: 12),
+                          Divider(
+                            height: 0,
+                            thickness: 1,
+                            color: Constanst.fgBorder,
+                          ),
+                          const SizedBox(height: 8),
+                          controllerGlobal.valuePolaPersetujuan.value == "1" ||
+                                  controllerGlobal.valuePolaPersetujuan.value == 1
+                              ? Container(
+                                  child: data['status'].toString().toLowerCase() ==
+                                          "approve".toLowerCase()
                                       ? Row(
                                           children: [
                                             const Icon(
@@ -1155,22 +1009,16 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                               color: Colors.green,
                                             ),
                                             const SizedBox(width: 8),
-                                            Column(
-                                              children: [
-                                                TextLabell(
-                                                  text:
-                                                      "Approved 2 by ${data['approve_by']}",
-                                                  color: Constanst.fgPrimary,
-                                                  weight: FontWeight.w500,
-                                                  size: 14,
-                                                ),
-                                              ],
+                                            TextLabell(
+                                              text:
+                                                  "Approved by ${data['approve_by']}",
+                                              color: Constanst.fgPrimary,
+                                              weight: FontWeight.w500,
+                                              size: 14,
                                             )
                                           ],
                                         )
-                                      : data['status']
-                                                  .toString()
-                                                  .toLowerCase() ==
+                                      : data['status'].toString().toLowerCase() ==
                                               "rejected".toLowerCase()
                                           ? Row(
                                               children: [
@@ -1185,27 +1033,23 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                                   children: [
                                                     Column(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                          CrossAxisAlignment.start,
                                                       children: [
                                                         TextLabell(
                                                           text:
                                                               "Rejected by ${data['approve_by']}",
-                                                          color: Constanst
-                                                              .fgPrimary,
-                                                          weight:
-                                                              FontWeight.w500,
+                                                          color:
+                                                              Constanst.fgPrimary,
+                                                          weight: FontWeight.w500,
                                                           size: 14,
                                                         ),
-                                                        const SizedBox(
-                                                            height: 4),
+                                                        const SizedBox(height: 4),
                                                         TextLabell(
                                                           text:
                                                               "${data['alasan_reject']}",
-                                                          color: Constanst
-                                                              .fgSecondary,
-                                                          weight:
-                                                              FontWeight.w400,
+                                                          color:
+                                                              Constanst.fgSecondary,
+                                                          weight: FontWeight.w400,
                                                           size: 14,
                                                         ),
                                                       ],
@@ -1232,18 +1076,15 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                                           const EdgeInsets.only(
                                                               left: 8.0),
                                                       child: TextLabell(
-                                                        text:
-                                                            "Pending Approval",
-                                                        color:
-                                                            Constanst.fgPrimary,
+                                                        text: "Pending Approval",
+                                                        color: Constanst.fgPrimary,
                                                         weight: FontWeight.w500,
                                                         size: 14,
                                                       ),
                                                     ),
                                                     InkWell(
                                                       onTap: () {
-                                                        print(
-                                                            "${namaTypeAjuan}");
+                                                        print("${namaTypeAjuan}");
                                                         var dataEmployee = {
                                                           'nameType': 'Absensi',
                                                           'nomor_ajuan':
@@ -1255,22 +1096,21 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                                       },
                                                       customBorder:
                                                           const RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius
-                                                                  .all(Radius
-                                                                      .circular(
-                                                                          100))),
+                                                              borderRadius:
+                                                                  BorderRadius.all(
+                                                                      Radius
+                                                                          .circular(
+                                                                              100))),
                                                       child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .fromLTRB(8.0,
-                                                                4.0, 8.0, 4.0),
+                                                        padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                            8.0, 4.0, 8.0, 4.0),
                                                         child: TextLabell(
                                                           text:
                                                               "Konfirmasi via Whatsapp",
-                                                          color: Constanst
-                                                              .infoLight,
-                                                          weight:
-                                                              FontWeight.w400,
+                                                          color:
+                                                              Constanst.infoLight,
+                                                          weight: FontWeight.w400,
                                                           size: 14,
                                                         ),
                                                       ),
@@ -1279,14 +1119,184 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                                 )
                                               ],
                                             ),
-                            )
-                    ],
+                                )
+                              : Container(
+                                  child: data['status'].toString().toLowerCase() ==
+                                          "approve".toLowerCase()
+                                      ? Row(
+                                          children: [
+                                            Icon(
+                                              Iconsax.timer,
+                                              size: 20,
+                                              color: Constanst.warning,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                TextLabell(
+                                                  text: "Pending Approval 2",
+                                                  color: Constanst.fgPrimary,
+                                                  weight: FontWeight.w500,
+                                                  size: 14,
+                                                ),
+                                                TextLabell(
+                                                  text:
+                                                      "Approved 1 by ${data['approve_by']}",
+                                                  color: Constanst.fgPrimary,
+                                                  weight: FontWeight.w500,
+                                                  size: 14,
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        )
+                                      : data['status'].toString().toLowerCase() ==
+                                              "approve2".toLowerCase()
+                                          ? Row(
+                                              children: [
+                                                const Icon(
+                                                  Iconsax.tick_circle,
+                                                  size: 20,
+                                                  color: Colors.green,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Column(
+                                                  children: [
+                                                    TextLabell(
+                                                      text:
+                                                          "Approved 2 by ${data['approve2_by']}",
+                                                      color: Constanst.fgPrimary,
+                                                      weight: FontWeight.w500,
+                                                      size: 14,
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            )
+                                          : data['status']
+                                                      .toString()
+                                                      .toLowerCase() ==
+                                                  "rejected".toLowerCase()
+                                              ? Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Iconsax.close_circle,
+                                                      size: 20,
+                                                      color: Colors.red,
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.start,
+                                                      children: [
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            TextLabell(
+                                                              text:
+                                                                  "Rejected by ${
+                                                                    data['approve2_by'] == '' || data['approve2_by'] == null ? data['approve_by'] : data['approve2_by'] == ''}",
+                                                              color: Constanst
+                                                                  .fgPrimary,
+                                                              weight:
+                                                                  FontWeight.w500,
+                                                              size: 14,
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 4),
+                                                            TextLabell(
+                                                              text:
+                                                                  "${data['alasan_reject']}",
+                                                              color: Constanst
+                                                                  .fgSecondary,
+                                                              weight:
+                                                                  FontWeight.w400,
+                                                              size: 14,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                )
+                                              : Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Icon(
+                                                      Iconsax.timer,
+                                                      size: 20,
+                                                      color: Constanst.warning,
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                  left: 8.0),
+                                                          child: TextLabell(
+                                                            text:
+                                                                "Pending Approval",
+                                                            color:
+                                                                Constanst.fgPrimary,
+                                                            weight: FontWeight.w500,
+                                                            size: 14,
+                                                          ),
+                                                        ),
+                                                        InkWell(
+                                                          onTap: () {
+                                                            print(
+                                                                "${namaTypeAjuan}");
+                                                            var dataEmployee = {
+                                                              'nameType': 'Absensi',
+                                                              'nomor_ajuan':
+                                                                  '$nomorAjuan',
+                                                            };
+                                                            controllerGlobal
+                                                                .showDataPilihAtasan(
+                                                                    dataEmployee);
+                                                          },
+                                                          customBorder:
+                                                              const RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius
+                                                                      .all(Radius
+                                                                          .circular(
+                                                                              100))),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .fromLTRB(8.0,
+                                                                    4.0, 8.0, 4.0),
+                                                            child: TextLabell(
+                                                              text:
+                                                                  "Konfirmasi via Whatsapp",
+                                                              color: Constanst
+                                                                  .infoLight,
+                                                              weight:
+                                                                  FontWeight.w400,
+                                                              size: 14,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                )
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
-        });
+              );
+            });
+      }
+    );
   }
 
   Widget tampilan1(index, index2) {
@@ -2837,6 +2847,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
 
   void showBottomDetailPengajuan(BuildContext context, index) {
     var data = controller.pengajuanAbsensi[index];
+    print(data);
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -2946,7 +2957,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                 ),
                                 const SizedBox(height: 4),
                                 TextLabell(
-                                  text: "-",
+                                  text: "Request Absen",
                                   color: Constanst.fgPrimary,
                                   size: 16,
                                   weight: FontWeight.w500,
@@ -3051,6 +3062,72 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                               height: 0,
                             ),
                             const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextLabell(
+                                        text: "Istirahat Keluar",
+                                        color: Constanst.fgSecondary,
+                                        size: 14,
+                                        weight: FontWeight.w400,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      data['breakout_time'] == "" || data['breakout_time'] == null
+                                          ? TextLabell(
+                                              text: "_ _ : _ _",
+                                              color: Constanst.fgPrimary,
+                                              size: 16,
+                                              weight: FontWeight.w500,
+                                            )
+                                          : TextLabell(
+                                              text: data['breakout_time'],
+                                              color: Constanst.fgPrimary,
+                                              size: 16,
+                                              weight: FontWeight.w500,
+                                            )
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextLabell(
+                                        text: "Istirahat Masuk",
+                                        color: Constanst.fgSecondary,
+                                        size: 14,
+                                        weight: FontWeight.w400,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      data['breakin_time'] == "" || data['breakout_time'] == null
+                                          ? TextLabell(
+                                              text: "_ _ : _ _",
+                                              color: Constanst.fgPrimary,
+                                              size: 16,
+                                              weight: FontWeight.w500,
+                                            )
+                                          : TextLabell(
+                                              text: data['breakin_time'],
+                                              color: Constanst.fgPrimary,
+                                              size: 16,
+                                              weight: FontWeight.w500,
+                                            )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            const Divider(
+                              thickness: 1,
+                              height: 0,
+                            ),
+                            const SizedBox(height: 12),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -3133,7 +3210,9 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     absenControllre.batalkanAjuan(
-                                        date: data['atten_date']);
+                                        date: data['atten_date'],
+                                        noAjuan: data['nomor_ajuan'],
+                                        );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     foregroundColor: Constanst.color4,
@@ -3271,126 +3350,124 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
     }
     return Container(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            "Status Pengajuan",
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w400,
+              fontSize: 14,
+              color: Constanst.fgSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Status Pengajuan",
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Constanst.fgSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      data['approve_status'] == "Pending"
-                          ? Icon(
-                              Iconsax.timer,
-                              color: Constanst.warning,
-                              size: 22,
-                            )
-                          : data['approve_status'] == "Rejected"
-                              ? const Icon(
-                                  Iconsax.close_circle,
-                                  color: Colors.red,
-                                  size: 22,
-                                )
-                              : const Icon(
-                                  Iconsax.tick_circle,
-                                  color: Colors.green,
-                                  size: 22,
-                                ),
-                      // Icon(
-                      //   Iconsax.close_circle,
-                      //   color: Constanst.color4,
-                      //   size: 22,
-                      // ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${text}",
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  color: Constanst.fgPrimary,
-                                  fontSize: 14)),
-                          const SizedBox(height: 4),
-                        ],
-                      ),
-                    ],
-                  ),
-                  data['approve_status'] == "Approve"
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 2.5, top: 2, bottom: 2),
-                              child: Container(
-                                height: 30,
-                                child: VerticalDivider(
-                                  color: Constanst.Secondary,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  data['approve2_status'] == "Pending" ||
-                                          data['approve2_status'] == null
-                                      ? Icon(
-                                          Iconsax.timer,
-                                          color: Constanst.warning,
-                                          size: 22,
-                                        )
-                                      : data['approve2_status'] == "Rejected"
-                                          ? const Icon(
-                                              Iconsax.close_circle,
-                                              color: Colors.red,
-                                              size: 22,
-                                            )
-                                          : const Icon(
-                                              Iconsax.tick_circle,
-                                              color: Colors.green,
-                                              size: 22,
-                                            ),
-                                  // Icon(
-                                  //   Iconsax.close_circle,
-                                  //   color: Constanst.color4,
-                                  //   size: 22,
-                                  // ),
-                                  const SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("${text2} ",
-                                          style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              color: Constanst.fgPrimary,
-                                              fontSize: 14)),
-                                      const SizedBox(height: 4),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+              data['approve_status'] == "Pending"
+                  ? Icon(
+                      Iconsax.timer,
+                      color: Constanst.warning,
+                      size: 22,
+                    )
+                  : data['approve_status'] == "Rejected"
+                      ? const Icon(
+                          Iconsax.close_circle,
+                          color: Colors.red,
+                          size: 22,
                         )
-                      : const SizedBox(),
-                ],
+                      : const Icon(
+                          Iconsax.tick_circle,
+                          color: Colors.green,
+                          size: 22,
+                        ),
+              // Icon(
+              //   Iconsax.close_circle,
+              //   color: Constanst.color4,
+              //   size: 22,
+              // ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("${text}",
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w500,
+                            color: Constanst.fgPrimary,
+                            fontSize: 14)),
+                    const SizedBox(height: 4),
+                  ],
+                ),
               ),
             ],
-          )
+          ),
+          data['approve_status'] == "Approve"
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 2.5, top: 2, bottom: 2),
+                      child: Container(
+                        height: 30,
+                        child: VerticalDivider(
+                          color: Constanst.Secondary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          data['approve2_status'] == "Pending" ||
+                                  data['approve2_status'] == null
+                              ? Icon(
+                                  Iconsax.timer,
+                                  color: Constanst.warning,
+                                  size: 22,
+                                )
+                              : data['approve2_status'] == "Rejected"
+                                  ? const Icon(
+                                      Iconsax.close_circle,
+                                      color: Colors.red,
+                                      size: 22,
+                                    )
+                                  : const Icon(
+                                      Iconsax.tick_circle,
+                                      color: Colors.green,
+                                      size: 22,
+                                    ),
+                          // Icon(
+                          //   Iconsax.close_circle,
+                          //   color: Constanst.color4,
+                          //   size: 22,
+                          // ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text("${text2} ",
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.fgPrimary,
+                                        fontSize: 14),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                        ),
+                                const SizedBox(height: 4),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : const SizedBox(),
         ],
       ),
     );

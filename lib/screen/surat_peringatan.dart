@@ -85,14 +85,13 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                         subtitle: Text(formatDate(list.approve_date)),
                         onTap: () {
                           if (list.isView == 0) {
-                            controller.updateDataNotif(list.id);
+                            controller.updateDataNotifSp(list.id, list.em_id);
                             controller.getPeringatan();
                           }
                           controller.getDetail(list.id);
                           var bulanIndo =
                               Constanst.convertGetMonth(list.tgl_surat);
                           controller.bulan.value = bulanIndo;
-                          controller.infoIds(list.diterbitkan_oleh);
                           // UtilsAlert.showToast(list.id);
                           Get.to(() => SuratPeringatanDetail(
                                 sp: list.sp,
@@ -100,8 +99,8 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                                 posisi: list.posisi.toString(),
                                 nomor: list.nomor_surat.toString(),
                                 hal: list.hal.toString(),
-                                tglSrt: list.tgl_surat.toString(),
-                                pelanggaran: list.title.toString(),
+                                tglSrt: list.eff_date.toString(),
+                                pelanggaran: list.alasan.toString(),
                                 alasan: list.alasan.toString(),
                                 diterbitkan: list.diterbitkan_oleh.toString(),
                               ));
@@ -179,7 +178,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              'NO : ${nomor}',
+                              'NO : ${nomor == 'null' ? '-' : nomor}',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),
@@ -227,19 +226,31 @@ class SuratPeringatanDetail extends StatelessWidget {
                       ),
                       Text(
                         sp == 'Surat Peringatan 3'
-                        ? '3. Saudara wajib mengembalikan seluruh barang-barang milik perusahaan yang Saudara gunakan selama bekerja di perusahaan.  '
-                        : sp == 'Surat Peringatan 2'
-                        ? '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 3 (Tiga) hari.'
-                        : '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 1 (Satu) hari.',
+                            ? '3. Saudara wajib mengembalikan seluruh barang-barang milik perusahaan yang Saudara gunakan selama bekerja di perusahaan.  '
+                            : sp == 'Surat Peringatan 2'
+                                ? '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 3 (Tiga) hari.'
+                                : '3. Dengan dikeluarkan $sp ini maka saudara akan menerima sanksi yaitu pemotongan hak cuti selama 1 (Satu) hari.',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
-                        height: 15,
+                        height: 8,
                       ),
-                      Text(
-                        '4. ${alasan}',
-                        textAlign: TextAlign.start,
-                      ),
+                      controller.listAlasan.isEmpty
+                          ? SizedBox()
+                          : Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                              children: List.generate(
+                                controller.listAlasan.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    '${index + 4}. ${controller.listAlasan[index]['name']}',
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ),
+                              ),
+                            ),
                       SizedBox(
                         height: 15,
                       ),
@@ -252,6 +263,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Column(
                             children: [
@@ -262,11 +274,11 @@ class SuratPeringatanDetail extends StatelessWidget {
                                     fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               SizedBox(
-                                height: 35,
+                                height: 47,
                               ),
                               Text(
-                                controller.diterbitkan.value,
-                                style: TextStyle(fontSize: 12),
+                                diterbitkan == 'null' ? '': diterbitkan,
+                                // style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),
@@ -274,7 +286,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                             children: [
                               SizedBox(height: 20),
                               Text(
-                                'Jakarta, ${DateFormat('dd MMMM yyyy').format(DateTime.parse(tglSrt.toString()))}',
+                                'Jakarta, ${formatDate(tglSrt.toString())}',
                                 style: TextStyle(fontSize: 12.0),
                               ),
                               Text(
@@ -283,7 +295,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12.0),
                               ),
-                              SizedBox(height: 25),
+                              SizedBox(height: 50),
                               Text('$nama'),
                             ],
                           ),
@@ -297,7 +309,7 @@ class SuratPeringatanDetail extends StatelessWidget {
 
   String formatDate(String dateString) {
     DateTime dateTime = DateTime.parse(dateString);
-    String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+    String formattedDate = DateFormat('dd MMMM yyyy', 'id_ID').format(dateTime);
     return formattedDate;
   }
 }

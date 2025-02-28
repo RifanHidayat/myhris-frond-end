@@ -1273,24 +1273,28 @@ class _RiwayatIzinState extends State<RiwayatIzin> {
                                         size: 22,
                                       ),
                                       const SizedBox(width: 8),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Rejected by $approve_by",
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text("Rejected by $approve_by",
+                                                style: GoogleFonts.inter(
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Constanst.fgPrimary,
+                                                    fontSize: 14)),
+                                            const SizedBox(height: 6),
+                                            Text(
+                                              alasanReject,
                                               style: GoogleFonts.inter(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Constanst.fgPrimary,
-                                                  fontSize: 14)),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            alasanReject,
-                                            style: GoogleFonts.inter(
-                                                fontWeight: FontWeight.w400,
-                                                color: Constanst.fgSecondary,
-                                                fontSize: 14),
-                                          )
-                                        ],
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Constanst.fgSecondary,
+                                                  fontSize: 14),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   )
