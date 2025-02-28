@@ -27,7 +27,8 @@ class DetailPersetujuanSuratPeringatan extends StatefulWidget {
   _DetailSuratPeringatanState createState() => _DetailSuratPeringatanState();
 }
 
-class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan> {
+class _DetailSuratPeringatanState
+    extends State<DetailPersetujuanSuratPeringatan> {
   var controller = Get.put(ApprovalController());
   var controllerGlobal = Get.put(GlobalController());
   int hours = 0, minutes = 0, second = 0;
@@ -104,8 +105,7 @@ class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan
                                         padding: EdgeInsets.only(top: 12),
                                         child: InkWell(
                                           onTap: () {
-                                            controller
-                                                    .statusPemgajuanSP.value =
+                                            controller.statusPemgajuanSP.value =
                                                 data['value'].toString();
                                           },
                                           child: Container(
@@ -198,7 +198,7 @@ class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan
                                 child: TextButtonWidget(
                                   title: "Menyetujui",
                                   onTap: () {
-                                      validasiMenyetujui(true, em_id);
+                                    validasiMenyetujui(true, em_id);
                                   },
                                   colorButton: Constanst.colorPrimary,
                                   colortext: Colors.white,
@@ -346,7 +346,6 @@ class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan
   }
 
   String formatDate(String dateString) {
-    
     DateTime dateTime = DateTime.parse(dateString);
 
     // Format the DateTime object to 'yyyy-MM-dd'
@@ -868,7 +867,7 @@ class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan
                                       ),
                                     ),
                                     Text(
-                                      "Catatan",
+                                      "Temuan Pelanggaran",
                                       style: GoogleFonts.inter(
                                           color: Constanst.fgSecondary,
                                           fontWeight: FontWeight.w400,
@@ -887,7 +886,6 @@ class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan
                                                 null
                                         ? const SizedBox()
                                         : fileWidget(),
-
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           top: 6.0, bottom: 12.0),
@@ -911,58 +909,72 @@ class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan
                             SizedBox(
                               height: 16,
                             ),
-                            TextLabell(
-                              text: "Temuan Pelanggaran",
-                              size: 14,
-                              weight: FontWeight.bold,
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(top: 12),
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        width: 1,
-                                        color: Constanst.greyLight100)),
-                                child: Column(
-                                  children: List.generate(
-                                      controller.listAlasan.length, (index) {
-                                    var data = controller.listAlasan[index];
-                                    return Container(
-                                      padding: EdgeInsets.only(top: 8),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 5,
-                                                child: TextLabell(
-                                                    size: 14,
-                                                    text: "${index + 1}. "),
-                                              ),
-                                              Expanded(
-                                                flex: 99,
-                                                child: TextLabell(
-                                                    size: 14,
-                                                    text: "${data['name']}"),
-                                              ),
-                                            ],
-                                          ),
-                                          Divider(
-                                            color: Constanst.greyLight100,
-                                          )
-                                        ],
+                            controller.listAlasan.isEmpty
+                                ? SizedBox()
+                                : Column(
+                                    children: [
+                                      TextLabell(
+                                        text: "Konsekuensi",
+                                        size: 14,
+                                        weight: FontWeight.bold,
                                       ),
-                                    );
-                                  }),
-                                ),
-                              ),
-                            )
+                                      Container(
+                                        padding: EdgeInsets.only(top: 12),
+                                        child: Container(
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                  width: 1,
+                                                  color:
+                                                      Constanst.greyLight100)),
+                                          child: Column(
+                                            children: List.generate(
+                                                controller.listAlasan.length,
+                                                (index) {
+                                              var data =
+                                                  controller.listAlasan[index];
+                                              return Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 8),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Expanded(
+                                                          flex: 5,
+                                                          child: TextLabell(
+                                                              size: 14,
+                                                              text:
+                                                                  "${index + 1}. "),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 99,
+                                                          child: TextLabell(
+                                                              size: 14,
+                                                              text:
+                                                                  "${data['name']}"),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Divider(
+                                                      color: Constanst
+                                                          .greyLight100,
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                           ],
                         ),
                       ),
@@ -1101,6 +1113,7 @@ class _DetailSuratPeringatanState extends State<DetailPersetujuanSuratPeringatan
       ),
     );
   }
+
   void viewLampiranAjuan(value) async {
     var urlViewGambar =
         Api.UrlfotoAbsen.toString().trim() + value.toString().trim();

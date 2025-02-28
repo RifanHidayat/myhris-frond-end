@@ -2602,7 +2602,7 @@ class ApprovalController extends GetxController {
       'tanggal': tanggalSekarang,
       'nourut': '0001',
       'em_id': getEmidEmployee,
-      'absen': dataEditFinal[0]['leave_duration'],
+      'absen': dataEditFinal[0]['leave_duration']==null ||dataEditFinal[0]['leave_duration']=='' ? 1 : dataEditFinal[0]['leave_duration'],
       'flag': '2'
     };
     print(body);
@@ -2611,6 +2611,8 @@ class ApprovalController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         UtilsAlert.showToast("${valueBody['message']}");
+      }else{
+        UtilsAlert.showToast("${res.body}");
       }
     });
   }

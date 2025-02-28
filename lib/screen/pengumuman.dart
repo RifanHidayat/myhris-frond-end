@@ -151,7 +151,7 @@ class _PengumumanScreenState extends State<PengumumanScreen> {
                       var id = peraturan['id'];
                       var title = peraturan['title'];
                       var desc = peraturan['description'];
-                      var create = peraturan['created_on'];
+                      var create = peraturan['begin_date'];
                       var beginDate = peraturan['begin_date'];
                       var type = peraturan['type'];
                       var idPertanyaan = peraturan['id_pertanyaan'].toString();

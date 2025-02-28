@@ -92,7 +92,6 @@ class _SuratPeringatanState extends State<SuratPeringatan> {
                           var bulanIndo =
                               Constanst.convertGetMonth(list.tgl_surat);
                           controller.bulan.value = bulanIndo;
-                          controller.infoIds(list.diterbitkan_oleh);
                           // UtilsAlert.showToast(list.id);
                           Get.to(() => SuratPeringatanDetail(
                                 sp: list.sp,
@@ -278,7 +277,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                                 height: 47,
                               ),
                               Text(
-                                controller.diterbitkan.value,
+                                diterbitkan == 'null' ? '': diterbitkan,
                                 // style: TextStyle(fontSize: 12),
                               ),
                             ],

@@ -91,7 +91,7 @@ class _TeguranLisanState extends State<TeguranLisan> {
                           }
 
                           print('ini teguran list data : ${list}');
-                          controller.infoIds(list.diterbitkan_oleh);
+                          // controller.infoIds(list.diterbitkan_oleh);
                           controller.getDetailTeguran(list.id);
                           // UtilsAlert.showToast(list.id);
                           Get.to(() => SuratTeguranDetail(
@@ -259,7 +259,7 @@ class SuratTeguranDetail extends StatelessWidget {
                                 height: 47,
                               ),
                               Text(
-                                controller.diterbitkan.value,
+                                diterbitkan == 'null' ? '' : diterbitkan,
                                 // style: TextStyle(
                                 //     fontSize: 12),
                               ),

@@ -99,6 +99,8 @@ class _DashboardState extends State<Dashboard> {
     var emId = AppData.informasiUser![0].em_id.toString();
     // setState(() {
     Future.wait([
+      absenControllre.getPosisition(),
+      absenControllre.getPlaceCoordinate(),
       controller.checkperaturanPerusahaan(emId),
       controller.updateInformasiUser(),
       controller.showDialogHistoryTerlambat(),
@@ -3951,7 +3953,7 @@ class _DashboardState extends State<Dashboard> {
   void _checkversion() async {
     try {
       final newVersion = NewVersionPlus(
-        androidId: 'com.siscom.siscomhris',
+        androidId: 'com.siscom.siscomhrisnew',
       );
 
       final status = await newVersion.getVersionStatus();

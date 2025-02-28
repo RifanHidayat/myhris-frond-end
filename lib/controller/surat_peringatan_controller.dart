@@ -101,7 +101,7 @@ class SuratPeringatanController extends GetxController {
           List data = jsonDecode(response.body)['data'];
           peringatanlist.value = Peringatan.fromJsonToList(data);
           isLoading.value = false;
-          print('ini peringatanlist $data');
+          print('ini peringatanlist ${data}');
         } else {
           print('gagal dapet surat peringatan ${response.code}');
         }

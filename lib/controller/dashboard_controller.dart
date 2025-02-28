@@ -206,7 +206,7 @@ class DashboardController extends GetxController {
 
   void versionCheck() async {
     final newVersion = NewVersionPlus(
-      androidId: 'com.siscom.siscomhris',
+      androidId: 'com.siscom.siscomhrisnew',
     );
     final infoStatus = await newVersion.getVersionStatus();
     statuz.value = infoStatus!.storeVersion;
@@ -578,7 +578,6 @@ class DashboardController extends GetxController {
   Future<void> showDialogHistoryTerlambat() async {
     await controllerAbsensi.loadHistoryAbsenUser();
     print('ini show');
-    print(controllerAbsensi.statusAbsen.value.toLowerCase());
 
     Set<String> seenDates = {};
 
@@ -588,6 +587,8 @@ class DashboardController extends GetxController {
               tambahSatuMenit(element.jamKerja.toString())))
           .toList();
 
+      
+
       controllerAbsensi.historyAbsen.value = filteredAbsen.where((event) {
         if (seenDates.contains(event.date)) {
           return false;
@@ -596,6 +597,7 @@ class DashboardController extends GetxController {
           return true;
         }
       }).toList();
+      print('ini absen terlambat yak ${controllerAbsensi.historyAbsen}');
     }
     // pulang cepet
     else {

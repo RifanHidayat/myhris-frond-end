@@ -71,25 +71,25 @@ class PengumumanController extends GetxController {
         if (connect.statusCode == 200) {
           var valueBody = jsonDecode(connect.body);
           var data = valueBody['data'];
-          var filter1 = [];
-          var dt = DateTime.now();
-          for (var element in data) {
-            DateTime dt2 = DateTime.parse("${element['end_date']}");
-            if (dt2.isBefore(dt)) {
-              if (DateFormat('yyyy-MM-dd').format(dt) ==
-                  DateFormat('yyyy-MM-dd').format(dt2)) {
-                filter1.add(element);
-              }
-            } else {
-              filter1.add(element);
-            }
-          }
-        print('data pengumuman ${filter1}');
-          filter1.sort((a, b) => b['begin_date']
-              .toUpperCase()
-              .compareTo(a['begin_date'].toUpperCase()));
+          // var filter1 = [];
+          // var dt = DateTime.now();
+        //   for (var element in data) {
+        //     DateTime dt2 = DateTime.parse("${element['end_date']}");
+        //     if (dt2.isBefore(dt)) {
+        //       if (DateFormat('yyyy-MM-dd').format(dt) ==
+        //           DateFormat('yyyy-MM-dd').format(dt2)) {
+        //         filter1.add(element);
+        //       }
+        //     } else {
+        //       filter1.add(element);
+        //     }
+        //   }
+        // print('data pengumuman ${filter1}');
+        //   filter1.sort((a, b) => b['begin_date']
+        //       .toUpperCase()
+        //       .compareTo(a['begin_date'].toUpperCase()));
 
-          pengumumanList.value = filter1;
+          pengumumanList.value = data;
           var belumDibaca = pengumumanList.where((pengumuman) {
           return pengumuman['is_view'] == 0; 
         }).length;
@@ -97,6 +97,8 @@ class PengumumanController extends GetxController {
         jumlahNotifikasiBelumDibaca.refresh();
           // getJumlahNotifikasi();
 
+        }else{
+          print('yah error uy ${connect.statusCode}: ${connect.body}');
         }
       }
     } catch (e) {
