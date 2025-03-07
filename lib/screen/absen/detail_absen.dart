@@ -386,118 +386,118 @@ class DetailAbsen extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         fontSize: 16),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Divider(
-                thickness: 1,
-                height: 0,
-                color: Constanst.fgBorder,
-              ),
-              const SizedBox(height: 16),
-              //gambarMasuk != ''
-              // ? Expanded(
-              //     flex: 30,
-              //     child: Center(
-              //       child: InkWell(
-              //         onTap: () {
-              //           Get.to(PhotoAbsen(
-              //             image: Api.UrlfotoAbsen + gambarMasuk,
-              //             type: "masuk",
-              //             time: jamMasuk,
-              //             alamat: alamatMasuk + placeIn,
-              //             note: catatanMasuk,
-              //           ));
-              //         },
-              //         child: gambarMasuk != ''
-              //             ? ClipRRect(
-              //                 borderRadius: BorderRadius.circular(6.0),
-              //                 child: SizedBox(
-              //                     width: MediaQuery.of(Get.context!)
-              //                             .size
-              //                             .width /
-              //                         3,
-              //                     child: Image.network(
-              //                       Api.UrlfotoAbsen + gambarMasuk,
-              //                       errorBuilder:
-              //                           (context, exception, stackTrace) {
-              //                         return ClipRRect(
-              //                           child: SizedBox(
-              //                               child: Image.asset(
-              //                             'assets/Foto.png',
-              //                             fit: BoxFit.fill,
-              //                           )),
-              //                         );
-              //                       },
-              //                       fit: BoxFit.fill,
-              //                     )),
-              //               )
-              //             : ClipRRect(
-              //                 child: SizedBox(
-              //                     width: MediaQuery.of(Get.context!)
-              //                             .size
-              //                             .width /
-              //                         3,
-              //                     child: Image.asset(
-              //                       'assets/Foto.png',
-              //                     )),
-              //               ),
-              //       ),
-              //     ),
-              //   )
-              // : Expanded(
-              //     flex: 00,
-              //     child: Container(),
-              //   ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Divider(
+                  thickness: 1,
+                  height: 0,
+                  color: Constanst.fgBorder,
+                ),
+                const SizedBox(height: 16),
+                //gambarMasuk != ''
+                // ? Expanded(
+                //     flex: 30,
+                //     child: Center(
+                //       child: InkWell(
+                //         onTap: () {
+                //           Get.to(PhotoAbsen(
+                //             image: Api.UrlfotoAbsen + gambarMasuk,
+                //             type: "masuk",
+                //             time: jamMasuk,
+                //             alamat: alamatMasuk + placeIn,
+                //             note: catatanMasuk,
+                //           ));
+                //         },
+                //         child: gambarMasuk != ''
+                //             ? ClipRRect(
+                //                 borderRadius: BorderRadius.circular(6.0),
+                //                 child: SizedBox(
+                //                     width: MediaQuery.of(Get.context!)
+                //                             .size
+                //                             .width /
+                //                         3,
+                //                     child: Image.network(
+                //                       Api.UrlfotoAbsen + gambarMasuk,
+                //                       errorBuilder:
+                //                           (context, exception, stackTrace) {
+                //                         return ClipRRect(
+                //                           child: SizedBox(
+                //                               child: Image.asset(
+                //                             'assets/Foto.png',
+                //                             fit: BoxFit.fill,
+                //                           )),
+                //                         );
+                //                       },
+                //                       fit: BoxFit.fill,
+                //                     )),
+                //               )
+                //             : ClipRRect(
+                //                 child: SizedBox(
+                //                     width: MediaQuery.of(Get.context!)
+                //                             .size
+                //                             .width /
+                //                         3,
+                //                     child: Image.asset(
+                //                       'assets/Foto.png',
+                //                     )),
+                //               ),
+                //       ),
+                //     ),
+                //   )
+                // : Expanded(
+                //     flex: 00,
+                //     child: Container(),
+                //   ),
 
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: [
-              //         Text(
-              //           "Tipe Absen",
-              //           style: GoogleFonts.inter(
-              //               color: Constanst.fgPrimary,
-              //               fontWeight: FontWeight.w500,
-              //               fontSize: 16),
-              //         ),
-              //         SizedBox(
-              //           child: Padding(
-              //             padding: const EdgeInsets.only(top: 4),
-              //             child: Text(
-              //               'Foto',
-              //               style: GoogleFonts.inter(
-              //                   color: Constanst.fgSecondary,
-              //                   fontWeight: FontWeight.w400,
-              //                   fontSize: 14),
-              //             ),
-              //           ),
-              //         )
-              //       ],
-              //     ),
-              //     InkWell(
-              //       onTap: () {
-              //         Get.to(PhotoAbsen(
-              //           image: Api.UrlfotoAbsen + gambarMasuk,
-              //           type: "masuk",
-              //           time: jamMasuk,
-              //           alamat: alamatMasuk + "({$placeIn})",
-              //           note: catatanMasuk,
-              //         ));
-              //       },
-              //       child: Text(
-              //         "Lihat Foto",
-              //         style: GoogleFonts.inter(
-              //             color: Constanst.infoLight,
-              //             fontWeight: FontWeight.w400,
-              //             fontSize: 14),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 16),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Text(
+                //           "Tipe Absen",
+                //           style: GoogleFonts.inter(
+                //               color: Constanst.fgPrimary,
+                //               fontWeight: FontWeight.w500,
+                //               fontSize: 16),
+                //         ),
+                //         SizedBox(
+                //           child: Padding(
+                //             padding: const EdgeInsets.only(top: 4),
+                //             child: Text(
+                //               'Foto',
+                //               style: GoogleFonts.inter(
+                //                   color: Constanst.fgSecondary,
+                //                   fontWeight: FontWeight.w400,
+                //                   fontSize: 14),
+                //             ),
+                //           ),
+                //         )
+                //       ],
+                //     ),
+                //     InkWell(
+                //       onTap: () {
+                //         Get.to(PhotoAbsen(
+                //           image: Api.UrlfotoAbsen + gambarMasuk,
+                //           type: "masuk",
+                //           time: jamMasuk,
+                //           alamat: alamatMasuk + "({$placeIn})",
+                //           note: catatanMasuk,
+                //         ));
+                //       },
+                //       child: Text(
+                //         "Lihat Foto",
+                //         style: GoogleFonts.inter(
+                //             color: Constanst.infoLight,
+                //             fontWeight: FontWeight.w400,
+                //             fontSize: 14),
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // const SizedBox(height: 16),
               gambarMasuk != ''
                   ? Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

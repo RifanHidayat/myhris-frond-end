@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:siscom_operasional/controller/absen_controller.dart';
 import 'package:siscom_operasional/controller/laporan_absen_karyawan_controller.dart';
 import 'package:siscom_operasional/model/absen_model.dart';
 import 'package:siscom_operasional/screen/absen/detail_absen.dart';
+import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/appbar_widget.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
@@ -20,6 +22,7 @@ class LaporanAbsenKaryawan extends StatefulWidget {
 
 class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
   var controller = Get.put(LaporanAbsenKaryawanController());
+  var controllerAbsen = Get.put(AbsenController());
 
   @override
   void initState() {
@@ -1254,8 +1257,135 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
   }
 
   Widget tampilan2(AbsenModel index) {
+
+    var startTime;
+    var endTime;
+    var startDate;
+    var endDate;
+    var now = DateTime.now();
+
+    TimeOfDay waktu1 = TimeOfDay(
+        hour: int.parse(
+            AppData.informasiUser![0].startTime.toString().split(':')[0]),
+        minute: int.parse(
+            AppData.informasiUser![0].startTime.toString().split(':')[1]));
+
+    TimeOfDay waktu2 = TimeOfDay(
+        hour: int.parse(
+            AppData.informasiUser![0].endTime.toString().split(':')[0]),
+        minute: int.parse(AppData.informasiUser![0].endTime
+            .toString()
+            .split(':')[1])); // Waktu kedua
+    print('ini waktu 1${AppData.informasiUser![0].startTime}');
+    int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
+    int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
+
+    //alur normal
+    if (totalMinutes1 < totalMinutes2) {
+// Menggabungkan tanggal hari ini dengan waktu dari string
+      startTime = DateTime.parse(
+          '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
+      endTime = DateTime.parse(
+          '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
+
+      //alur beda hari
+    } else if (totalMinutes1 > totalMinutes2) {
+      var waktu3 =
+          TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
+      int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
+
+      if (totalMinutes2 > totalMinutes3) {
+        print("masuk sini view las user");
+        var today;
+        if (index.atten_date!.isNotEmpty) {
+          today = DateTime.parse(index.atten_date!);
+        }
+        var yesterday = today.add(const Duration(days: 1));
+        startDate = DateFormat('yyyy-MM-dd').format(yesterday);
+        endDate = DateFormat('yyyy-MM-dd').format(today);
+        startTime = DateTime.parse(
+            '$startDate ${AppData.informasiUser![0].startTime}:00');
+        endTime =
+            DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
+        print('ini  bener gakl lu${startTime.isAfter(today)}');
+      } else {
+        var today;
+        print('masa lu kosong sih ${index.atten_date}');
+        if (index.atten_date!.isNotEmpty) {
+          today = DateTime.parse(index.atten_date!);
+        } else {
+          today = DateTime.now();
+        }
+        var yesterday = today.add(const Duration(days: 1));
+
+        startDate = DateFormat('yyyy-MM-dd').format(today);
+        endDate = DateFormat('yyyy-MM-dd').format(yesterday);
+
+        startTime = DateTime.parse(
+            '$startDate ${AppData.informasiUser![0].startTime}:00'); // Waktu kemarin
+        endTime =
+            DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
+        print(
+            'ini  bener gakl lu${startTime.isBefore(today)}'); // Waktu hari ini
+        print('ini  bener gakl lu${startTime}'); // Waktu hari ini
+        print('ini  bener gakl lu${endTime}'); // Waktu hari ini
+      }
+    } else {
+      startTime = AppData.informasiUser![0].startTime;
+      endTime = AppData.informasiUser![0].endTime;
+
+      startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      print(
+          "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
+    }
+    var tipeAbsen = AppData.informasiUser![0].tipeAbsen;
+    var tipeAlpha = AppData.informasiUser![0].tipeAlpha;
+    var list = tipeAlpha.toString().split(',').map(int.parse).toList();
+    print('ini tampilan 2 $tipeAbsen $tipeAlpha $list');
+    var masuk = list[0];
+    var keluar = list[1];
+    var istirahatMasuk = list[2];
+    var istirahatKeluar = list[3];
     var jamMasuk = index.signin_time ?? '';
     var jamKeluar = index.signout_time ?? '';
+    print(jamKeluar.isEmpty);
+    print(keluar);
+    var jamIstirahatMasuk = index.breakinTime ?? '';
+    var jamIstirahatKeluar = index.breakoutTime ?? '';
+    if (tipeAbsen == '2') {
+      if ((keluar == 1 && jamKeluar == '00:00:00') ||
+          (masuk == 1 && jamMasuk == '00:00:00')) {
+        controllerAbsen.tipeAlphaAbsen.value = 1;
+        if (jamMasuk == '00:00:00') {
+          controllerAbsen.catatanAlpha.value = '/ Gak Absen Masuk';
+        } else {
+          controllerAbsen.catatanAlpha.value = '/ Gak Absen Keluar';
+        }
+      } else {
+        controllerAbsen.tipeAlphaAbsen.value = 0;
+      }
+    } else if (tipeAbsen == '3') {
+      print('gak mungkin gak kemari');
+      if ((keluar == 1 && jamKeluar == '00:00:00') ||
+          (masuk == 1 && jamMasuk == '00:00:00') ||
+          (jamIstirahatKeluar == '00:00:00' && istirahatKeluar == 1) ||
+          (jamIstirahatMasuk == '00:00:00' && istirahatMasuk == 1)) {
+        print('masa gak kesini');
+        controllerAbsen.tipeAlphaAbsen.value = 1;
+        if (jamMasuk == '00:00:00') {
+          controllerAbsen.catatanAlpha.value = '/ Gak Absen Masuk';
+        } else if (jamKeluar == '00:00:00') {
+          controllerAbsen.catatanAlpha.value = '/ Gak Absen Keluar';
+        } else if (jamIstirahatKeluar == '00:00:00') {
+          controllerAbsen.catatanAlpha.value = '/ Gak Absen Istirahat Keluar';
+        } else if (jamIstirahatMasuk == '00:00:00') {
+          controllerAbsen.catatanAlpha.value = '/ Gak Absen Istirahat Masuk';
+        }
+      } else {
+        controllerAbsen.tipeAlphaAbsen.value = 0;
+      }
+    }
     var placeIn = index.place_in ?? '';
     var placeOut = index.place_out ?? '';
     var note = index.signin_note ?? '';
@@ -1628,7 +1758,30 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                           index.atten_date != "" || index.atten_date != null
                               ?
                               //tidak ada absen
-                              index.namaHariLibur != null
+                              controllerAbsen.tipeAlphaAbsen.value == 1 &&
+                                      (endTime.isBefore(now))
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 12),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Iconsax.info_circle,
+                                            size: 15,
+                                            color: Constanst.infoLight,
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          TextLabell(
+                                            text:
+                                                "ALPHA ${controllerAbsen.catatanAlpha.value}",
+                                            weight: FontWeight.w400,
+                                            size: 11.0,
+                                          ),
+                                        ],
+                                      ))
+                                  
+                              : index.namaHariLibur != null
                                   ? Padding(
                                       padding: const EdgeInsets.only(top: 12),
                                       child: Row(

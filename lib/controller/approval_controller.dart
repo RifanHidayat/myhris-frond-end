@@ -233,7 +233,8 @@ class ApprovalController extends GetxController {
             'image': element['image'],
             'apply_status': element['apply_status'],
             'apply2_status': element['apply2_status'],
-            'nama_tipe': element['nama_tipe']
+            'nama_tipe': element['nama_tipe'],
+            'cut_leave': element['cut_leave']
           };
           listData.value.add(data);
           listDataRiwayat.value.add(data);
@@ -1270,7 +1271,7 @@ class ApprovalController extends GetxController {
   }
 
   void getDetailData(idxDetail, emId, title, delegasi) {
-    if (title == "Cuti") {
+    if (title.toString().toLowerCase().contains('cuti')) {
       loadCutiPengaju(emId);
     }
     if (title != "Klaim") {
@@ -1388,6 +1389,7 @@ class ApprovalController extends GetxController {
     var connect = Api.connectionApi("post", body, "whereOnce-assign_leave");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
+        print('dat cuti ${res.body}');
         var valueBody = jsonDecode(res.body);
         if (valueBody['data'].isNotEmpty) {
           var totalDay = valueBody['data'][0]['total_day'];
@@ -1404,6 +1406,8 @@ class ApprovalController extends GetxController {
           statusHitungCuti.value = false;
           this.statusHitungCuti.refresh();
         }
+      } else {
+        print('erro data cuti user ${res.body}');
       }
     });
   }
@@ -1886,7 +1890,7 @@ class ApprovalController extends GetxController {
         'approve2_by': applyBy2,
         'approve2_id': applyId2,
         'tasks': listTask,
-        'total_persentase': totalPercent.value,
+        'total_persentase': totalPercent.isNaN ? 0.0 : totalPercent.value,
         'alasan1': alasan1.value.text,
         'alasan2': alasan2.value.text,
         'em_delegation': dataEditFinal[0]['em_delegation'],
@@ -1901,6 +1905,7 @@ class ApprovalController extends GetxController {
         "approve_status": applyStatus,
         "approve2_status": apply2Status
       };
+      print('inipersentasi cuti ${totalPercent.value}');
       print("body approval lembur ${body.toString()}");
       var connect = Api.connectionApi("post", body, url_tujuan);
       connect.then((dynamic res) {
@@ -2602,7 +2607,10 @@ class ApprovalController extends GetxController {
       'tanggal': tanggalSekarang,
       'nourut': '0001',
       'em_id': getEmidEmployee,
-      'absen': dataEditFinal[0]['leave_duration']==null ||dataEditFinal[0]['leave_duration']=='' ? 1 : dataEditFinal[0]['leave_duration'],
+      'absen': dataEditFinal[0]['leave_duration'] == null ||
+              dataEditFinal[0]['leave_duration'] == ''
+          ? 1
+          : dataEditFinal[0]['leave_duration'],
       'flag': '2'
     };
     print(body);
@@ -2611,7 +2619,7 @@ class ApprovalController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         UtilsAlert.showToast("${valueBody['message']}");
-      }else{
+      } else {
         UtilsAlert.showToast("${res.body}");
       }
     });
