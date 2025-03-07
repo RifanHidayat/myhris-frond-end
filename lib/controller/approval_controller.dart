@@ -1886,7 +1886,7 @@ class ApprovalController extends GetxController {
         'approve2_by': applyBy2,
         'approve2_id': applyId2,
         'tasks': listTask,
-        'total_persentase': totalPercent.value,
+        'total_persentase': totalPercent.isNaN ? 0.0 : totalPercent.value,
         'alasan1': alasan1.value.text,
         'alasan2': alasan2.value.text,
         'em_delegation': dataEditFinal[0]['em_delegation'],
