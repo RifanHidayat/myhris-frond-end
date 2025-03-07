@@ -95,6 +95,8 @@ class AbsenController extends GetxController {
   var catataanAjuan = TextEditingController();
   var imageAjuan = "".obs;
   var nomorAjuan = "".obs;
+  var tipeAlphaAbsen = 0.obs;
+  var catatanAlpha = ''.obs;
 
   var pengajuanAbsensi = [].obs;
 
@@ -2643,6 +2645,10 @@ class AbsenController extends GetxController {
     historyAbsenShow.value.clear();
 
     var dataUser = AppData.informasiUser;
+
+    print('ini dataUserALpha: ${dataUser![0].tipeAlpha}');
+    print('ini dataTipeAbsen: ${dataUser![0].tipeAbsen}');
+
 
     var getEmpId = dataUser![0].em_id;
     print(getEmpId);

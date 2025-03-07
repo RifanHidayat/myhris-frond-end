@@ -1172,10 +1172,15 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
 
   @override
   void initState() {
+    print(controller.detailData);
     controller.statusPemgajuanIzin.value = "none";
     controller.konsekuemsiList.clear();
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
+    print('ini apa yak ${widget.emId}');
+    print('ini apa yak ${controller.jumlahCuti}');
+    print('ini apa yak ${widget.title}');
+
     super.initState();
     var emId = AppData.informasiUser![0].em_id;
 
@@ -1242,6 +1247,9 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
 
   @override
   Widget build(BuildContext context) {
+    
+    var cutLeave = controller.detailData[0]['cut_leave'];
+    print('ini cut_leave ${cutLeave}');
     var totalKlaim = controller.detailData[0]['type'] == "Klaim"
         ? controller.detailData[0]['lainnya']['total_claim']
         : 0;
@@ -1439,10 +1447,10 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      controller.jumlahCuti.value == 0
+                       cutLeave == 0
                           ? const SizedBox()
                           : informasiSisaCuti(),
-                      controller.jumlahCuti.value == 0
+                      cutLeave == 0
                           ? const SizedBox()
                           : const SizedBox(height: 16),
                       Container(
@@ -2102,16 +2110,16 @@ class _DetailPersetujuanCutiState extends State<DetailPersetujuanCuti> {
                 ],
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                width: MediaQuery.of(Get.context!).size.width,
-                child: LinearPercentIndicator(
-                  barRadius: const Radius.circular(100.0),
-                  lineHeight: 8.0,
-                  padding: EdgeInsets.zero,
-                  percent: controller.persenCuti.value,
-                  progressColor: Constanst.colorPrimary,
-                ),
-              ),
+              // SizedBox(
+              //   width: MediaQuery.of(Get.context!).size.width,
+              //   child: LinearPercentIndicator(
+              //     barRadius: const Radius.circular(100.0),
+              //     lineHeight: 8.0,
+              //     padding: EdgeInsets.zero,
+              //     percent: controller.persenCuti.value,
+              //     progressColor: Constanst.colorPrimary,
+              //   ),
+              // ),
 
               // Text("Cuti Khusus"),
             ],

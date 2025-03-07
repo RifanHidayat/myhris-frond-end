@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:siscom_operasional/controller/approval_controller.dart';
 import 'package:siscom_operasional/controller/global_controller.dart';
+import 'package:siscom_operasional/main.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
@@ -772,7 +773,8 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
   void initState() {
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
-    controller.infoIds(widget.emIds);
+        print('ini emIdz user ${widget.emIds}');
+    controller.infoIds(widget.emIds == null? controllerApproval.detailData[0]['em_ids'] : widget.emIds);
     controller.infoTask(widget.emId);
 
     super.initState();
