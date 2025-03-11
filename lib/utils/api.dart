@@ -28,8 +28,7 @@ class Api {
   //  static var basicUrl = "http://kantor.membersis.com:2627/";
 //
   // API LOCAL
-  // static var basicUrl = "http://192.168.20.13:2627/";
-//
+  // static var basicUrl = "http://192.168.20.23:2627/";
 
   static var urlImage = 'https://imagehris.siscom.id:4431';
 
@@ -106,7 +105,7 @@ class Api {
         final url = Uri.parse(getUrl);
         final response =
             await post(url, body: jsonEncode(valFormData), headers: headers);
-        if (response.statusCode == 402) {
+        if (response.statusCode == 400) {
           var authController = Get.put(AuthController());
           var res = jsonDecode(response.body);
           var resp = res['message'];
@@ -212,7 +211,7 @@ class ApiRequest {
   static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API LOCAL
-  // static var basicUrl = "http://192.168.20.13:2627/";
+  // static var basicUrl = "http://192.168.20.23:2627/";
 
   // API DEV
   //  static var basicUrl = "http://kantor.membersis.com:2627/";

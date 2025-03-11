@@ -61,6 +61,7 @@ import 'package:siscom_operasional/screen/absen/riwayat_cuti.dart';
 import 'package:siscom_operasional/screen/absen/izin.dart';
 import 'package:siscom_operasional/screen/bpjs/bpjs_kesehatan.dart';
 import 'package:siscom_operasional/screen/bpjs/bpjs_ketenagakerjaan.dart';
+import 'package:siscom_operasional/screen/daily_task/daily_task.dart';
 import 'package:siscom_operasional/screen/init_screen.dart';
 
 import 'package:siscom_operasional/screen/kandidat/form_kandidat.dart';
@@ -235,7 +236,6 @@ class DashboardController extends GetxController {
     // DateTime startDate = await NTP.now();
 
     DateTime startDate = DateTime.now();
-    updateInformasiUser();
 
     // if (AppData.informasiUser != null && AppData.informasiUser!.isNotEmpty) {
     var emId = AppData.informasiUser![0].em_id.toString();
@@ -1186,6 +1186,7 @@ class DashboardController extends GetxController {
 
     //alur normal
     if (totalMinutes1 < totalMinutes2) {
+      print('ini 1');
       startTime = AppData.informasiUser![0].startTime;
       endTime = AppData.informasiUser![0].endTime;
 
@@ -1194,6 +1195,7 @@ class DashboardController extends GetxController {
 
       //alur beda hari
     } else if (totalMinutes1 > totalMinutes2) {
+
       var waktu3 =
           TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
       int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
@@ -1216,7 +1218,7 @@ class DashboardController extends GetxController {
         endTime = AppData.informasiUser![0].startTime;
 
         endDate = DateFormat('yyyy-MM-dd')
-            .format(DateTime.now().add(const Duration(days: 2)));
+            .format(DateTime.now().add(const Duration(days: 1)));
 
         startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
       }
@@ -1231,7 +1233,7 @@ class DashboardController extends GetxController {
     }
     Map<String, dynamic> body = {
       'atten_date': DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().add(const Duration(days: -1))),
+          .format(DateTime.now()),
       'em_id': getEmid,
       'database': AppData.selectedDatabase,
       'start_date': startDate,
@@ -2617,6 +2619,7 @@ class DashboardController extends GetxController {
             lamaBekerjaFormat: element['lama_bekerja_format'],
             branchId: element['branch_id'],
             tipeAbsen: element['tipe_absen'],
+            tipeAlpha: element['tipe_alpha'],
             periodeAwal: element['periode_awal'],
           );
           print('ini branch id ${element['branch_id']}');
@@ -2664,10 +2667,11 @@ class DashboardController extends GetxController {
       print("data body ${body}");
 
       if (valueBody['status'] == false) {
+        print("data work time ${valueBody}");
         timeIn.value = AppData.informasiUser![0].timeIn;
         timeOut.value = AppData.informasiUser![0].timeOut;
       } else {
-        print("data work time ${valueBody['data']}");
+        print("data work time ${valueBody['data']['time_in']}");
         timeIn.value = valueBody['data']['time_in'];
         timeOut.value = valueBody['data']['time_out'];
       }
@@ -3061,20 +3065,7 @@ class DashboardController extends GetxController {
           }
         }
       });
-      // .catchError((error) async {
-      //   bannerDashboard.clear();
-      //   var banners = await SqliteDatabaseHelper().getBanners();
-      //   bannerDashboard.value = banners;
-      //   bannerDashboard.refresh();
-      // });
     });
-    // } else {
-    //   bannerDashboard.clear();
-    //   var banners = await SqliteDatabaseHelper().getBanners();
-    //   bannerDashboard.value = banners;
-    //   print(" banner :${bannerDashboard.value}");
-    //   bannerDashboard.refresh();
-    // }
   }
 
   Future<void> _getTime() async {
@@ -3212,7 +3203,7 @@ class DashboardController extends GetxController {
   }
 
   void routePageDashboard(url, arguments) {
-    print(url);
+    print('ini url menu dasboard ${url}');
     if (url == "HistoryAbsen") {
       Get.to(HistoryAbsen(), arguments: arguments);
     } else if (url == "TidakMasukKerja") {
@@ -3224,7 +3215,10 @@ class DashboardController extends GetxController {
       Get.to(FormPengajuanCuti(
         dataForm: [[], false],
       ));
-    } else if (url == "RiwayatCuti") {
+    } else if (url == "DailyTask") {
+      Get.to(DailyTask());
+    } 
+    else if (url == "RiwayatCuti") {
       Get.to(RiwayatCuti(), arguments: arguments);
       // } else if (url == "Izin") {
       //   Get.to(Izin(), arguments: arguments);

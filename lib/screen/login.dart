@@ -407,6 +407,7 @@ class Login extends StatelessWidget {
                               if (internetController.isConnected.value) {
                                 print('lah kemari lu');
                                 await controller.peraturanPerusahaan();
+                                // await controller.loginUser();
                               } else {
                                 String? savedEmail = AppData.emailUser;
                                 String? savedPassword = AppData.passwordUser;
