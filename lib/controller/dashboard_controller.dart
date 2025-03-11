@@ -236,7 +236,6 @@ class DashboardController extends GetxController {
     // DateTime startDate = await NTP.now();
 
     DateTime startDate = DateTime.now();
-    updateInformasiUser();
 
     // if (AppData.informasiUser != null && AppData.informasiUser!.isNotEmpty) {
     var emId = AppData.informasiUser![0].em_id.toString();
@@ -3066,20 +3065,7 @@ class DashboardController extends GetxController {
           }
         }
       });
-      // .catchError((error) async {
-      //   bannerDashboard.clear();
-      //   var banners = await SqliteDatabaseHelper().getBanners();
-      //   bannerDashboard.value = banners;
-      //   bannerDashboard.refresh();
-      // });
     });
-    // } else {
-    //   bannerDashboard.clear();
-    //   var banners = await SqliteDatabaseHelper().getBanners();
-    //   bannerDashboard.value = banners;
-    //   print(" banner :${bannerDashboard.value}");
-    //   bannerDashboard.refresh();
-    // }
   }
 
   Future<void> _getTime() async {

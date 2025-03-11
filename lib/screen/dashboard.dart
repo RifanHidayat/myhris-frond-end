@@ -103,7 +103,6 @@ class _DashboardState extends State<Dashboard> {
       absenControllre.getPosisition(),
       absenControllre.getPlaceCoordinate(),
       controller.checkperaturanPerusahaan(emId),
-      controller.updateInformasiUser(),
       controller.showDialogHistoryTerlambat(),
       controllerBpj.employeDetaiBpjs(),
       controllerAbsensi.employeDetail(),

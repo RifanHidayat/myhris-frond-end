@@ -25,6 +25,7 @@ import 'package:ntp/ntp.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:siscom_operasional/controller/dashboard_controller.dart';
 // import 'package:siscom_operasional/controller/dashboard_controller.dart';
 import 'package:siscom_operasional/model/absen_model.dart';
 import 'package:siscom_operasional/model/detail_tracking.dart';
@@ -275,6 +276,7 @@ class TrackingController extends GetxController {
   @override
   void onReady() async {
     print("Masulk ke controller absen");
+    DashboardController().updateInformasiUser();
     getTimeNow();
     getLoadsysData();
     loadHistoryAbsenUser();
