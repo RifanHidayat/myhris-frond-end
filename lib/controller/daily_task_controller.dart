@@ -3,69 +3,171 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/widgets.dart';
 import 'package:siscom_operasional/model/daily_task_model.dart';
+import 'package:siscom_operasional/screen/daily_task/daily_task.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
+import 'package:siscom_operasional/utils/constans.dart';
+import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class DailyTaskController extends GetxController {
   var tipeAlphaAbsen = 0.obs;
   var catatanAlpha = ''.obs;
   var allTask = <DailyTaskModel>[].obs;
   var listTask = [].obs;
+  var idTask = ''.obs;
   var tanggalTask = TextEditingController().obs;
   var task = [].obs;
   var catatan = TextEditingController().obs;
-    Rx<DateTime> initialDate = DateTime.now().obs;
+  Rx<DateTime> initialDate = DateTime.now().obs;
+  var statusForm = false.obs;
+  var tahunSelectedSearchHistory = ''.obs;
+  var bulanSelectedSearchHistory = ''.obs;
+  var bulanDanTahunNow = "".obs;
+  var monitoringList = [].obs;
+  var date = DateTime.now().obs;
+  var tanggal = ''.obs;
+  var emId = ''.obs;
+  var tempNamaStatus1 = "".obs;
+  var tempTask = ''.obs;
+  var tempDifficulty = 0.obs;
+  var tempTitle = ''.obs;
+  var tempTanggalSelesai = ''.obs;
+  var tempStatus = 0.obs;
 
-  
-  
-  void kirimDailyTask() {
-    var polaInput = DateFormat('EEEE, dd-MM-yyyy', 'id'); // 'id' untuk lokal Indonesia
-  var polaOutput = DateFormat('yyyy-MM-dd');
-  var atten_date;
-  try {
-    // Parsing tanggal sesuai pola input
-    var parsedDate = polaInput.parse(tanggalTask.value.text);
-    
-    // Format kembali tanggal menjadi 'yyyy-MM-dd'
-    atten_date = polaOutput.format(parsedDate);
-
-    print('Tanggal Terformat: $atten_date');
-  } catch (e) {
-    print('Format tanggal tidak valid: ${tanggalTask.value.text}');
+  @override
+  void onReady() async {
+    await getTimeNow();
   }
+
+  void updateStatus(int index, String status) {
+    listTask[index]['dropdown'] = status;
+    listTask[index]['tgl_finish'] == '' &&
+            listTask[index]['dropdown'] == 'Finished'
+        ? listTask[index]['tgl_finish'] =
+            Constanst.convertDate("${DateTime.now()}")
+        : listTask[index]['dropdown'] == 'Ongoing'
+            ? listTask[index]['tgl_finish'] = ''
+            : listTask[index]['tgl_finish'];
+    listTask.refresh();
+  }
+
+  void getMonitor() async {
+    monitoringList.clear();
+    var connect = Api.connectionApi("get", {}, "getDailyMonitoring");
+    connect.then(
+      (dynamic response) {
+        if (response.statusCode == 200) {
+          var data = jsonDecode(response.body)['data'];
+          print(data);
+          monitoringList.add(data);
+          print(monitoringList);
+          tempNamaStatus1.value = monitoringList[0][0]['full_name'];
+          emId.value = monitoringList[0][0]['em_id'];
+          print('ini emid dari monitoring ${emId.value}');
+          loadAllTask(emId.value);
+        } else {
+          // Get.snackbar("error", "gagal");
+        }
+      },
+    );
+  }
+
+  void kirimDailyTask() {
+    if (tanggalTask.value.text == '' || tanggalTask.value.text == '') {
+      Get.back();
+      UtilsAlert.showToast('Tanggal Tidak boleh kosong');
+      return;
+    }
+    bool isTaskEmpty = listTask.any(
+        (task) => task['judul'].trim().isEmpty || task['task'].trim().isEmpty);
+    if (isTaskEmpty) {
+      Get.back();
+      UtilsAlert.showToast('Judul task atau rincian tidak boleh kosong');
+      return;
+    }
+    var polaInput =
+        DateFormat('EEEE, dd-MM-yyyy', 'id'); // 'id' untuk lokal Indonesia
+    var polaOutput = DateFormat('yyyy-MM-dd');
+    var atten_date;
+    var emId = AppData.informasiUser![0].em_id;
+    try {
+      var parsedDate = polaInput.parse(tanggalTask.value.text);
+      atten_date = polaOutput.format(parsedDate);
+      print('Tanggal Terformat: $atten_date');
+    } catch (e) {
+      print('Format tanggal tidak valid: ${tanggalTask.value.text}');
+    }
+
+    print(task);
 
     Map<String, dynamic> body = {
       'atten_date': atten_date,
-      'em_id': AppData.informasiUser![0].em_id,
+      'em_id': emId,
+      'id': listTask.isEmpty ? "" : task[0]['daily_task_id'],
       'list_task': listTask,
     };
-    var connect = Api.connectionApi("post", body, "insertTaskDaily");
-    connect.then((dynamic res) {
-      if (res.statusCode == 200) {
+    
+    if (statusForm.value == false) {
+      var connect = Api.connectionApi("post", body, "insertTaskDaily");
+      connect.then((dynamic res) {
         var valueBody = jsonDecode(res.body);
-        print(valueBody);
-        
+        if (res.statusCode == 200) {
+          print(valueBody);
+          Get.back();
+          Get.back();
+          loadAllTask(emId);
+          UtilsAlert.showToast(valueBody.message);
+        } else {
+          UtilsAlert.showToast(valueBody['message']);
+          print(valueBody['message']);
+          Get.back();
         }
-    });
+      });
+    } else {
+      var connect = Api.connectionApi("post", body, "updateTaskDaily");
+      connect.then((dynamic res) {
+        var valueBody = jsonDecode(res.body);
+        if (res.statusCode == 200) {
+          print(valueBody);
+          Get.back();
+          Get.back();
+          loadAllTask(emId);
+          UtilsAlert.showToast(valueBody['message']);
+        } else {
+          UtilsAlert.showToast(valueBody['message']);
+          print(valueBody['message']);
+          Get.back();
+        }
+      });
+    }
   }
 
-  void loadAllTask() {
+  Future<void> getTimeNow() async {
+    var dt = DateTime.parse(AppData.endPeriode);
+    bulanSelectedSearchHistory.value = "${dt.month}";
+    tahunSelectedSearchHistory.value = "${dt.year}";
+    bulanDanTahunNow.value = "${dt.month}-${dt.year}";
+    tanggal.value = '${dt.year}-${dt.month}-${dt.hour}';
+  }
+
+  void loadAllTask(emId) {
     allTask.clear();
     Map<String, dynamic> body = {
-      'atten_date': '2025-03-06',
-      'em_id': AppData.informasiUser![0].em_id,
-      'bulan': '03',
-      'tahun': '2025',
+      'atten_date': tanggal.value,
+      'em_id': emId,
+      'bulan': bulanSelectedSearchHistory.value,
+      'tahun': tahunSelectedSearchHistory.value,
     };
     var connect = Api.connectionApi("post", body, "getAllTaskDaily");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        print(valueBody);
+        print('ini data daily ${valueBody['data']}');
         for (var element in valueBody['data'][0]) {
           allTask.add(DailyTaskModel(
-              date: element['date']?? '',
+              date: element['date'] ?? '',
               id: element['id'] ?? 0,
               em_id: element['em_id'] ?? "",
               atten_date: element['tgl_buat'],
@@ -99,9 +201,9 @@ class DailyTaskController extends GetxController {
               namaHariLibur: element['hari_libur'],
               jamKerja: element['jam_kerja'],
               jamPulang: element['jam_pulang'],
-              breakoutTime: element['breakout_time'],
-              breakoutNote: element['breakout_note'],
-              breakoutPict: element['breakout_pict'],
+              breakoutTime: element['total_status_0'],
+              breakoutNote: element['total_status_1'],
+              breakoutPict: element['jumlah_task'],
               breakoutPlace: element['place_break_out'],
               breakinTime: element['breakin_time'],
               breakinNote: element['breakin_note'],
@@ -115,20 +217,37 @@ class DailyTaskController extends GetxController {
     });
   }
 
-  void loadTask(id) {
+  Future<void> loadTask(id) async {
+    listTask.clear();
     task.clear();
-    Map<String, dynamic> body = {
-      'id': id,
-    };
-    var connect = Api.connectionApi("post", body, "getTaskDaily");
-    connect.then((dynamic res) {
+    Map<String, dynamic> body = {'id': id};
+    try {
+      var res = await Api.connectionApi("post", body, "getTaskDaily");
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        print('ini isi nya : ${valueBody}');
-        task.add(valueBody['data']);
-        print('ini  task $task');
-      }
-    });
-  }
+        var dataList =
+            valueBody['data'] is List ? valueBody['data'] : [valueBody['data']];
+        task.addAll(dataList);
+        for (var tas in dataList) {
+          listTask.add({
+            'id': tas['id'],
+            'judul': tas['judul'],
+            'task': tas['rincian'],
+            'level': tas['level'],
+            'status': tas['status'],
+            'tgl_finish': tas['tgl_finish'] == null
+                ? ''
+                : Constanst.convertDate(tas['tgl_finish'])
+          });
+        }
 
+        print('ini task $task');
+        Get.back();
+      } else {
+        print("Error: ${res.statusCode} - ${res.body}");
+      }
+    } catch (e) {
+      print("Exception saat load task: $e");
+    }
+  }
 }

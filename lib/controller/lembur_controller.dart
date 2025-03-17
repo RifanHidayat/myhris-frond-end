@@ -17,6 +17,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LemburController extends GetxController {
+  var isFormChanged = false.obs;
   var nomorAjuan = TextEditingController().obs;
   var tanggalLembur = TextEditingController().obs;
   var dariJam = TextEditingController().obs;
@@ -37,8 +38,13 @@ class LemburController extends GetxController {
   var statusFormPencarian = false.obs;
   var statusFormPencarianBerhubungan = false.obs;
   var statusFormPencarianAtas = false.obs;
-
+  var focusNodes = <FocusNode>[].obs;
+  var keyboardStates = <bool>[].obs;
+  var listTaskControllers = <TextEditingController>[].obs;
+  var statusDraft = ''.obs;
   var tempNamaStatus1 = "Semua Status".obs;
+  var tempTask = ''.obs;
+  var tempDifficulty = 0.obs;
 
   var bulanSelectedSearchHistory = "".obs;
   var tahunSelectedSearchHistory = "".obs;
@@ -82,8 +88,24 @@ class LemburController extends GetxController {
     "Pending"
   ];
 
-  GlobalController globalCt = Get.put(GlobalController());
+  void removeTask(int index) {
+    listTask.removeAt(index);
+    listTaskControllers[index].dispose();
+    focusNodes[index].dispose();
+    listTaskControllers.removeAt(index);
+    focusNodes.removeAt(index);
+    keyboardStates.removeAt(index);
+  }
 
+  void setFormChanged() {
+    isFormChanged.value = true;
+  }
+
+  void resetFormState() {
+    isFormChanged.value = false;
+  }
+
+  GlobalController globalCt = Get.put(GlobalController());
   @override
   void onReady() async {
     print("on ready");
@@ -531,33 +553,76 @@ class LemburController extends GetxController {
     });
   }
 
+
   void validasiKirimPengajuan() {
     print("data selected ${selectedTypeLembur.value}");
     bool isTaskEmpty = listTask.any((task) => task['task'].trim().isEmpty);
     print('ini isTaskEmpaty ${isTaskEmpty}');
-    if (tanggalLembur.value.text == "" ||
-        dariJam.value.text == "" ||
-        sampaiJam.value.text == "" ||
-        selectedTypeLembur.value == "" ||
-        catatan.value.text == "" ||
-        selectedDropdownDelegasi.value == "" ||
-        selectedDropdownEmploy.isEmpty ||
-        (listTask.isEmpty && dinilai.value == 'N')) {
-      print('ini kepangil');
-      UtilsAlert.showToast("Lengkapi form *");
-    } else if (isTaskEmpty){
-      UtilsAlert.showToast("Wajib isi keterangan task");
-    }
-    else {
-      if (statusForm.value == false) {
-        print('ini kepangil');
-        UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
-        checkNomorAjuan();
-      } else {
-        print('ini kepangil');
-        UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
-        kirimPengajuan(nomorAjuan.value.text);
+    if (statusDraft.value != 'draft') {
+      if (selectedTypeLembur.value == '') {
+        showGeneralDialog(
+      barrierDismissible: false,
+      context: Get.context!,
+      barrierColor: Colors.black54, // space around dialog
+      transitionDuration: Duration(milliseconds: 200),
+      transitionBuilder: (context, a1, a2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+              parent: a1,
+              curve: Curves.elasticOut,
+              reverseCurve: Curves.easeOutCubic),
+          child: CustomDialog(
+            // our custom dialog
+            title: "Peringatan",
+            content: " Anda belum punya hak lembur, kalau ada pertanyaan silahkan menghubungi HRD",
+            positiveBtnText: "Hubungi HRD",
+            negativeBtnText: "Tidak",
+            style: 1,
+            buttonStatus: 1,
+            positiveBtnPressed: () async {
+              var global = globalCt.dataHrd[0];
+              print('ini glonal hrd ${global}');
+              var full_name =
+                          global[0]['full_name'];
+                      
+                      var nohp = global[0]['em_mobile'];
+                      var jeniKelamin =
+                          global[0]['em_gender'];
+              globalCt.kirimKonfirmasiWaHrd(full_name, nohp, jeniKelamin);
+            },
+          ),
+        );
+      },
+      pageBuilder: (BuildContext context, Animation animation,
+          Animation secondaryAnimation) {
+        return null!;
+      },
+    );
       }
+      if (tanggalLembur.value.text == "" ||
+          dariJam.value.text == "" ||
+          sampaiJam.value.text == "" ||
+          catatan.value.text == "" ||
+          selectedDropdownDelegasi.value == "" ||
+          selectedDropdownEmploy.isEmpty ||
+          (listTask.isEmpty && dinilai.value == 'N')) {
+        print('ini kepangil');
+        UtilsAlert.showToast("Lengkapi form *");
+      } else if (isTaskEmpty) {
+        UtilsAlert.showToast("Wajib isi keterangan task");
+      } else {
+        if (statusForm.value == false) {
+          print('ini kepangil');
+          UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
+          checkNomorAjuan();
+        } else {
+          print('ini kepangil');
+          UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
+          kirimPengajuan(nomorAjuan.value.text);
+        }
+      }
+    } else {
+      kirimPengajuan(nomorAjuan.value.text);
     }
   }
 
@@ -615,16 +680,34 @@ class LemburController extends GetxController {
     // check id type lembur
     var finalIdLembur = checkLembur();
     var listTanggal = tanggalLembur.value.text.split(',');
-    var getTanggal = listTanggal[1].replaceAll(' ', '');
-    var tanggalLemburEditData = Constanst.convertDateSimpan(getTanggal);
+    var getTanggal = listTanggal.isNotEmpty && listTanggal[0].trim().isNotEmpty
+        ? (listTanggal.length > 1
+            ? listTanggal[1].trim()
+            : listTanggal[0].trim())
+        : DateFormat('yyyy-MM-dd')
+            .format(DateTime.now()); // Gunakan tanggal sekarang jika kosong
+
+    print('ini get tanggal ${getTanggal}');
+    var tanggalLemburEditData;
+    var polaFormat = DateFormat('yyyy-MM-dd');
+    var tanggalPengajuanInsert;
+    try {
+      tanggalLemburEditData = Constanst.convertDateSimpan(getTanggal);
+      tanggalPengajuanInsert = polaFormat.format(initialDate.value);
+      print('Tanggal berhasil dikonversi: $tanggalLemburEditData');
+      print('Tanggal berhasil dikonversi: $tanggalPengajuanInsert');
+    } catch (e) {
+      print('Error saat mengonversi tanggal: $e');
+      tanggalLemburEditData = polaFormat.format(DateTime.now());
+      tanggalPengajuanInsert = polaFormat.format(DateTime.now());
+    }
     var dataUser = AppData.informasiUser;
     var getEmid = dataUser![0].em_id;
     var getFullName = dataUser[0].full_name;
     var validasiDelegasiSelected = validasiSelectedDelegasi();
     var validasiEmploySelected = validasiSelectedEmploy();
     var validasiDelegasiSelectedToken = validasiSelectedDelegasiToken();
-    var polaFormat = DateFormat('yyyy-MM-dd');
-    var tanggalPengajuanInsert = polaFormat.format(initialDate.value);
+
     var finalTanggalPengajuan = statusForm.value == false
         ? tanggalPengajuanInsert
         : tanggalLemburEditData;
@@ -633,8 +716,9 @@ class LemburController extends GetxController {
       'em_id': getEmid,
       'typeid': finalIdLembur,
       'nomor_ajuan': getNomorAjuanTerakhir,
-      'dari_jam': dariJam.value.text,
-      'sampai_jam': sampaiJam.value.text,
+      'dari_jam': dariJam.value.text == '' ? '00:00:00' : dariJam.value.text,
+      'sampai_jam':
+          sampaiJam.value.text == '' ? '00:00:00' : sampaiJam.value.text,
       'durasi': hasilDurasi,
       'atten_date': finalTanggalPengajuan,
       'status': 'PENDING',
@@ -646,33 +730,104 @@ class LemburController extends GetxController {
       'ajuan': '1',
       'created_by': getEmid,
       'menu_name': 'Lembur',
-      'approve_status': "pending"
+      'approve_status': "pending",
+      'status_pengajuan': statusDraft.value
     };
     var typeNotifFcm = "Pengajuan Lembur";
     print('ini body $body');
     print('ini status form ${statusForm.value}');
-    if (statusForm.value == false) {
-      print("sampe sini input");
-      body['activity_name'] =
-          "Membuat Pengajuan Lembur. alasan = ${catatan.value.text}";
-      var connect = Api.connectionApi("post", body, "lembur");
-      connect.then((dynamic res) {
-        var valueBody = jsonDecode(res.body);
-        if (res.statusCode == 200) {
-          if (valueBody['status'] == true) {
-            var stringWaktu =
-                "${dariJam.value.text} sd ${sampaiJam.value.text}";
-            // kirimNotifikasiToDelegasi(
-            //     getFullName,
-            //     finalTanggalPengajuan,
-            //     validasiDelegasiSelected,
-            //     validasiDelegasiSelectedToken,
-            //     stringWaktu,
-            //     typeNotifFcm);
-            // kirimNotifikasiToReportTo(getFullName, finalTanggalPengajuan,
-            //     getEmid, "Lembur", stringWaktu);
+    if (statusDraft != 'draft') {
+      if (statusForm.value == false) {
+        print("sampe sini input");
+        body['activity_name'] =
+            "Membuat Pengajuan Lembur. alasan = ${catatan.value.text}";
+        var connect = Api.connectionApi("post", body, "lembur");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            if (valueBody['status'] == true) {
+              var stringWaktu =
+                  "${dariJam.value.text} sd ${sampaiJam.value.text}";
+              // kirimNotifikasiToDelegasi(
+              //     getFullName,
+              //     finalTanggalPengajuan,
+              //     validasiDelegasiSelected,
+              //     validasiDelegasiSelectedToken,
+              //     stringWaktu,
+              //     typeNotifFcm);
+              // kirimNotifikasiToReportTo(getFullName, finalTanggalPengajuan,
+              //     getEmid, "Lembur", stringWaktu);
+              Navigator.pop(Get.context!);
+              var pesan1 = "Pengajuan lembur berhasil dibuat";
+              var pesan2 =
+                  "Selanjutnya silahkan menunggu atasan kamu untuk menyetujui pengajuan yang telah dibuat atau langsung";
+              var pesan3 = "konfirmasi via WhatsApp";
+              var dataPengajuan = {
+                'nameType': 'LEMBUR',
+                'nomor_ajuan': '${getNomorAjuanTerakhir}',
+              };
+              for (var item in globalCt.konfirmasiAtasan) {
+                print(item['token_notif']);
+                var pesan;
+                if (item['em_gender'] == "PRIA") {
+                  pesan =
+                      "Hallo pak ${item['full_name']}, saya ${getFullName} mengajukan LEMBUR dengan nomor ajuan ${getNomorAjuanTerakhir}";
+                } else {
+                  pesan =
+                      "Hallo bu ${item['full_name']}, saya ${getFullName} mengajukan LEMBUR dengan nomor ajuan ${getNomorAjuanTerakhir}";
+                }
+                // kirimNotifikasiToDelegasi1(
+                //     getFullName,
+                //     finalTanggalPengajuan,
+                //     item['em_id'],
+                //     validasiDelegasiSelectedToken,
+                //     stringWaktu,
+                //     typeNotifFcm,
+                //     pesan);
+
+                // if (item['token_notif'] != null) {
+                //   globalCt.kirimNotifikasiFcm(
+                //       title: typeNotifFcm,
+                //       message: pesan,
+                //       tokens: item['token_notif']);
+                // }
+              }
+
+              Get.offAll(BerhasilPengajuan(
+                dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
+              ));
+            } else {
+              if (valueBody['message'] == "ulang") {
+                var nomorAjuanTerakhirDalamAntrian =
+                    valueBody['data'][0]['nomor_ajuan'];
+                checkNomorAjuanDalamAntrian(nomorAjuanTerakhirDalamAntrian);
+              }
+              if (valueBody['message'] == "date") {
+                Navigator.pop(Get.context!);
+                UtilsAlert.showToast(valueBody['error']);
+              } else {
+                Navigator.pop(Get.context!);
+                UtilsAlert.showToast(
+                    "Data periode $finalTanggalPengajuan belum tersedia, harap hubungi HRD");
+              }
+            }
+          } else {
+            Get.back();
+            UtilsAlert.showToast(valueBody['message']);
+          }
+        });
+      } else {
+        print('ini id pengajuan lembur : ${idpengajuanLembur.value}');
+        body['id'] = idpengajuanLembur.value;
+        body['cari'] = finalIdLembur;
+        body['activity_name'] =
+            "Edit Pengajuan Lembur. Tanggal Pengajuan = $finalTanggalPengajuan";
+        var connect = Api.connectionApi("post", body, "edit-lembur");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
             Navigator.pop(Get.context!);
-            var pesan1 = "Pengajuan lembur berhasil dibuat";
+            var pesan1 = "Pengajuan lembur berhasil di edit";
             var pesan2 =
                 "Selanjutnya silahkan menunggu atasan kamu untuk menyetujui pengajuan yang telah dibuat atau langsung";
             var pesan3 = "konfirmasi via WhatsApp";
@@ -680,85 +835,43 @@ class LemburController extends GetxController {
               'nameType': 'LEMBUR',
               'nomor_ajuan': '${getNomorAjuanTerakhir}',
             };
-            for (var item in globalCt.konfirmasiAtasan) {
-              print(item['token_notif']);
-              var pesan;
-              if (item['em_gender'] == "PRIA") {
-                pesan =
-                    "Hallo pak ${item['full_name']}, saya ${getFullName} mengajukan LEMBUR dengan nomor ajuan ${getNomorAjuanTerakhir}";
-              } else {
-                pesan =
-                    "Hallo bu ${item['full_name']}, saya ${getFullName} mengajukan LEMBUR dengan nomor ajuan ${getNomorAjuanTerakhir}";
-              }
-              // kirimNotifikasiToDelegasi1(
-              //     getFullName,
-              //     finalTanggalPengajuan,
-              //     item['em_id'],
-              //     validasiDelegasiSelectedToken,
-              //     stringWaktu,
-              //     typeNotifFcm,
-              //     pesan);
-
-              // if (item['token_notif'] != null) {
-              //   globalCt.kirimNotifikasiFcm(
-              //       title: typeNotifFcm,
-              //       message: pesan,
-              //       tokens: item['token_notif']);
-              // }
-            }
-
             Get.offAll(BerhasilPengajuan(
               dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
             ));
           } else {
-            if (valueBody['message'] == "ulang") {
-              var nomorAjuanTerakhirDalamAntrian =
-                  valueBody['data'][0]['nomor_ajuan'];
-              checkNomorAjuanDalamAntrian(nomorAjuanTerakhirDalamAntrian);
-            }
-            if (valueBody['message'] == "date") {
-              Navigator.pop(Get.context!);
-              UtilsAlert.showToast(valueBody['error']);
-            } else {
-              Navigator.pop(Get.context!);
-              UtilsAlert.showToast(
-                  "Data periode $finalTanggalPengajuan belum tersedia, harap hubungi HRD");
+            Get.back();
+            print(body);
+            print('error edit lembur ${res.statusCode} ${res.body}');
+            UtilsAlert.showToast(valueBody['message']);
+          }
+        });
+      }
+    } else {
+      if (statusForm.value == false) {
+        var connect = Api.connectionApi("post", body, "lembur_draft");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            if (valueBody['status'] == true) {
+              UtilsAlert.showToast('Berhasil Simpan Draft');
+              loadDataLembur();
             }
           }
-        } else {
-          Get.back();
-          UtilsAlert.showToast(valueBody['message']);
-        }
-      });
-    } else {
-      print('ini id pengajuan lembur : ${idpengajuanLembur.value}');
-      body['id'] = idpengajuanLembur.value;
-      body['cari'] = finalIdLembur;
-      body['activity_name'] =
-          "Edit Pengajuan Lembur. Tanggal Pengajuan = $finalTanggalPengajuan";
-      var connect = Api.connectionApi("post", body, "edit-lembur");
-      connect.then((dynamic res) {
-        var valueBody = jsonDecode(res.body);
-        if (res.statusCode == 200) {
-          Navigator.pop(Get.context!);
-          var pesan1 = "Pengajuan lembur berhasil di edit";
-          var pesan2 =
-              "Selanjutnya silahkan menunggu atasan kamu untuk menyetujui pengajuan yang telah dibuat atau langsung";
-          var pesan3 = "konfirmasi via WhatsApp";
-          var dataPengajuan = {
-            'nameType': 'LEMBUR',
-            'nomor_ajuan': '${getNomorAjuanTerakhir}',
-          };
-          Get.offAll(BerhasilPengajuan(
-            dataBerhasil: [pesan1, pesan2, pesan3, dataPengajuan],
-          ));
-        } else {
-          Get.back();
-          print(body);
-          print('error edit lembur ${res.statusCode} ${res.body}');
-          UtilsAlert.showToast(valueBody['message']);
-        }
-      });
+        });
+      } else {
+        body['id'] = idpengajuanLembur.value;
+        body['cari'] = finalIdLembur;
+        var connect = Api.connectionApi("post", body, "lembur_draft_update");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            if (valueBody['status'] == true) {
+              UtilsAlert.showToast('Berhasil Edit Draft');
+              loadDataLembur();
+            }
+          }
+        });
+      }
     }
   }
 
@@ -959,11 +1072,36 @@ class LemburController extends GetxController {
 
   String hitungDurasi() {
     var format = DateFormat("HH:mm");
-    var dari = format.parse("${dariJam.value.text}");
-    var sampai = format.parse("${sampaiJam.value.text}");
-    var hasil1 = "${sampai.difference(dari)}";
-    var hasilAkhir = hasil1.replaceAll(':00.000000', '');
-    return hasilAkhir;
+
+    try {
+      // Cek apakah input kosong, jika iya, gunakan waktu sekarang dengan format "HH:mm"
+      String dariText = dariJam.value.text.isNotEmpty
+          ? dariJam.value.text
+          : format.format(DateTime.now());
+      String sampaiText = sampaiJam.value.text.isNotEmpty
+          ? sampaiJam.value.text
+          : format.format(DateTime.now());
+
+      // Parsing jam
+      var dari = format.parse(dariText);
+      var sampai = format.parse(sampaiText);
+
+      // Jika 'sampai' lebih kecil dari 'dari', tambahkan satu hari ke 'sampai'
+      if (sampai.isBefore(dari)) {
+        sampai = sampai.add(Duration(days: 1));
+      }
+
+      // Hitung durasi dalam jam dan menit
+      Duration durasi = sampai.difference(dari);
+      int jam = durasi.inHours;
+      int menit = durasi.inMinutes % 60;
+
+      // Format output menjadi HH:mm
+      return "${jam.toString().padLeft(2, '0')}:${menit.toString().padLeft(2, '0')}";
+    } catch (e) {
+      print('Error parsing date: $e');
+      return "00:00"; // Default return jika terjadi error
+    }
   }
 
   void showModalBatalPengajuan(index) {
@@ -1102,7 +1240,8 @@ class LemburController extends GetxController {
     print('ini showDetailDataLembur $detailData');
     var nomorAjuan = detailData['nomor_ajuan'];
     var dinalai = detailData['dinalai'];
-    infoTask(nomorAjuan);
+    var id_lembur = detailData['id'];
+    infoTask(id_lembur);
     var tanggalMasukAjuan = detailData['atten_date'];
     var tanggalAjuan = detailData['tgl_ajuan'];
     var namaTypeAjuan = detailData['type'];
@@ -1467,14 +1606,15 @@ class LemburController extends GetxController {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text("Rejected by $approve",
-                                              style: GoogleFonts.inter(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Constanst.fgPrimary,
-                                                  fontSize: 14),
-                                                  maxLines: 1, 
-                                                  overflow: TextOverflow.ellipsis,
-                                              ),
+                                          Text(
+                                            "Rejected by $approve",
+                                            style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                color: Constanst.fgPrimary,
+                                                fontSize: 14),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                           const SizedBox(height: 6),
                                           Text(
                                             alasanReject,

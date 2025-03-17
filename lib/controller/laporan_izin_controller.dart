@@ -386,7 +386,8 @@ class LaporanIzinController extends GetxController {
       'tahun': tahunSelectedSearchHistory.value,
       'status': idDepartemenTerpilih.value,
       'branch_id': branchId.value,
-      'type': title.value
+      'type': title.value,
+      'leave_status': filterStatusAjuanTerpilih.value
     };
     var connect = Api.connectionApi("post", body, "load_laporan_pengajuan");
     connect.then((dynamic res) {
@@ -930,21 +931,21 @@ class LaporanIzinController extends GetxController {
 
   void filterStatusPengajuan(name) {
     List listFilterLokasi = [];
-    for (var element in allNameLaporanTidakhadirCopy.value) {
-      if (name == "Semua") {
-        listFilterLokasi.add(element);
-      } else {
-        if (title == "lembur" || title == "tugas_luar") {
-          if (element['status'] == name) {
-            listFilterLokasi.add(element);
-          }
-        } else {
-          if (element['leave_status'] == name) {
-            listFilterLokasi.add(element);
-          }
-        }
-      }
-    }
+    // for (var element in allNameLaporanTidakhadirCopy.value) {
+    //   if (name == "Semua") {
+    //     listFilterLokasi.add(element);
+    //   } else {
+    //     if (title == "lembur" || title == "tugas_luar") {
+    //       if (element['status'] == name) {
+    //         listFilterLokasi.add(element);
+    //       }
+    //     } else {
+    //       if (element['leave_status'] == name) {
+    //         listFilterLokasi.add(element);
+    //       }
+    //     }
+    //   }
+    // }
     allNameLaporanTidakhadir.value = listFilterLokasi;
     filterStatusAjuanTerpilih.value = name;
     this.allNameLaporanTidakhadir.refresh();
@@ -952,6 +953,7 @@ class LaporanIzinController extends GetxController {
     loadingString.value = allNameLaporanTidakhadir.value.length != 0
         ? "Memuat Data..."
         : "Tidak ada pengajuan";
+    aksiCariLaporan();
     Navigator.pop(Get.context!);
   }
 

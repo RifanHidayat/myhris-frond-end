@@ -1,4 +1,3 @@
-// ignore_for_file: deprecated_member_use
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:siscom_operasional/controller/lembur_controller.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
+import 'package:siscom_operasional/utils/custom_dialog.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 
@@ -27,6 +27,7 @@ class _FormLemburState extends State<FormLembur> {
   @override
   void initState() {
     super.initState();
+    print('ini data lembut status ${controller.isFormChanged.value}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('ini data lembur ${widget.dataForm![0]}');
       if (widget.dataForm![1] == true) {
@@ -57,182 +58,163 @@ class _FormLemburState extends State<FormLembur> {
         controller.getTypeLembur();
         controller.loadAllEmployeeDelegasi();
         controller.getUserInfo();
-        addNewTask();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Constanst.coloBackgroundScreen,
-      appBar: AppBar(
-          backgroundColor: Constanst.colorWhite,
-          elevation: 0,
-          leadingWidth: 50,
-          titleSpacing: 0,
-          centerTitle: true,
-          title: Text(
-            "Pengajuan Lembur",
-            style: GoogleFonts.inter(
+    return WillPopScope(
+      onWillPop: () async {
+        if (controller.isFormChanged.value == false) {
+          bool? confirmExit = await _showExitConfirmationDialog(context);
+          return confirmExit ?? false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: Constanst.coloBackgroundScreen,
+        appBar: AppBar(
+            backgroundColor: Constanst.colorWhite,
+            elevation: 0,
+            leadingWidth: 50,
+            titleSpacing: 0,
+            centerTitle: true,
+            title: Text(
+              "Pengajuan Lembur",
+              style: GoogleFonts.inter(
+                  color: Constanst.fgPrimary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20),
+            ),
+            leading: IconButton(
+              icon: Icon(
+                Iconsax.arrow_left,
                 color: Constanst.fgPrimary,
-                fontWeight: FontWeight.w500,
-                fontSize: 20),
-          ),
-          leading: IconButton(
-            icon: Icon(
-              Iconsax.arrow_left,
-              color: Constanst.fgPrimary,
-              size: 24,
-            ),
-            onPressed: () {
-              Get.back();
-            },
-          )),
-      body: SingleChildScrollView(
-        child: WillPopScope(
-            onWillPop: () async {
-              Get.back();
-              return true;
-            },
-            child: SafeArea(
-              child: Obx(
-                () => Column(
-                  children: [
-                    Obx(() => controller.statusJam.value.isNotEmpty
-                        ? Padding(
-                            padding:
-                                const EdgeInsets.only(right: 16.0, left: 16.0),
-                            child: UtilsAlert.infoContainer(
-                                controller.statusJam.value),
-                          )
-                        : const SizedBox(height: 18.0)),
-                    Padding(
-                        padding:
-                            const EdgeInsets.only(left: 16, right: 16, top: 8),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Constanst.fgBorder,
-                                width: 1.0,
-                              ),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(12))),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              controller.viewTypeLembur.value == false
-                                  ? const SizedBox()
-                                  : formType(),
-                              formHariDanTanggal(),
-                              formJam(),
-                              formDelegasiKepada(),
-                              Obx(() {
-                                return controller.dinilai.value == 'Y'
-                                    ? formTugasKepada()
-                                    : SizedBox();
-                              }),
-                              formCatatan(),
-                            ],
-                          ),
-                        )),
-                    formTugas(),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            addNewTask();
-                          },
-                          child: Text(
-                            '+  Tambah Task',
-                            style: TextStyle(color: Constanst.colorPrimary),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            backgroundColor: Constanst.colorWhite,
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(color: Constanst.colorPrimary),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                size: 24,
               ),
-            )),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(16.0),
-            ),
-            color: Constanst.colorWhite,
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                offset: Offset(0, 2.0),
-                blurRadius: 12.0,
-              )
-            ]),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
-            child: ElevatedButton(
               onPressed: () {
-                print("tes ${controller.dariJam.value.text.toString()}");
-                // TimeOfDay _startTime = TimeOfDay(
-                //     hour: int.parse(
-                //         controller.dariJam.value.text.toString().split(":")[0]),
-                //     minute: int.parse(controller.dariJam.value.text
-                //         .toString()
-                //         .split(":")[1]));
-                // TimeOfDay _endTime = TimeOfDay(
-                //     hour: int.parse(controller.sampaiJam.value.text
-                //         .toString()
-                //         .split(":")[0]),
-                //     minute: int.parse(controller.sampaiJam.value.text
-                //         .toString()
-                //         .split(":")[1]));
-
-                // if (_endTime.hour >= _startTime.hour) {
-                //   if (_endTime.hour == _startTime.hour) {
-                //     if (_endTime.minute < _startTime.minute) {
-                //       UtilsAlert.showToast(
-                //           "waktu yang dimasukan tidak valid, coba periksa lagi waktu lemburmu");
-
-                //       return;
-                //     }
-                //   }
-                //   print("masuk sini");
-                //   controller.validasiKirimPengajuan();
-                // } else {
-
-                //   UtilsAlert.showToast(
-                //       "waktu yang dimasukan tidak valid, coba periksa lagi waktu lemburmu");
-                // }
-
-                //
-
-                controller.validasiKirimPengajuan();
+                Get.back();
               },
-              style: ElevatedButton.styleFrom(
-                  foregroundColor: Constanst.colorWhite,
-                  backgroundColor: Constanst.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  elevation: 0,
-                  padding: const EdgeInsets.fromLTRB(0, 12, 0, 12)),
-              child: Text(
-                'Kirim',
-                style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    color: Constanst.colorWhite),
+            )),
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Obx(
+              () => Column(
+                children: [
+                  Obx(() => controller.statusJam.value.isNotEmpty
+                      ? Padding(
+                          padding:
+                              const EdgeInsets.only(right: 16.0, left: 16.0),
+                          child: UtilsAlert.infoContainer(
+                              controller.statusJam.value),
+                        )
+                      : const SizedBox(height: 18.0)),
+                  Padding(
+                      padding:
+                          const EdgeInsets.only(left: 16, right: 16, top: 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Constanst.fgBorder,
+                              width: 1.0,
+                            ),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(12))),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            controller.viewTypeLembur.value == false
+                                ? const SizedBox()
+                                : formType(),
+                            formHariDanTanggal(),
+                            formJam(),
+                            formDelegasiKepada(),
+                            Obx(() {
+                              return controller.dinilai.value == 'Y'
+                                  ? formTugasKepada()
+                                  : SizedBox();
+                            }),
+                            formCatatan(),
+                          ],
+                        ),
+                      )),
+                  buttonTambahTask(),
+                  formTugas(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16.0),
+              ),
+              color: Constanst.colorWhite,
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  offset: Offset(0, 2.0),
+                  blurRadius: 12.0,
+                )
+              ]),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  print("tes ${controller.dariJam.value.text.toString()}");
+                  // TimeOfDay _startTime = TimeOfDay(
+                  //     hour: int.parse(
+                  //         controller.dariJam.value.text.toString().split(":")[0]),
+                  //     minute: int.parse(controller.dariJam.value.text
+                  //         .toString()
+                  //         .split(":")[1]));
+                  // TimeOfDay _endTime = TimeOfDay(
+                  //     hour: int.parse(controller.sampaiJam.value.text
+                  //         .toString()
+                  //         .split(":")[0]),
+                  //     minute: int.parse(controller.sampaiJam.value.text
+                  //         .toString()
+                  //         .split(":")[1]));
+
+                  // if (_endTime.hour >= _startTime.hour) {
+                  //   if (_endTime.hour == _startTime.hour) {
+                  //     if (_endTime.minute < _startTime.minute) {
+                  //       UtilsAlert.showToast(
+                  //           "waktu yang dimasukan tidak valid, coba periksa lagi waktu lemburmu");
+
+                  //       return;
+                  //     }
+                  //   }
+                  //   print("masuk sini");
+                  //   controller.validasiKirimPengajuan();
+                  // } else {
+
+                  //   UtilsAlert.showToast(
+                  //       "waktu yang dimasukan tidak valid, coba periksa lagi waktu lemburmu");
+                  // }
+
+                  //
+                  controller.statusDraft.value = 'post';
+                  controller.validasiKirimPengajuan();
+                },
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Constanst.colorWhite,
+                    backgroundColor: Constanst.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                    padding: const EdgeInsets.fromLTRB(0, 12, 0, 12)),
+                child: Text(
+                  'Kirim',
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      color: Constanst.colorWhite),
+                ),
               ),
             ),
           ),
@@ -240,6 +222,65 @@ class _FormLemburState extends State<FormLembur> {
       ),
     );
   }
+
+  Future<bool?> _showExitConfirmationDialog(BuildContext context) async {
+    return await showGeneralDialog(
+      barrierDismissible: false,
+      context: Get.context!,
+      barrierColor: Colors.black54, // space around dialog
+      transitionDuration: Duration(milliseconds: 200),
+      transitionBuilder: (context, a1, a2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+              parent: a1,
+              curve: Curves.elasticOut,
+              reverseCurve: Curves.easeOutCubic),
+          child: CustomDialog(
+            // our custom dialog
+            icon: 0,
+            title: "Konfirmasi",
+            content: "Apakah Anda yakin ingin keluar? Semua perubahan akan di simpan di draft.",
+            positiveBtnText: "Ya",
+            negativeBtnText: "Tidak",
+            style: 1,
+            buttonStatus: 1,
+            positiveBtnPressed: () {
+              Get.back();
+              Get.back();
+              controller.statusDraft.value = 'draft';
+              controller.validasiKirimPengajuan();
+              Get.back(result: true);
+            },
+          ),
+        );
+      },
+      pageBuilder: (BuildContext context, Animation animation,
+          Animation secondaryAnimation) {
+        return null!;
+      },
+    );
+  }
+
+  // Future<bool?> _showExitConfirmationDialog(BuildContext context) async {
+  //   return await Get.defaultDialog<bool>(
+  //     title: "Konfirmasi",
+  //     content: Text(
+  //         "Apakah Anda yakin ingin keluar? Semua perubahan akan di simpan di draft."),
+  //     textConfirm: "Ya",
+  //     textCancel: "Tidak",
+  //     confirmTextColor: Colors.white,
+  //     onConfirm: () {
+  //       Get.back();
+  //       Get.back();
+  //       controller.statusDraft.value = 'draft';
+  //       controller.validasiKirimPengajuan();
+  //       Get.back(result: true);
+  //     },
+  //     onCancel: () {
+  //       // return true;
+  //     },
+  //   );
+  // }
 
   Widget formType() {
     return InkWell(
@@ -484,16 +525,6 @@ class _FormLemburState extends State<FormLembur> {
           } else {
             controller.statusJam.value = "";
           }
-          // DateTime now = DateTime.now();
-          // if (now.month == dateSelect.month) {
-          //   controller.initialDate.value = dateSelect;
-          //   controller.tanggalLembur.value.text =
-          //       Constanst.convertDate("$dateSelect");
-          //   this.controller.tanggalLembur.refresh();
-          // } else {
-          //   UtilsAlert.showToast(
-          //       "Tidak bisa memilih tanggal di luar bulan ini");
-          // }
         }
       },
       child: Column(
@@ -1474,46 +1505,67 @@ class _FormLemburState extends State<FormLembur> {
     );
   }
 
-  Widget formTugas() {
-    return Obx(
-      () => Column(
-          children: List.generate(controller.listTask.length, (index) {
-        var data = controller.listTask[index];
-        print('ini data listTask $data');
-        return Dismissible(
-          key: Key(data.hashCode.toString()),
-          direction: DismissDirection.startToEnd,
-          confirmDismiss: (direction) async {
-            if (controller.listTask.length == 1) {
-              UtilsAlert.showToast("Pastikan anda mengisi minimal 1 tugas");
-              return false;
-            } else {
-              return true;
-            }
-          },
-          onDismissed: (direction) {
-            controller.listTask.removeAt(index);
-          },
-          child: Padding(
-            padding: EdgeInsets.only(top: 16.0, right: 16.0, left: 16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: Constanst.fgBorder, width: 1.0),
-                  borderRadius: BorderRadius.circular(8.0)),
+  void bottomSheetTask(BuildContext context, {int? editIndex}) {
+    if (editIndex != null) {
+      controller.tempTask.value = controller.listTask[editIndex]["task"];
+      controller.tempDifficulty.value =
+          int.tryParse(controller.listTask[editIndex]["level"].toString()) ?? 0;
+    } else {
+      controller.tempTask.value = "";
+      controller.tempDifficulty.value = 1;
+    }
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Menjadikan full screen
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 1, // Full screen
+          minChildSize: 1, // Tidak bisa dikecilkan
+          maxChildSize: 1,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
               child: Padding(
-                padding: const EdgeInsets.only(right: 16.0, left: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 16.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('${index + 1}.'),
-                          const SizedBox(width: 12),
-                          Expanded(
+                padding: const EdgeInsets.only(top: 36.0),
+                child: Scaffold(
+                  appBar: PreferredSize(
+                    preferredSize: const Size.fromHeight(kToolbarHeight) * 1,
+                    child: AppBar(
+                      backgroundColor: Constanst.colorWhite,
+                      elevation: 0,
+                      titleSpacing: 0,
+                      centerTitle: true,
+                      title: Text(
+                        editIndex == null ? "Add your task" : "Edit your task",
+                        style: GoogleFonts.inter(
+                            color: Constanst.fgPrimary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18),
+                      ),
+                      leading: IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: Constanst.fgPrimary,
+                          size: 24,
+                        ),
+                        onPressed: () {
+                          Get.back();
+                        },
+                      ),
+                    ),
+                  ),
+                  body: Column(
+                    children: [
+                      // Konten utama
+                      Expanded(
+                        child: SingleChildScrollView(
+                          controller: scrollController,
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -1525,52 +1577,273 @@ class _FormLemburState extends State<FormLembur> {
                                 ),
                                 TextFormField(
                                   minLines: 1,
-                                  maxLines: 10,
-                                  controller:
-                                      TextEditingController(text: data['task']),
+                                  maxLines: 1000,
+                                  controller: TextEditingController(
+                                    text: controller.tempTask.value,
+                                  ),
                                   decoration: const InputDecoration(
                                     hintText: 'Tulis tugas anda disini',
                                     border: InputBorder.none,
                                   ),
                                   onChanged: (value) {
-                                    data['task'] = value;
+                                    controller.tempTask.value = value;
                                   },
                                   style: GoogleFonts.inter(
                                       color: Constanst.fgPrimary,
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16),
-                                )
+                                ),
+                                const SizedBox(height: 16),
+                                TextLabell(
+                                  text: "Tingkat Kesulitan *",
+                                  color: Constanst.fgPrimary,
+                                  size: 14,
+                                  weight: FontWeight.w400,
+                                ),
+                                Obx(() => DropdownButton<int>(
+                                      value: controller.tempDifficulty.value,
+                                      isExpanded: true,
+                                      items: [
+                                        {"label": "Sangat Mudah", "value": 1},
+                                        {"label": "Mudah", "value": 2},
+                                        {"label": "Normal", "value": 3},
+                                        {"label": "Sulit", "value": 4},
+                                        {"label": "Sangat Sulit", "value": 5},
+                                      ].map((item) {
+                                        return DropdownMenuItem(
+                                          value: item["value"] as int,
+                                          child: Text(
+                                            "${item["label"]} (${item["value"]})",
+                                            style: GoogleFonts.inter(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          controller.tempDifficulty.value =
+                                              value;
+                                        }
+                                      },
+                                    )),
                               ],
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              if (controller.listTask.length == 1) {
-                                UtilsAlert.showToast(
-                                    "Pastikan anda mengisi minimal 1 tugas");
-                              } else {
-                                controller.listTask.removeAt(index);
-                              }
-                            },
-                            child: const Icon(
-                              Icons.close,
-                              color: Colors.red,
-                            ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  bottomNavigationBar: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16.0),
+                        ),
+                        color: Constanst.colorWhite,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            offset: Offset(0, 2.0),
+                            blurRadius: 12.0,
                           )
+                        ]),
+                    child: SafeArea(
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (controller.tempTask.value.isNotEmpty) {
+                              if (editIndex == null) {
+                                controller.listTask.add({
+                                  "task": controller.tempTask.value,
+                                  "level": controller.tempDifficulty.value
+                                });
+                              } else {
+                                controller.listTask[editIndex]["task"] =
+                                    controller.tempTask.value;
+                                controller.listTask[editIndex]["level"] =
+                                    controller.tempDifficulty.value;
+                              }
+                            }
+                            controller.listTask.refresh();
+                            Get.back();
+                          },
+                          style: ElevatedButton.styleFrom(
+                              foregroundColor: Constanst.colorWhite,
+                              backgroundColor: Constanst.onPrimary,
+                              elevation: 0,
+                              padding: const EdgeInsets.fromLTRB(0, 12, 0, 12)),
+                          child: Text(
+                            'Simpan',
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                color: Constanst.colorWhite),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget formTugas() {
+    return Obx(
+      () => ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: controller.listTask.length,
+        itemBuilder: (context, index) {
+          var data = controller.listTask[index];
+          String difficultyLabel = "";
+          int level = int.tryParse(data["level"].toString()) ?? 0;
+          print('ini level kesulitan ${data['level']}');
+          switch (level) {
+            case 1:
+              difficultyLabel = "Sangat Mudah";
+              break;
+            case 2:
+              difficultyLabel = "Mudah";
+              break;
+            case 3:
+              difficultyLabel = "Normal";
+              break;
+            case 4:
+              difficultyLabel = "Sulit";
+              break;
+            case 5:
+              difficultyLabel = "Sangat Sulit";
+              break;
+            default:
+              difficultyLabel = "Tidak Diketahui";
+          }
+
+          return Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextLabell(
+                      text: "${index + 1}.",
+                      color: Constanst.fgPrimary,
+                      size: 16,
+                      weight: FontWeight.w500,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            data['task'],
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Kesulitan: $difficultyLabel",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  PopupMenuButton<int>(
+                    icon: Icon(Icons.more_vert),
+                    onSelected: (value) {
+                      if (value == 1) {
+                        print(controller.listTask);
+                        bottomSheetTask(Get.context!, editIndex: index);
+                      } else if (value == 2) {
+                        if (controller.listTask.length == 1) {
+                          UtilsAlert.showToast(
+                              "Pastikan anda mengisi minimal 1 tugas");
+                        } else {
+                          controller.listTask.removeAt(index);
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 1,
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined, color: Colors.black),
+                            SizedBox(width: 8),
+                            Text("Edit"),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 2,
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text("Hapus"),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
+              if (index != controller.listTask.length - 1)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Divider(
+                    height: 0,
+                    thickness: 1,
+                    color: Constanst.fgBorder,
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buttonTambahTask() {
+    return Padding(
+      padding: const EdgeInsets.all(18.0),
+      child: Row(
+        children: [
+          Text(
+            'List Task',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        );
-      })),
+          Spacer(),
+          InkWell(
+            child: Icon(Icons.add),
+            onTap: () => bottomSheetTask(context),
+          )
+        ],
+      ),
     );
   }
 
   void addNewTask() {
     controller.listTask.add({"task": ""});
+    // controller.focusNodes.add(FocusNode());
+    // controller.keyboardStates.add(false);
   }
 }

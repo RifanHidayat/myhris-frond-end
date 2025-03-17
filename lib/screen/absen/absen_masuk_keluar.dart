@@ -761,7 +761,24 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                       onPressed: () async {
                                         // await controller.offlineToOnline();
                                         // await controller.getPlaceCoordinate1();
-                                        if (controller.coordinate.value ==
+                                        if (!internetController
+                                            .isConnected.value) {
+                                          print('ini skenario ke 2');
+                                          UtilsAlert.showCheckOfflineAbsensi(
+                                              positiveBtnPressed: () {
+                                            Get.back();
+                                            controller.selectedType.value
+                                                            .toString() ==
+                                                        "WFH" &&
+                                                    widget.status ==
+                                                        "Absen Masuk"
+                                                ? controllerDashboard
+                                                    .widgetButtomSheetWfh()
+                                                : controller
+                                                    .widgetButtomSheetLanjutkanOffline(
+                                                        type: 'offlineAbsensi');
+                                          });
+                                        }else if (controller.coordinate.value ==
                                             true) {
                                           print('ini skenario ke 1');
                                           UtilsAlert
@@ -779,24 +796,7 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                                     .widgetButtomSheetLanjutkanOffline(
                                                         type: 'offlineAbsensi');
                                           });
-                                        } else if (!internetController
-                                            .isConnected.value) {
-                                          print('ini skenario ke 2');
-                                          UtilsAlert.showCheckOfflineAbsensi(
-                                              positiveBtnPressed: () {
-                                            Get.back();
-                                            controller.selectedType.value
-                                                            .toString() ==
-                                                        "WFH" &&
-                                                    widget.status ==
-                                                        "Absen Masuk"
-                                                ? controllerDashboard
-                                                    .widgetButtomSheetWfh()
-                                                : controller
-                                                    .widgetButtomSheetLanjutkanOffline(
-                                                        type: 'offlineAbsensi');
-                                          });
-                                        } else {
+                                        }  else {
                                         final packageInfo =
                                             await PackageInfo.fromPlatform();
                                         //for (var package in packageInfo) {

@@ -144,6 +144,7 @@ class DashboardController extends GetxController {
   var showPkwt = false.obs;
   var showPengumuman = false.obs;
   var showLaporan = false.obs;
+  var showMonitDaily = false.obs;
   var offlineInternet = false.obs;
 
   var selectedPageView = 0.obs;
@@ -2870,6 +2871,7 @@ class DashboardController extends GetxController {
       showPkwt.value = false;
       showUlangTahun.value = false;
       showLaporan.value = false;
+      showMonitDaily.value = false;
 
       var connect = await Api.connectionApi(
         "get",
@@ -2911,6 +2913,8 @@ class DashboardController extends GetxController {
             menu['url'].toString().toLowerCase().trim() == "ulangtahun");
         showLaporan.value = menusUtama.any(
             (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
+        showMonitDaily.value = menusUtama.any(
+            (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
       }
     } catch (error) {
       print("Terjadi kesalahan: $error");
@@ -2926,6 +2930,8 @@ class DashboardController extends GetxController {
           menu['url'].toString().toLowerCase().trim() == "ulangtahun");
       showLaporan.value = menusUtama.any(
           (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
+      showMonitDaily.value = menusUtama.any(
+            (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
     }
   }
 

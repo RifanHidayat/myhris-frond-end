@@ -66,6 +66,8 @@ class _FormTugasLuarState extends State<FormTugasLuar> {
         }
         controller.tanggalSelectedEdit.value = getDummy;
       }
+    }else{
+      controller.statusForm.value = false;
     }
     super.initState();
   }
