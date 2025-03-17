@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
 import 'package:pdf/widgets.dart';
 import 'package:siscom_operasional/model/daily_task_model.dart';
 import 'package:siscom_operasional/screen/daily_task/daily_task.dart';
@@ -11,11 +12,17 @@ import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 
+import 'package:siscom_operasional/model/daily_task_model.dart';
+import 'package:siscom_operasional/utils/api.dart';
+import 'package:siscom_operasional/utils/app_data.dart';
+
+
 class DailyTaskController extends GetxController {
   var tipeAlphaAbsen = 0.obs;
   var catatanAlpha = ''.obs;
   var allTask = <DailyTaskModel>[].obs;
   var listTask = [].obs;
+
   var idTask = ''.obs;
   var tanggalTask = TextEditingController().obs;
   var task = [].obs;
@@ -159,15 +166,18 @@ class DailyTaskController extends GetxController {
       'em_id': emId,
       'bulan': bulanSelectedSearchHistory.value,
       'tahun': tahunSelectedSearchHistory.value,
+
     };
     var connect = Api.connectionApi("post", body, "getAllTaskDaily");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
+
         print('ini data daily ${valueBody['data']}');
         for (var element in valueBody['data'][0]) {
           allTask.add(DailyTaskModel(
               date: element['date'] ?? '',
+
               id: element['id'] ?? 0,
               em_id: element['em_id'] ?? "",
               atten_date: element['tgl_buat'],
@@ -201,9 +211,11 @@ class DailyTaskController extends GetxController {
               namaHariLibur: element['hari_libur'],
               jamKerja: element['jam_kerja'],
               jamPulang: element['jam_pulang'],
+
               breakoutTime: element['total_status_0'],
               breakoutNote: element['total_status_1'],
               breakoutPict: element['jumlah_task'],
+
               breakoutPlace: element['place_break_out'],
               breakinTime: element['breakin_time'],
               breakinNote: element['breakin_note'],
@@ -250,4 +262,5 @@ class DailyTaskController extends GetxController {
       print("Exception saat load task: $e");
     }
   }
+
 }

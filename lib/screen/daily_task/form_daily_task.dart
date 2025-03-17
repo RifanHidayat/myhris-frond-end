@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+
 import 'package:intl/intl.dart';
+
 import 'package:siscom_operasional/controller/daily_task_controller.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
@@ -19,6 +21,7 @@ class FormDailyTask extends StatefulWidget {
 
 class _FormDailyTaskState extends State<FormDailyTask> {
   final controller = Get.put(DailyTaskController());
+
 
   @override
   void initState() {
@@ -42,6 +45,7 @@ class _FormDailyTaskState extends State<FormDailyTask> {
       controller.tanggalTask.refresh();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +75,7 @@ class _FormDailyTaskState extends State<FormDailyTask> {
             },
           )),
       body: SingleChildScrollView(
+
         child: SafeArea(
           child: Column(
             children: [
@@ -158,6 +163,7 @@ class _FormDailyTaskState extends State<FormDailyTask> {
             } 
           )
         ],
+
       ),
     );
   }
@@ -178,6 +184,8 @@ class _FormDailyTaskState extends State<FormDailyTask> {
   Widget formHariDanTanggal() {
     return InkWell(
       onTap: () async {
+
+
         var dateSelect = await showDatePicker(
           context: Get.context!,
           firstDate:
@@ -226,6 +234,7 @@ class _FormDailyTaskState extends State<FormDailyTask> {
         } else {
           controller.tanggalTask.value.text =
               Constanst.convertDate("$dateSelect");
+
           controller.tanggalTask.refresh();
         }
       },
@@ -345,17 +354,21 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                           controller: scrollController,
                           child: Padding(
                             padding: EdgeInsets.all(16.0),
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 TextLabell(
+
                                   text: "Judul *",
+
                                   color: Constanst.fgPrimary,
                                   size: 14,
                                   weight: FontWeight.w400,
                                 ),
                                 TextFormField(
                                   minLines: 1,
+
                                   maxLines: 1000,
                                   controller: TextEditingController(
                                     text: controller.tempTitle.value,
@@ -366,6 +379,7 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                                   ),
                                   onChanged: (value) {
                                     controller.tempTitle.value = value;
+
                                   },
                                   style: GoogleFonts.inter(
                                       color: Constanst.fgPrimary,
@@ -377,6 +391,7 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                                   thickness: 1,
                                   color: Constanst.fgBorder,
                                 ),
+
                                 const SizedBox(height: 16),
                                 TextLabell(
                                   text: "Tugas *",
@@ -390,12 +405,15 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                                   controller: TextEditingController(
                                     text: controller.tempTask.value,
                                   ),
+
                                   decoration: const InputDecoration(
                                     hintText: 'Tulis tugas anda disini',
                                     border: InputBorder.none,
                                   ),
                                   onChanged: (value) {
+
                                     controller.tempTask.value = value;
+
                                   },
                                   style: GoogleFonts.inter(
                                       color: Constanst.fgPrimary,
@@ -407,6 +425,7 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                                   thickness: 1,
                                   color: Constanst.fgBorder,
                                 ),
+
                                 const SizedBox(height: 16),
                                 TextLabell(
                                   text: "Status task *",
@@ -870,5 +889,6 @@ class _FormDailyTaskState extends State<FormDailyTask> {
         },
       ),
     );
+
   }
 }

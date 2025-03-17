@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
@@ -11,12 +13,14 @@ import 'package:siscom_operasional/model/absen_model.dart';
 import 'package:siscom_operasional/model/daily_task_model.dart';
 import 'package:siscom_operasional/screen/absen/loading_absen.dart';
 import 'package:siscom_operasional/screen/daily_task/detail_daily_task.dart';
+
 import 'package:siscom_operasional/screen/daily_task/form_daily_task.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/month_year_picker.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
+
 
 class DailyTask extends StatefulWidget {
   const DailyTask({super.key});
@@ -32,13 +36,16 @@ class _DailyTaskState extends State<DailyTask> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     controller.getTimeNow();
     controller.loadAllTask(AppData.informasiUser![0].em_id);
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight) * 1,
         child: Container(
@@ -138,6 +145,7 @@ class _DailyTaskState extends State<DailyTask> {
           ),
         ),
       ),
+
     );
   }
 
@@ -146,7 +154,9 @@ class _DailyTaskState extends State<DailyTask> {
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
+
       itemCount: controller.allTask.length,
+
       itemBuilder: (context, index) {
         DateTime now = DateTime.now();
         DateTime date = DateTime(now.year, now.month, index + 1);
@@ -157,7 +167,9 @@ class _DailyTaskState extends State<DailyTask> {
         );
 
         // return Obx(() {
+
         return tampilan2(taskForDate, date);
+
         // });
       },
     );
@@ -166,7 +178,9 @@ class _DailyTaskState extends State<DailyTask> {
 
   Widget tampilan2(DailyTaskModel index, date) {
     print('ini index date ${index.atten_date}');
+
     print('ini id index ${index.namaHariLibur}');
+
     var startTime;
     var endTime;
     var startDate;
@@ -190,6 +204,7 @@ class _DailyTaskState extends State<DailyTask> {
     int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
 
     //alur normal
+
     // if (totalMinutes1 < totalMinutes2) {
     //   startTime = DateTime.parse(
     //       '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
@@ -248,6 +263,66 @@ class _DailyTaskState extends State<DailyTask> {
     //   print(
     //       "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
     // }
+
+    if (totalMinutes1 < totalMinutes2) {
+      startTime = DateTime.parse(
+          '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
+      endTime = DateTime.parse(
+          '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
+
+      //alur beda hari
+    } else if (totalMinutes1 > totalMinutes2) {
+      var waktu3 =
+          TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
+      int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
+
+      if (totalMinutes2 > totalMinutes3) {
+        print("masuk sini view las user");
+        var today;
+        if (index.atten_date!.isNotEmpty) {
+          today = DateTime.parse(index.atten_date!);
+        }
+        var yesterday = today.add(const Duration(days: 1));
+        startDate = DateFormat('yyyy-MM-dd').format(yesterday);
+        endDate = DateFormat('yyyy-MM-dd').format(today);
+        startTime = DateTime.parse(
+            '$startDate ${AppData.informasiUser![0].startTime}:00');
+        endTime =
+            DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
+        print('ini  bener gakl lu${startTime.isAfter(today)}');
+      } else {
+        var today;
+        print('masa lu kosong sih ${index.atten_date}');
+        // if (index.atten_date!.isNotEmpty) {
+        //   today = DateTime.parse(index.atten_date!);
+        // } else {
+        //   today = DateTime.now();
+        // }
+        today = DateTime.now();
+        var yesterday = today.add(const Duration(days: 1));
+
+        startDate = DateFormat('yyyy-MM-dd').format(today);
+        endDate = DateFormat('yyyy-MM-dd').format(yesterday);
+
+        startTime = DateTime.parse(
+            '$startDate ${AppData.informasiUser![0].startTime}:00'); // Waktu kemarin
+        endTime =
+            DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
+        print(
+            'ini  bener gakl lu${startTime.isBefore(today)}'); // Waktu hari ini
+        print('ini  bener gakl lu${startTime}'); // Waktu hari ini
+        print('ini  bener gakl lu${endTime}'); // Waktu hari ini
+      }
+    } else {
+      startTime = AppData.informasiUser![0].startTime;
+      endTime = AppData.informasiUser![0].endTime;
+
+      startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      print(
+          "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
+    }
+=
     var tipeAbsen = AppData.informasiUser![0].tipeAbsen;
     var tipeAlpha = AppData.informasiUser![0].tipeAlpha;
     var list = tipeAlpha.toString().split(',').map(int.parse).toList();
@@ -300,6 +375,7 @@ class _DailyTaskState extends State<DailyTask> {
       child: InkWell(
         customBorder: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12))),
+
         onTap: () async {
           if (index.atten_date != null) {
             UtilsAlert.showLoadingIndicator(context);
@@ -307,6 +383,7 @@ class _DailyTaskState extends State<DailyTask> {
             controller.statusForm.value = true;
             Get.to(FormDailyTask());
           }
+
         },
         child: Container(
           decoration: BoxDecoration(
@@ -331,8 +408,10 @@ class _DailyTaskState extends State<DailyTask> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+
                       child: index.namaHariLibur != null ||
                               index.offDay.toString() != '0'
+
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -393,6 +472,7 @@ class _DailyTaskState extends State<DailyTask> {
                             padding: const EdgeInsets.only(left: 18),
                             child: TextLabell(
                               text: index.namaHariLibur,
+
                               weight: FontWeight.w500,
                             ))
                         : index.namaTugasLuar != null
@@ -400,6 +480,7 @@ class _DailyTaskState extends State<DailyTask> {
                                 padding: EdgeInsets.only(left: 18),
                                 child: TextLabell(
                                   text: "Tugas Luar",
+
                                   weight: FontWeight.w500,
                                 ))
                             : index.namaDinasLuar != null
@@ -407,6 +488,7 @@ class _DailyTaskState extends State<DailyTask> {
                                     padding: EdgeInsets.only(left: 18),
                                     child: TextLabell(
                                       text: "Dinas Luar",
+
                                       weight: FontWeight.w500,
                                     ))
                                 : index.namaCuti != null
@@ -414,6 +496,7 @@ class _DailyTaskState extends State<DailyTask> {
                                         padding: EdgeInsets.only(left: 18),
                                         child: TextLabell(
                                           text: "Cuti",
+
                                           weight: FontWeight.w500,
                                         ))
                                     : index.namaSakit != null
@@ -423,6 +506,7 @@ class _DailyTaskState extends State<DailyTask> {
                                             child: TextLabell(
                                               text:
                                                   "Sakit : ${index.namaSakit}",
+
                                               weight: FontWeight.w500,
                                             ))
                                         : index.namaIzin != null
@@ -432,6 +516,7 @@ class _DailyTaskState extends State<DailyTask> {
                                                 child: TextLabell(
                                                   text:
                                                       "Izin : ${index.namaIzin}",
+
                                                   weight: FontWeight.w500,
                                                 ))
                                             : index.offDay.toString() == '0'
@@ -440,17 +525,20 @@ class _DailyTaskState extends State<DailyTask> {
                                                         left: 18),
                                                     child: TextLabell(
                                                       text: "Hari Libur Kerja",
+
                                                       weight: FontWeight.w500,
                                                     ))
                                                 : const Padding(
                                                     padding: EdgeInsets.only(
                                                         left: 18),
                                                     child: TextLabell(
+
                                                       text: "Belum ada task",
                                                       weight: FontWeight.w500,
                                                     ))
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+
                         children: [
                           index.atten_date != "" || index.atten_date != null
                               ? controller.tipeAlphaAbsen.value == 1 &&
@@ -471,6 +559,7 @@ class _DailyTaskState extends State<DailyTask> {
                                             text:
                                                 "ALPHA ${controller.catatanAlpha.value}",
                                             weight: FontWeight.w400,
+
                                           ),
                                         ],
                                       ))
@@ -491,6 +580,7 @@ class _DailyTaskState extends State<DailyTask> {
                                               TextLabell(
                                                 text: index.namaHariLibur,
                                                 weight: FontWeight.w400,
+
                                               ),
                                             ],
                                           ))
@@ -511,6 +601,7 @@ class _DailyTaskState extends State<DailyTask> {
                                                   TextLabell(
                                                     text: index.namaTugasLuar,
                                                     weight: FontWeight.w400,
+
                                                   ),
                                                 ],
                                               ))
@@ -598,6 +689,7 @@ class _DailyTaskState extends State<DailyTask> {
                                                               padding:
                                                                   const EdgeInsets
                                                                       .only(
+
                                                                       left:
                                                                           18.0),
                                                               child:
@@ -608,10 +700,12 @@ class _DailyTaskState extends State<DailyTask> {
                                                                     FontWeight
                                                                         .w300,
                                                                 size: 11.0,
+
                                                               ))
                                                           : SizedBox()
                               : const SizedBox(),
                           Padding(
+
                             padding: const EdgeInsets.only(left: 18),
                             child: Text(
                               "Lihat task",
@@ -752,4 +846,5 @@ class _DailyTaskState extends State<DailyTask> {
       ),
     );
   }
+
 }
