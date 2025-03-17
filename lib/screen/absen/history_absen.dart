@@ -1670,10 +1670,11 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
     //alur normal
     if (totalMinutes1 < totalMinutes2) {
 // Menggabungkan tanggal hari ini dengan waktu dari string
-      startTime = DateTime.parse(
-          '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
-      endTime = DateTime.parse(
-          '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
+print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
+      // startTime = DateTime.parse(
+      //     '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
+      // endTime = DateTime.parse(
+      //     '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
 
       //alur beda hari
     } else if (totalMinutes1 > totalMinutes2) {

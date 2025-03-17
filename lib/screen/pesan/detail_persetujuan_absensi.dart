@@ -307,7 +307,6 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
 
       if (controller.detailData[0]['status'] == "Pending" ||
           controller.detailData[0]['approve_status'] == "Pending" ||
-          controller.detailData[0]['approve_status'] == "Pending" ||
           (controller.detailData[0]['approve2_status'] == "Pending" &&
               controller.detailData[0]['approve_status'] != "Rejected")) {
         if (controller.detailData[0]['em_report_to']
@@ -2528,6 +2527,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
         const SizedBox(height: 4),
         InkWell(
             onTap: () {
+              print(controller.detailData[0]['foto_masuk']);
               viewLampiranAjuan(controller.detailData[0]['foto_$title']);
             },
             child: Text(

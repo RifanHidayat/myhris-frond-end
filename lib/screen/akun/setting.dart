@@ -11,6 +11,7 @@ import 'package:siscom_operasional/controller/aktifitas_controller.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 import 'package:siscom_operasional/controller/auth_controller.dart';
 import 'package:siscom_operasional/controller/dashboard_controller.dart';
+import 'package:siscom_operasional/controller/internet_controller.dart';
 import 'package:siscom_operasional/controller/setting_controller.dart';
 import 'package:siscom_operasional/controller/surat_peringatan_controller.dart';
 import 'package:siscom_operasional/screen/absen/camera_view_location.dart';
@@ -42,6 +43,7 @@ class _SettingState extends State<Setting> {
   final controllerDashboard = Get.put(DashboardController());
   final authController = Get.put(AuthController());
   final suratController = Get.put(SuratPeringatanController());
+  final internetController = Get.find<InternetController>();
   var faceRecog = false;
   var namaVersi = "...".obs;
 
@@ -258,7 +260,7 @@ class _SettingState extends State<Setting> {
                                     Container(
                                       decoration: BoxDecoration(
                                           border: Border.all(
-                                            color: Constanst.color5,
+                                            color: internetController.isConnected.value ? Constanst.color5 : Constanst.color4,
                                             width: 2.0,
                                           ),
                                           borderRadius: const BorderRadius.all(
@@ -410,7 +412,7 @@ class _SettingState extends State<Setting> {
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.all(3),
-                                                color: Constanst.color5,
+                                                color: internetController.isConnected.value ? Constanst.color5: Constanst.color4,
                                                 child: const Icon(
                                                   Icons.check,
                                                   size: 12,

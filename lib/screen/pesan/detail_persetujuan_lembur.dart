@@ -259,114 +259,143 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                           ...controller.listTask.asMap().entries.map((entry) {
                             int index = entry.key;
                             var task = entry.value;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 15.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text("${index + 1}. ${task['task']}",
-                                              style: GoogleFonts.inter(
-                                                color: Constanst.fgPrimary,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 16,
-                                              )),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Divider(
-                                            height: 0,
-                                            thickness: 1,
-                                            color: Constanst.fgBorder,
-                                          ),
-                                        ],
+                            String difficultyLabel = "";
+                            int level =
+                                int.tryParse(task["level"].toString()) ?? 0;
+                            print('ini level kesulitan ${task['level']}');
+                            switch (level) {
+                              case 1:
+                                difficultyLabel = "Sangat Mudah";
+                                break;
+                              case 2:
+                                difficultyLabel = "Mudah";
+                                break;
+                              case 3:
+                                difficultyLabel = "Normal";
+                                break;
+                              case 4:
+                                difficultyLabel = "Sulit";
+                                break;
+                              case 5:
+                                difficultyLabel = "Sangat Sulit";
+                                break;
+                              default:
+                                difficultyLabel = "Tidak Diketahui";
+                            }
+                            return Column(
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 16.0, top: 16.0, bottom: 16.0),
+                                      child: TextLabell(
+                                        text: "${index + 1}.",
+                                        color: Constanst.fgPrimary,
+                                        size: 16,
+                                        weight: FontWeight.w500,
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  widget.dinilai == "N"
-                                      ? SizedBox()
-                                      : SizedBox(
-                                          width: 50,
-                                          child: Column(
-                                            children: [
-                                              TextFormField(
-                                                controller: controller
-                                                    .taskControllers[index],
-                                                decoration: InputDecoration(
-                                                  hintText: '0%',
-                                                  border: InputBorder.none,
-                                                ),
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                inputFormatters: [
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly, // Hanya angka
-                                                  LengthLimitingTextInputFormatter(
-                                                      3),
-                                                ],
-                                                onChanged: (value) {
-                                                  if (value.isNotEmpty) {
-                                                    int input =
-                                                        int.parse(value);
-                                                    // if (input < 1) {
-                                                    //   controller
-                                                    //       .taskControllers[index]
-                                                    //       .text = '1';
-                                                    //   controller
-                                                    //           .taskControllers[index]
-                                                    //           .selection =
-                                                    //       TextSelection
-                                                    //           .fromPosition(
-                                                    //     TextPosition(
-                                                    //         offset: controller
-                                                    //             .taskControllers[
-                                                    //                 index]
-                                                    //             .text
-                                                    //             .length),
-                                                    //   );
-                                                    // } else
-                                                    if (input > 100) {
-                                                      controller
-                                                          .taskControllers[
-                                                              index]
-                                                          .text = '100';
-                                                      controller
+                                    Expanded(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              task['task'],
+                                              textAlign: TextAlign.justify,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              "Kesulitan: $difficultyLabel",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    widget.dinilai == "N"
+                                        ? SizedBox()
+                                        : SizedBox(
+                                            width: 50,
+                                            child: TextFormField(
+                                              controller: controller
+                                                  .taskControllers[index],
+                                              decoration: InputDecoration(
+                                                hintText: '0%',
+                                                border: InputBorder.none,
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly, // Hanya angka
+                                                LengthLimitingTextInputFormatter(
+                                                    3),
+                                              ],
+                                              onChanged: (value) {
+                                                if (value.isNotEmpty) {
+                                                  int input = int.parse(value);
+
+                                                  if (input > 100) {
+                                                    controller
+                                                        .taskControllers[index]
+                                                        .text = '100';
+                                                    controller
+                                                            .taskControllers[index]
+                                                            .selection =
+                                                        TextSelection
+                                                            .fromPosition(
+                                                      TextPosition(
+                                                          offset: controller
                                                               .taskControllers[
                                                                   index]
-                                                              .selection =
-                                                          TextSelection
-                                                              .fromPosition(
-                                                        TextPosition(
-                                                            offset: controller
-                                                                .taskControllers[
-                                                                    index]
-                                                                .text
-                                                                .length),
-                                                      );
-                                                    }
+                                                              .text
+                                                              .length),
+                                                    );
+                                                    
                                                   }
-                                                },
-                                              ),
-                                              Divider(
-                                                height: 0,
-                                                thickness: 1,
-                                                color: Constanst.fgBorder,
-                                              ),
-                                            ],
+                                                  controller.updateTotalPercentage();
+                                                }
+                                              },
+                                            ),
                                           ),
-                                        ),
-                                ],
-                              ),
+                                  ],
+                                ),
+                                if (index != controller.listTask.length - 1)
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Divider(
+                                      height: 0,
+                                      thickness: 1,
+                                      color: Constanst.fgBorder,
+                                    ),
+                                  ),
+                              ],
                             );
                           }).toList(),
+                          Obx(() {
+                            return Text(
+                              "Total Persentase: ${controller.totalPercentage.value}%",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            );
+                          }),
                         ],
                       ),
                     ),
@@ -450,68 +479,108 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                     ...controller.listTask.asMap().entries.map((entry) {
                       int index = entry.key;
                       var task = entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 15.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "${index + 1}. ${task['task']}",
-                                      style: GoogleFonts.inter(
-                                        color: Constanst.fgPrimary,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                      color: Constanst.fgBorder,
-                                    ),
-                                  ],
+                      String difficultyLabel = "";
+                      int level = int.tryParse(task["level"].toString()) ?? 0;
+                      print('ini level kesulitan ${task['level']}');
+                      switch (level) {
+                        case 1:
+                          difficultyLabel = "Sangat Mudah";
+                          break;
+                        case 2:
+                          difficultyLabel = "Mudah";
+                          break;
+                        case 3:
+                          difficultyLabel = "Normal";
+                          break;
+                        case 4:
+                          difficultyLabel = "Sulit";
+                          break;
+                        case 5:
+                          difficultyLabel = "Sangat Sulit";
+                          break;
+                        default:
+                          difficultyLabel = "Tidak Diketahui";
+                      }
+                      return Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 16.0, bottom: 16.0, right: 16.0),
+                                child: TextLabell(
+                                  text: "${index + 1}.",
+                                  color: Constanst.fgPrimary,
+                                  size: 16,
+                                  weight: FontWeight.w500,
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 10),
-                            widget.dinilai == 'N'
-                                ? SizedBox()
-                                : SizedBox(
-                                    width: 50,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 15.0),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            "${task['persentase'].toString()}%",
-                                            style: GoogleFonts.inter(
-                                              color: Constanst.fgPrimary,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16,
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        task['task'],
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Kesulitan: $difficultyLabel",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              widget.dinilai == 'N'
+                                  ? SizedBox()
+                                  : SizedBox(
+                                      width: 50,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "${task['persentase'].toString()}%",
+                                              style: GoogleFonts.inter(
+                                                color: Constanst.fgPrimary,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Divider(
-                                            height: 0,
-                                            thickness: 1,
-                                            color: Constanst.fgBorder,
-                                          ),
-                                        ],
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                          ],
-                        ),
+                            ],
+                          ),
+                          if (index != controller.listTask.length - 1)
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Divider(
+                                height: 0,
+                                thickness: 1,
+                                color: Constanst.fgBorder,
+                              ),
+                            ),
+                        ],
                       );
                     }).toList(),
                   ],
@@ -660,8 +729,8 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 UtilsAlert.showToast(
                                     "Harap isi alasan terlebih dahulu");
                               }
-                            }else{
-                               if (controller.alasan2.value.text != "") {
+                            } else {
+                              if (controller.alasan2.value.text != "") {
                                 Navigator.pop(Get.context!);
                                 validasiMenyetujui(true, em_id);
                               } else {
@@ -773,9 +842,11 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
   void initState() {
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
-        print('ini emIdz user ${widget.emIds}');
-    controller.infoIds(widget.emIds == null? controllerApproval.detailData[0]['em_ids'] : widget.emIds);
-    controller.infoTask(widget.emId);
+    print('ini emIdz user ${widget.emIds}');
+    controller.infoIds(widget.emIds == null
+        ? controllerApproval.detailData[0]['em_ids']
+        : widget.emIds);
+    controller.infoTask(widget.idxDetail);
 
     super.initState();
     var emId = AppData.informasiUser![0].em_id;

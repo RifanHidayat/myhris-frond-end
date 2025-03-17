@@ -144,6 +144,7 @@ class DashboardController extends GetxController {
   var showPkwt = false.obs;
   var showPengumuman = false.obs;
   var showLaporan = false.obs;
+  var showMonitDaily = false.obs;
   var offlineInternet = false.obs;
 
   var selectedPageView = 0.obs;
@@ -236,7 +237,6 @@ class DashboardController extends GetxController {
     // DateTime startDate = await NTP.now();
 
     DateTime startDate = DateTime.now();
-    updateInformasiUser();
 
     // if (AppData.informasiUser != null && AppData.informasiUser!.isNotEmpty) {
     var emId = AppData.informasiUser![0].em_id.toString();
@@ -2871,6 +2871,7 @@ class DashboardController extends GetxController {
       showPkwt.value = false;
       showUlangTahun.value = false;
       showLaporan.value = false;
+      showMonitDaily.value = false;
 
       var connect = await Api.connectionApi(
         "get",
@@ -2912,6 +2913,8 @@ class DashboardController extends GetxController {
             menu['url'].toString().toLowerCase().trim() == "ulangtahun");
         showLaporan.value = menusUtama.any(
             (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
+        showMonitDaily.value = menusUtama.any(
+            (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
       }
     } catch (error) {
       print("Terjadi kesalahan: $error");
@@ -2927,6 +2930,8 @@ class DashboardController extends GetxController {
           menu['url'].toString().toLowerCase().trim() == "ulangtahun");
       showLaporan.value = menusUtama.any(
           (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
+      showMonitDaily.value = menusUtama.any(
+            (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
     }
   }
 
@@ -3066,20 +3071,7 @@ class DashboardController extends GetxController {
           }
         }
       });
-      // .catchError((error) async {
-      //   bannerDashboard.clear();
-      //   var banners = await SqliteDatabaseHelper().getBanners();
-      //   bannerDashboard.value = banners;
-      //   bannerDashboard.refresh();
-      // });
     });
-    // } else {
-    //   bannerDashboard.clear();
-    //   var banners = await SqliteDatabaseHelper().getBanners();
-    //   bannerDashboard.value = banners;
-    //   print(" banner :${bannerDashboard.value}");
-    //   bannerDashboard.refresh();
-    // }
   }
 
   Future<void> _getTime() async {
