@@ -221,7 +221,8 @@ class LaporanCutiController extends GetxController {
       'tahun': tahunSelectedSearchHistory.value,
       'status': idDepartemenTerpilih.value,
       'type': title.value,
-      'branch_id': branchId.value
+      'branch_id': branchId.value,
+      'leave_status': filterStatusAjuanTerpilih.value
     };
     var connect = Api.connectionApi("post", body, "load_laporan_pengajuan");
     connect.then((dynamic res) {
@@ -233,6 +234,7 @@ class LaporanCutiController extends GetxController {
               "Data periode $bulanSelectedSearchHistory belum tersedia, harap hubungi HRD");
         } else {
           var data = valueBody['data'];
+          print('ini data : ${data}');
           loadingString.value =
               data.length == 0 ? "Data tidak tersedia" : "Memuat Data...";
           allNameLaporanTidakhadir.value = data;
@@ -511,6 +513,10 @@ class LaporanCutiController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         var data = valueBody['data'];
+        for (var ya in data){
+
+        print('ini tampil laporan  ${ya['leave_status']}');
+        }
         listDetailLaporanEmployee.value = data;
         alllistDetailLaporanEmployee.value = data;
         this.listDetailLaporanEmployee.refresh();
@@ -574,6 +580,7 @@ class LaporanCutiController extends GetxController {
             title == "dinas_luar") {
           if (element['leave_status'] == statusFilter) {
             data.add(element);
+            print('${element['leave_status']}');
           }
         } else {
           if (element['status'] == statusFilter) {
@@ -898,6 +905,7 @@ class LaporanCutiController extends GetxController {
                                       : InkWell(
                                           onTap: () {
                                             // if (selectedViewFilterPengajuan.value == 1) {
+                                            // aksiCariLaporan();
                                             filterStatusPengajuan(name);
                                             // }
                                           },
@@ -937,16 +945,19 @@ class LaporanCutiController extends GetxController {
   }
 
   void filterStatusPengajuan(name) {
+    
     List listFilterLokasi = [];
-    for (var element in allNameLaporanTidakhadirCopy.value) {
-      if (name == "Semua") {
-        listFilterLokasi.add(element);
-      } else {
-        if (element['leave_status'] == name) {
-          listFilterLokasi.add(element);
-        }
-      }
-    }
+    print('ini name: $name');
+    // for (var element in allNameLaporanTidakhadirCopy.value) {
+    //   if (name == "Semua") {
+    //     listFilterLokasi.add(element);
+    //   } else {
+    //     print(element['leave_status']);
+    //     if (element['leave_status'] == name) {
+    //       listFilterLokasi.add(element);
+    //     }
+    //   }
+    // }
     allNameLaporanTidakhadir.value = listFilterLokasi;
     filterStatusAjuanTerpilih.value = name;
     this.allNameLaporanTidakhadir.refresh();
@@ -954,6 +965,7 @@ class LaporanCutiController extends GetxController {
     loadingString.value = allNameLaporanTidakhadir.value.length != 0
         ? "Memuat Data..."
         : "Tidak ada pengajuan";
+    aksiCariLaporan();
     Navigator.pop(Get.context!);
   }
 

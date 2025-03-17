@@ -51,6 +51,7 @@ class ApprovalController extends GetxController {
   var statusPengajuan = false;
 
   var totalPercent = 0.0.obs;
+  var totalPercentage = 0.0.obs;
   var listTask = [].obs;
   var listNotModif = [].obs;
   var listData = [].obs;
@@ -457,12 +458,12 @@ class ApprovalController extends GetxController {
             'status': element['status'],
             'approve_status': element['approve_status'],
             'approve2_status': element['approve2_status'],
-            'catatan_masuk': element['catatan_masuk'],
-            'catatan_keluar': element['catatan_keluar'],
-            'lokasi_masuk': element['lokasi_masuk'],
-            'lokasi_keluar': element['lokasi_keluar'],
-            'foto_masuk': element['foto_masuk'],
-            'foto_keluar': element['foto_keluar'],
+            'catatan_masuk': element['sigin_note'],
+            'catatan_keluar': element['signout_note'],
+            'lokasi_masuk': element['signin_addr'],
+            'lokasi_keluar': element['signout_addr'],
+            'foto_masuk': element['signin_pict'],
+            'foto_keluar': element['signout_pict'],
           };
           listData.value.add(data);
           listDataAll.value.add(data);
@@ -1302,7 +1303,18 @@ class ApprovalController extends GetxController {
       }
     });
   }
+  void updateTotalPercentage() {
+    int total = 0;
+    int count = taskControllers.length;
+    
+    for (var controller in taskControllers) {
+      int value = int.tryParse(controller.text) ?? 0;
+      total += value;
+    }
 
+    // Ubah hasil pembagian ke tipe double
+    totalPercentage.value = count > 0 ? (total / count).toDouble() : 0.0;
+}
   void infoTask(emPengaju) {
     listTask.clear();
     taskControllers.clear();

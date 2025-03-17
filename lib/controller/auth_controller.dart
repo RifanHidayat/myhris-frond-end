@@ -859,9 +859,9 @@ class AuthController extends GetxController {
     var connect =
         Api.connectionApi("post", body, "peraturan-perusahaan-check-employee");
     connect.then((dynamic res) {
-      var valueBody = jsonDecode(res.body);
-      print("bah: $valueBody");
+      print(res);
       if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
         if (valueBody['status'] == false) {
           Get.back();
           UtilsAlert.showToast(valueBody['message']);

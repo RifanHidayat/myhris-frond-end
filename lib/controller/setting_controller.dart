@@ -425,31 +425,36 @@ class SettingController extends GetxController {
     }
   }
 
-  void aksiEditLastLogin() {
-    var dataUser = AppData.informasiUser;
-    var getEmid = dataUser![0].em_id;
-    authController.isautoLogout.value = true;
-    Map<String, dynamic> body = {
-      'last_login': '0000-00-00 00:00:00',
-      'em_id': getEmid
-    };
-    var connect = Api.connectionApi(
-      "post",
-      body,
-      "edit_last_login_clear",
-    );
-    connect.then((dynamic res) {
-      if (res.statusCode == 200) {
-        var valueBody = jsonDecode(res.body);
-        print('ini value logout${valueBody['data']}');
-        // AppData.informasiUser = null;
-        Navigator.pop(Get.context!);
-        _stopForegroundTask();
-        Get.offAll(Login());
-        AppData.isLogin = false;
-      }
-    });
+  void aksiEditLastLogin() async {
+  var dataUser = AppData.informasiUser;
+  var getEmid = dataUser![0].em_id;
+  authController.isautoLogout.value = true;
+
+  Map<String, dynamic> body = {
+    'last_login': '0000-00-00 00:00:00',
+    'em_id': getEmid
+  };
+
+  var connect = await Api.connectionApi("post", body, "edit_last_login_clear");
+
+  if (connect == null) {
+    print("Gagal melakukan koneksi ke API!");
+    return;
   }
+
+  if (connect.statusCode == 200) {
+    var valueBody = jsonDecode(connect.body);
+    print('ini value logout ${valueBody['data']}');
+
+    Navigator.pop(Get.context!);
+    _stopForegroundTask();
+    Get.offAll(Login());
+    AppData.isLogin = false;
+  } else {
+    print("Error: ${connect.statusCode}");
+  }
+}
+
 
   validateAuth(code) {
     print("kode validate");

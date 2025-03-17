@@ -33,6 +33,7 @@ class _TugasLuarState extends State<TugasLuar> {
   void initState() {
     super.initState();
     Api().checkLogin();
+    controller.loadAllEmployeeDelegasi();
     controller.loadDataTugasLuar();
     controller.loadDataDinasLuar();
     if (Get.arguments != null) {

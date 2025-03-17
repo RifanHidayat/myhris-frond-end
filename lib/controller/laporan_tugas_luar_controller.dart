@@ -388,7 +388,8 @@ class LaporanTugasLuarController extends GetxController {
       'tahun': tahunSelectedSearchHistory.value,
       'status': idDepartemenTerpilih.value,
       'branch_id': branchId.value,
-      'type': title.value
+      'type': title.value,
+      'leave_status': filterStatusAjuanTerpilih.value
     };
     var connect = Api.connectionApi("post", body, "load_laporan_pengajuan");
     connect.then((dynamic res) {
@@ -934,21 +935,21 @@ class LaporanTugasLuarController extends GetxController {
 
   void filterStatusPengajuan(name) {
     List listFilterLokasi = [];
-    for (var element in allNameLaporanTidakhadirCopy.value) {
-      if (name == "Semua") {
-        listFilterLokasi.add(element);
-      } else {
-        if (title == "lembur" || title == "tugas_luar") {
-          if (element['status'] == name) {
-            listFilterLokasi.add(element);
-          }
-        } else {
-          if (element['status'] == name) {
-            listFilterLokasi.add(element);
-          }
-        }
-      }
-    }
+    // for (var element in allNameLaporanTidakhadirCopy.value) {
+    //   if (name == "Semua") {
+    //     listFilterLokasi.add(element);
+    //   } else {
+    //     if (title == "lembur" || title == "tugas_luar") {
+    //       if (element['status'] == name) {
+    //         listFilterLokasi.add(element);
+    //       }
+    //     } else {
+    //       if (element['status'] == name) {
+    //         listFilterLokasi.add(element);
+    //       }
+    //     }
+    //   }
+    // }
     allNameLaporanTidakhadir.value = listFilterLokasi;
     filterStatusAjuanTerpilih.value = name;
     this.allNameLaporanTidakhadir.refresh();
@@ -956,6 +957,7 @@ class LaporanTugasLuarController extends GetxController {
     loadingString.value = allNameLaporanTidakhadir.value.length != 0
         ? "Memuat Data..."
         : "Tidak ada pengajuan";
+    aksiCariLaporan();
     Navigator.pop(Get.context!);
   }
 
@@ -1248,11 +1250,12 @@ class LaporanTugasLuarController extends GetxController {
     var nomorAjuan = detailData['nomor_ajuan'];
     var get2StringNomor = '${nomorAjuan[0]}${nomorAjuan[1]}';
     var tanggalMasukAjuan = detailData['atten_date'];
+    print(detailData);
     var namaTypeAjuan = detailData['name'];
     var tanggalAjuanDari = detailData['start_date'];
     var tanggalAjuanSampai = detailData['end_date'];
-    var alasan = detailData['reason'];
-    var durasi = detailData['leave_duration'];
+    var alasan = detailData['uraian'];
+    var durasi = detailData['durasi'];
     var status;
     if (valuePolaPersetujuan.value == "1") {
       status = detailData['status'];

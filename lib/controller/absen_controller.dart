@@ -2119,8 +2119,12 @@ class AbsenController extends GetxController {
           var connect = Api.connectionApi(
               "post", body, typewfh == "wfh" ? "wfh" : "kirimAbsen");
           connect.then((dynamic res) async {
-            print("respon wfh ${res.statusCode}");
-            if (res.statusCode == 200) {
+            if(res == false){
+              isLoaingAbsensi.value = false;
+              Get.back(); 
+              UtilsAlert.koneksiBuruk();
+            }else{
+              if (res.statusCode == 200) {
               var valueBody = jsonDecode(res.body);
               print("respon wfh ${valueBody}");
               // for (var element in sysData.value) {
@@ -2183,7 +2187,7 @@ class AbsenController extends GetxController {
               ));
             } else {
               isLoaingAbsensi.value = false;
-              Get.back();
+              Get.back(); 
               UtilsAlert.koneksiBuruk();
               // UtilsAlert.showCheckOfflineAbsensiKesalahanServer(
               //     positiveBtnPressed: () {
@@ -2193,6 +2197,8 @@ class AbsenController extends GetxController {
               // });
               //error
             }
+            }
+            
           });
           // .catchError((error) {
           //   isLoaingAbsensi.value = false;

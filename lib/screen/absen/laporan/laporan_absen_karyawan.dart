@@ -1280,7 +1280,7 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
     int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
     int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
 
-    //alur normal
+
     if (totalMinutes1 < totalMinutes2) {
 // Menggabungkan tanggal hari ini dengan waktu dari string
       startTime = DateTime.parse(
@@ -1339,6 +1339,7 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
       print(
           "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
     }
+
     var tipeAbsen = AppData.informasiUser![0].tipeAbsen;
     var tipeAlpha = AppData.informasiUser![0].tipeAlpha;
     var list = tipeAlpha.toString().split(',').map(int.parse).toList();
