@@ -35,6 +35,10 @@ class DailyTaskController extends GetxController {
   var tempTitle = ''.obs;
   var tempTanggalSelesai = ''.obs;
   var tempStatus = 0.obs;
+  var filterStatus = 'Semua'.obs;
+  var statusDraft = ''.obs;
+  var atasanStatus = ''.obs;
+  var isFormChanged = false.obs;
 
   @override
   void onReady() async {
@@ -66,6 +70,7 @@ class DailyTaskController extends GetxController {
           tempNamaStatus1.value = monitoringList[0][0]['full_name'];
           emId.value = monitoringList[0][0]['em_id'];
           print('ini emid dari monitoring ${emId.value}');
+          atasanStatus.value = 'draft';
           loadAllTask(emId.value);
         } else {
           // Get.snackbar("error", "gagal");
@@ -75,18 +80,21 @@ class DailyTaskController extends GetxController {
   }
 
   void kirimDailyTask() {
-    if (tanggalTask.value.text == '' || tanggalTask.value.text == '') {
-      Get.back();
-      UtilsAlert.showToast('Tanggal Tidak boleh kosong');
-      return;
+    if (statusDraft.value != 'draft') {
+      if (tanggalTask.value.text == '' || tanggalTask.value.text == '') {
+        Get.back();
+        UtilsAlert.showToast('Tanggal Tidak boleh kosong');
+        return;
+      }
+      bool isTaskEmpty = listTask.any((task) =>
+          task['judul'].trim().isEmpty || task['task'].trim().isEmpty);
+      if (isTaskEmpty) {
+        Get.back();
+        UtilsAlert.showToast('Judul task atau rincian tidak boleh kosong');
+        return;
+      }
     }
-    bool isTaskEmpty = listTask.any(
-        (task) => task['judul'].trim().isEmpty || task['task'].trim().isEmpty);
-    if (isTaskEmpty) {
-      Get.back();
-      UtilsAlert.showToast('Judul task atau rincian tidak boleh kosong');
-      return;
-    }
+
     var polaInput =
         DateFormat('EEEE, dd-MM-yyyy', 'id'); // 'id' untuk lokal Indonesia
     var polaOutput = DateFormat('yyyy-MM-dd');
@@ -105,42 +113,79 @@ class DailyTaskController extends GetxController {
     Map<String, dynamic> body = {
       'atten_date': atten_date,
       'em_id': emId,
-      'id': listTask.isEmpty ? "" : task[0]['daily_task_id'],
       'list_task': listTask,
+      'status': statusDraft.value,
     };
-    
-    if (statusForm.value == false) {
-      var connect = Api.connectionApi("post", body, "insertTaskDaily");
-      connect.then((dynamic res) {
-        var valueBody = jsonDecode(res.body);
-        if (res.statusCode == 200) {
-          print(valueBody);
-          Get.back();
-          Get.back();
-          loadAllTask(emId);
-          UtilsAlert.showToast(valueBody.message);
-        } else {
-          UtilsAlert.showToast(valueBody['message']);
-          print(valueBody['message']);
-          Get.back();
-        }
-      });
+    if (statusDraft != 'draft') {
+      if (statusForm.value == false) {
+        var connect = Api.connectionApi("post", body, "insertTaskDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            Get.back();
+            Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody.message);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            Get.back();
+          }
+        });
+      } else {
+        body['id']= listTask.isEmpty ? "" : task[0]['daily_task_id'];
+        var connect = Api.connectionApi("post", body, "updateTaskDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            Get.back();
+            Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody['message']);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            Get.back();
+          }
+        });
+      }
     } else {
-      var connect = Api.connectionApi("post", body, "updateTaskDaily");
-      connect.then((dynamic res) {
-        var valueBody = jsonDecode(res.body);
-        if (res.statusCode == 200) {
-          print(valueBody);
-          Get.back();
-          Get.back();
-          loadAllTask(emId);
-          UtilsAlert.showToast(valueBody['message']);
-        } else {
-          UtilsAlert.showToast(valueBody['message']);
-          print(valueBody['message']);
-          Get.back();
-        }
-      });
+      if (statusForm.value == false) {
+        var connect = Api.connectionApi("post", body, "insertDraftDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            // Get.back();
+            // Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody.message);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            Get.back();
+          }
+        });
+      } else {
+        body['id']= listTask.isEmpty ? "" : task[0]['daily_task_id'];
+        var connect = Api.connectionApi("post", body, "updateDraftDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            // Get.back();
+            // Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody['message']);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            Get.back();
+          }
+        });
+      }
     }
   }
 
@@ -152,10 +197,19 @@ class DailyTaskController extends GetxController {
     tanggal.value = '${dt.year}-${dt.month}-${dt.hour}';
   }
 
+  void setFormChanged() {
+    isFormChanged.value = true;
+  }
+
+  void resetFormState() {
+    isFormChanged.value = false;
+  }
+
   void loadAllTask(emId) {
     allTask.clear();
     Map<String, dynamic> body = {
       'atten_date': tanggal.value,
+      'atasanStatus': atasanStatus.value,
       'em_id': emId,
       'bulan': bulanSelectedSearchHistory.value,
       'tahun': tahunSelectedSearchHistory.value,
@@ -205,7 +259,7 @@ class DailyTaskController extends GetxController {
               breakoutNote: element['total_status_1'],
               breakoutPict: element['jumlah_task'],
               breakoutPlace: element['place_break_out'],
-              breakinTime: element['breakin_time'],
+              breakinTime: element['status_pengajuan'],
               breakinNote: element['breakin_note'],
               breakinPict: element['breakin_pict'],
               breakinPlace: element['place_break_in'],

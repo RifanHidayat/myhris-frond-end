@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:android_intent/android_intent.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
@@ -317,14 +318,11 @@ class GlobalController extends GetxController {
                     physics: const BouncingScrollPhysics(),
                     itemCount: dataHrd.value.length,
                     itemBuilder: (context, index) {
-                      var full_name =
-                          dataHrd.value[index]['full_name'];
-                      var job_title =
-                          dataHrd.value[index]['job_title'];
+                      var full_name = dataHrd.value[index]['full_name'];
+                      var job_title = dataHrd.value[index]['job_title'];
                       var gambar = dataHrd.value[index]['em_image'];
                       var nohp = dataHrd.value[index]['em_mobile'];
-                      var jeniKelamin =
-                          dataHrd.value[index]['em_gender'];
+                      var jeniKelamin = dataHrd.value[index]['em_gender'];
                       return InkWell(
                         onTap: () {
                           kirimKonfirmasiWa(
@@ -730,53 +728,18 @@ class GlobalController extends GetxController {
     }
   }
 
-  void kirimKonfirmasiWaHrd(
-       namaAtasan, nomorAtasan, jeniKelamin) async {
-    print('jenis kelamin $jeniKelamin');
-    print('nomor atasan $nomorAtasan');
-    if (nomorAtasan == "" || nomorAtasan == null || nomorAtasan == "null") {
-      UtilsAlert.showToast("Nomor wa atasan tidak valid");
+  void kirimKonfirmasiWaHrd(namaAtasan, nomorAtasan, jeniKelamin) async {
+    if (Platform.isAndroid) {
+      final intent = AndroidIntent(
+        action: "android.intent.action.VIEW",
+        data: "https://wa.me/",
+        package: "com.whatsapp",
+      );
+      await intent.launch();
     } else {
-      var dataUser = AppData.informasiUser;
-      var getEmid = dataUser![0].em_id;
-      var getFullName = dataUser[0].full_name;
-      var pesan;
-      if (jeniKelamin == "PRIA") {
-        pesan =
-            "Hallo pak ${namaAtasan}, saya ${getFullName} memiliki kendala dengan hak lembur";
-      } else {
-        pesan =
-            "Hallo bu ${namaAtasan}, saya ${getFullName} memiliki kendala dengan hak lembur";
-      }
-      var gabunganPesan = pesan;
-      var notujuan = nomorAtasan;
-      var filternohp = notujuan.substring(1);
-      var kodeNegara = 62;
-      var gabungNohp = "$kodeNegara$filternohp";
-
-      var whatsappURl_android =
-          "whatsapp://send?phone=$gabungNohp&text=${Uri.parse(gabunganPesan)}";
-      var whatappURL_ios =
-          "https://wa.me/$gabungNohp?text=${Uri.parse(gabunganPesan)}";
-
-      if (Platform.isIOS) {
-        // for iOS phone only
-        final url = Uri.parse(whatappURL_ios);
-        if (!await launchUrl(
-          url,
-          mode: LaunchMode.externalApplication,
-        )) {
-          UtilsAlert.showToast('Terjadi kesalahan $whatappURL_ios');
-        }
-      } else {
-        // android , web
-        final url = Uri.parse(whatsappURl_android);
-        if (!await launchUrl(
-          url,
-          mode: LaunchMode.externalApplication,
-        )) {
-          UtilsAlert.showToast('Terjadi kesalahan $whatsappURl_android');
-        }
+      final Uri url = Uri.parse("whatsapp://app");
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        print("WhatsApp tidak terinstal atau terjadi kesalahan");
       }
     }
   }

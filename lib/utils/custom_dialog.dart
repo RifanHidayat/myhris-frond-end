@@ -10,6 +10,7 @@ class CustomDialog extends StatelessWidget {
   final int? icon;
   final int? buttonStatus;
   final GestureTapCallback? positiveBtnPressed;
+  final GestureTapCallback? negativeBtnPressed;
 
   CustomDialog({
     @required this.title,
@@ -18,6 +19,7 @@ class CustomDialog extends StatelessWidget {
     this.negativeBtnText,
     this.icon,
     @required this.positiveBtnPressed,
+    this.negativeBtnPressed,
     @required this.style,
     @required this.buttonStatus,
   });
@@ -67,7 +69,8 @@ class CustomDialog extends StatelessWidget {
                   if (negativeBtnText != null)
                     TextButton(
                       child: Text(negativeBtnText!),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: negativeBtnPressed != null ? negativeBtnPressed :
+                      () => Navigator.of(context).pop(),
                     ),
                   TextButton(
                     child: Text(positiveBtnText!),

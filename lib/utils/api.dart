@@ -22,13 +22,13 @@ class Api {
 
   // static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
-  //  static var basicUrl = "http://mobilehris.siscom.id:3009/";
+   static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API DEV
   //  static var basicUrl = "http://kantor.membersis.com:2627/";
 //
   // API LOCAL
-  static var basicUrl = "http://192.168.20.246:2627/";
+  // static var basicUrl = "http://192.168.20.6:2627/";
 
   static var urlImage = 'https://imagehris.siscom.id:4431';
 
@@ -183,7 +183,7 @@ class Api {
   }
 
   validateAuth(code, message) {
-    if (code == 402 || code == "" || code == null) {
+    if (code == 401 || code == "" || code == null) {
       AppData.isLogin = false;
       Get.offAll(Login());
 
@@ -208,10 +208,10 @@ class ApiRequest {
           .encode('aplikasioperasionalsiscom:siscom@ptshaninformasi#2022@'));
 
   // API PROD
-  // static var basicUrl = "http://mobilehris.siscom.id:3009/";
+  static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API LOCAL
-  static var basicUrl = "http://192.168.20.246:2627/";
+  // static var basicUrl = "http://192.168.20.6:2627/";
 
   // API DEV
   //  static var basicUrl = "http://kantor.membersis.com:2627/";

@@ -41,11 +41,7 @@ class ApprovalController extends GetxController {
   var listStatusPengajuan = <Map<String, String>>[].obs;
 
   var statusPemgajuanIzin = ''.obs;
-  var listStatusPengajuanSP = [
-    {'name': "None", 'value': "none"},
-    {'name': "Potong Cuti", 'value': "potong_cuti"},
-    {'name': "Potong Gaji", 'value': "potong_gaji"}
-  ].obs;
+  var listStatusPengajuanSP = <Map<String, String>>[].obs;
   var statusPemgajuanSP = ''.obs;
   var konsekuemsiList = [].obs;
   var statusPengajuan = false;
@@ -105,6 +101,27 @@ class ApprovalController extends GetxController {
           ];
     listStatusPengajuan.refresh();
     print(listStatusPengajuan);
+  }
+
+  void updateListStatusSp() {
+    print('ini di update gak sih');
+    print('ini di update gak sih${searchSp}');
+    print('searchSp: ${searchSp.value}, searchTl: ${searchTl.value}');
+    print(searchSp.isEmpty || searchTl.isEmpty);
+    listStatusPengajuanSP.value = searchTl.isNotEmpty
+        ? [
+            {'name': "None", 'value': "none"},
+            {'name': "Potong Cuti", 'value': "potong_cuti"},
+            {'name': "Potong Gaji", 'value': "potong_gaji"},
+          ]
+        : [
+            {'name': "None", 'value': "none"},
+            {'name': "Potong Cuti", 'value': "potong_cuti"},
+            {'name': "Potong Gaji", 'value': "potong_gaji"},
+            {'name': "Teguran Lisan", 'value': "teguran_lisan"}
+          ].obs;
+    listStatusPengajuanSP.refresh();
+    print(listStatusPengajuanSP);
   }
 
   void getSaldo({emId, id}) {
@@ -770,6 +787,7 @@ class ApprovalController extends GetxController {
         }
         print(valueBody);
         updateListStatus();
+        updateListStatusSp();
       } else {
         UtilsAlert.showToast('yah error');
       }
@@ -883,6 +901,8 @@ class ApprovalController extends GetxController {
       'id': detailData[0]['id'].toString(),
       'alasan': alasanReject.value.text,
       'tipe_sp': detailData[0]['nama'].toString(),
+      'approval_id': AppData.informasiUser![0].em_id,
+      'list_konsekuensi': konsekuemsiList,
       'konsekuesi':
           statusPemgajuanSP.value == '' ? 'none' : statusPemgajuanSP.value
     };
@@ -1303,10 +1323,11 @@ class ApprovalController extends GetxController {
       }
     });
   }
+
   void updateTotalPercentage() {
     int total = 0;
     int count = taskControllers.length;
-    
+
     for (var controller in taskControllers) {
       int value = int.tryParse(controller.text) ?? 0;
       total += value;
@@ -1314,7 +1335,8 @@ class ApprovalController extends GetxController {
 
     // Ubah hasil pembagian ke tipe double
     totalPercentage.value = count > 0 ? (total / count).toDouble() : 0.0;
-}
+  }
+
   void infoTask(emPengaju) {
     listTask.clear();
     taskControllers.clear();

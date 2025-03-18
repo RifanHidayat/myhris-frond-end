@@ -91,6 +91,42 @@ class _DetailSuratPeringatanState
                             height: 16,
                           ),
                           Obx(() {
+                            var tl = controller.searchTl;
+                             return controller.searchTl.isNotEmpty
+                              ? Container(
+                                decoration: BoxDecoration(
+                                  color: Constanst.infoLight1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.info_circle5,
+                                      color: Constanst.colorPrimary,
+                                      size: 26,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        tl[0]['status'] == 'Approve'
+                                        ? "Karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}"
+                                        : 'Karyawan ${tl[0]['nama']} mempunyai teguran lisan dengan nomor ${tl[0]['nomor']}, status: ${tl[0]['status']}',
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w400,
+                                            color: Constanst.fgSecondary,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : SizedBox();
+                            }
+                          ),
+                          const SizedBox(height: 12),
+                          Obx(() {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -178,6 +214,185 @@ class _DetailSuratPeringatanState
                           const SizedBox(
                             height: 16,
                           ),
+                          Obx(() {
+                            return controller.statusPemgajuanSP.value !=
+                                    'teguran_lisan'
+                                ? SizedBox()
+                                : Column(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                Constanst.borderStyle1,
+                                            border: Border.all(
+                                                width: 1.0,
+                                                color: const Color.fromARGB(
+                                                    255, 211, 205, 205))),
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            left: 8,
+                                          ),
+                                          child: TextField(
+                                            cursorColor: Colors.black,
+                                            controller:
+                                                controller.alasanReject.value,
+                                            maxLines: null,
+                                            maxLength: 225,
+                                            autofocus: true,
+                                            decoration: new InputDecoration(
+                                                border: InputBorder.none,
+                                                hintText:
+                                                    "Pelanggaran yang di lakukan"),
+                                            keyboardType:
+                                                TextInputType.multiline,
+                                            textInputAction:
+                                                TextInputAction.done,
+                                            style: const TextStyle(
+                                                fontSize: 12.0,
+                                                height: 2.0,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 16,
+                                      ),
+                                      TextLabell(
+                                        text: "Konsekuensi",
+                                        size: 12,
+                                        weight: FontWeight.bold,
+                                      ),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      Obx(() {
+                                        return controller
+                                                    .konsekuemsiList.length ==
+                                                0
+                                            ? Text(
+                                                'Buat konsekuensi dengan klik tombol dibawah',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 11),
+                                              )
+                                            : Column(
+                                                children: List.generate(
+                                                    controller.konsekuemsiList
+                                                        .length, (index) {
+                                                  var data = controller
+                                                      .konsekuemsiList[index];
+                                                  return Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          flex: 90,
+                                                          child: TextFormField(
+                                                            onChanged: (value) {
+                                                              data['konsekuensi'] =
+                                                                  value;
+                                                            },
+                                                            controller:
+                                                                TextEditingController(
+                                                                    text: data[
+                                                                        'konsekuensi']),
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        12.0,
+                                                                    height: 2.0,
+                                                                    color: Colors
+                                                                        .black),
+                                                            decoration:
+                                                                InputDecoration(
+                                                              hintText:
+                                                                  'Masukan konsekuensi', // Menambahkan teks petunjuk saat field kosong
+                                                              border:
+                                                                  OutlineInputBorder(), // Menambahkan border di sekitar text field
+                                                              enabledBorder:
+                                                                  OutlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Constanst
+                                                                        .Secondary), // Warna border saat aktif
+                                                              ),
+                                                              focusedBorder:
+                                                                  OutlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Constanst
+                                                                        .Secondary), // Warna border saat field difokuskan
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                            flex: 10,
+                                                            child: InkWell(
+                                                                onTap: () {
+                                                                  controller
+                                                                      .konsekuemsiList
+                                                                      .removeAt(
+                                                                          index);
+                                                                  controller
+                                                                      .konsekuemsiList
+                                                                      .refresh();
+                                                                },
+                                                                child: Icon(
+                                                                  Icons.delete,
+                                                                  color: Colors
+                                                                      .red,
+                                                                )))
+                                                      ],
+                                                    ),
+                                                  );
+                                                }),
+                                              );
+                                      }),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          controller.konsekuemsiList
+                                              .add({"konsekuensi": ""});
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              top: 8, bottom: 8),
+                                          decoration: BoxDecoration(
+                                              color: Constanst.onPrimary,
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                              border: Border.all(
+                                                  width: 1,
+                                                  color: Constanst.onPrimary)),
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                              ),
+                                              TextLabell(
+                                                text: "Konsekuensi",
+                                                color: Constanst.colorWhite,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 16,
+                                      ),
+                                    ],
+                                  );
+                          }),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -433,9 +648,12 @@ class _DetailSuratPeringatanState
   void initState() {
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
+    controller.statusPemgajuanSP.value = "none";
+    controller.konsekuemsiList.clear();
     controller.fetchAlasan(widget.idxDetail);
     super.initState();
     var emId = AppData.informasiUser![0].em_id;
+
 
     if (controllerGlobal.valuePolaPersetujuan.value.toString() == "1") {
       if (controller.detailData[0]['nama_approve1'] == "" ||
