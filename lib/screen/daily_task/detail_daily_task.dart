@@ -18,14 +18,17 @@ class DetailDailyTask extends StatefulWidget {
 class _DetailDailyTaskState extends State<DetailDailyTask> {
   final controller = Get.find<DailyTaskController>();
   @override
-  // void initState() {
-  //   super.initState();
-  //   // controller.loadTask(widget.id);
-  // }
+
+  void initState() {
+    super.initState();
+    controller.loadTask(widget.id);
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         backgroundColor: Constanst.colorWhite,
         elevation: 0,
@@ -33,6 +36,14 @@ class _DetailDailyTaskState extends State<DetailDailyTask> {
         titleSpacing: 0,
         centerTitle: true,
         title: const Text("Detail Daily Task"),
+
+      appBar: AppBar(title: Text('Detail Your Task')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(FormDailyTask());
+        },
+        child: Icon(Icons.add),
+
       ),
       body: widget.id == null || widget.id == 0
           ? Center(child: Text('hari ini gak ada task, yuk kita bikin'))
@@ -42,6 +53,7 @@ class _DetailDailyTaskState extends State<DetailDailyTask> {
             ),
     );
   }
+
 Widget descMasuk() {
   return Obx(() {
     return controller.task.isEmpty
@@ -170,4 +182,5 @@ Widget descMasuk() {
           );
   });
 }
+
 }
