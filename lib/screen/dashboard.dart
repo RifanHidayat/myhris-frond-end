@@ -561,91 +561,91 @@ class _DashboardState extends State<Dashboard> {
                                       : sliderBanner(),
                                   const SizedBox(height: 10),
 
-                                  controller.showPengumuman.value == false
-                                      ? const SizedBox()
-                                      : controller
-                                              .informasiDashboard.value.isEmpty
-                                          ? const SizedBox()
-                                          : Column(
-                                              children: [
-                                                Container(
-                                                  width: double.infinity,
-                                                  height: 6,
-                                                  color: Constanst
-                                                      .colorNeutralBgSecondary,
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 16.0,
-                                                          top: 16.0,
-                                                          right: 8.0),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        "Informasi",
-                                                        style:
-                                                            GoogleFonts.inter(
-                                                                color: Constanst
-                                                                    .fgPrimary,
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500),
-                                                      ),
-                                                      Material(
-                                                        color: Constanst
-                                                            .colorWhite,
-                                                        child: InkWell(
-                                                          customBorder:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                Constanst
-                                                                    .borderStyle5,
-                                                          ),
-                                                          onTap: () =>
-                                                              Get.to(Informasi(
-                                                            index: 0,
-                                                          )),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .fromLTRB(
-                                                                    8.0,
-                                                                    3.0,
-                                                                    8.0,
-                                                                    3.0),
-                                                            child: Text(
-                                                              "Lihat semua",
-                                                              style: GoogleFonts.inter(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Constanst
-                                                                      .infoLight),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                  // controller.showPengumuman.value == false
+                                  //     ? const SizedBox()
+                                  //     : controller
+                                  //             .informasiDashboard.value.isEmpty
+                                  //         ? const SizedBox()
+                                  //         : Column(
+                                  //             children: [
+                                  //               Container(
+                                  //                 width: double.infinity,
+                                  //                 height: 6,
+                                  //                 color: Constanst
+                                  //                     .colorNeutralBgSecondary,
+                                  //               ),
+                                  //               Padding(
+                                  //                 padding:
+                                  //                     const EdgeInsets.only(
+                                  //                         left: 16.0,
+                                  //                         top: 16.0,
+                                  //                         right: 8.0),
+                                  //                 child: Row(
+                                  //                   crossAxisAlignment:
+                                  //                       CrossAxisAlignment
+                                  //                           .start,
+                                  //                   mainAxisAlignment:
+                                  //                       MainAxisAlignment
+                                  //                           .spaceBetween,
+                                  //                   children: [
+                                  //                     Text(
+                                  //                       "Informasi",
+                                  //                       style:
+                                  //                           GoogleFonts.inter(
+                                  //                               color: Constanst
+                                  //                                   .fgPrimary,
+                                  //                               fontSize: 18,
+                                  //                               fontWeight:
+                                  //                                   FontWeight
+                                  //                                       .w500),
+                                  //                     ),
+                                  //                     Material(
+                                  //                       color: Constanst
+                                  //                           .colorWhite,
+                                  //                       child: InkWell(
+                                  //                         customBorder:
+                                  //                             RoundedRectangleBorder(
+                                  //                           borderRadius:
+                                  //                               Constanst
+                                  //                                   .borderStyle5,
+                                  //                         ),
+                                  //                         onTap: () =>
+                                  //                             Get.to(Informasi(
+                                  //                           index: 0,
+                                  //                         )),
+                                  //                         child: Padding(
+                                  //                           padding:
+                                  //                               const EdgeInsets
+                                  //                                   .fromLTRB(
+                                  //                                   8.0,
+                                  //                                   3.0,
+                                  //                                   8.0,
+                                  //                                   3.0),
+                                  //                           child: Text(
+                                  //                             "Lihat semua",
+                                  //                             style: GoogleFonts.inter(
+                                  //                                 fontSize: 14,
+                                  //                                 fontWeight:
+                                  //                                     FontWeight
+                                  //                                         .w500,
+                                  //                                 color: Constanst
+                                  //                                     .infoLight),
+                                  //                           ),
+                                  //                         ),
+                                  //                       ),
+                                  //                     ),
+                                  //                   ],
+                                  //                 ),
+                                  //               ),
+                                  //             ],
+                                  //           ),
 
-                                  controller.showPengumuman.value == false
-                                      ? const SizedBox()
-                                      : controller
-                                              .informasiDashboard.value.isEmpty
-                                          ? const SizedBox()
-                                          : listInformasi(),
+                                  // controller.showPengumuman.value == false
+                                  //     ? const SizedBox()
+                                  //     : controller
+                                  //             .informasiDashboard.value.isEmpty
+                                  //         ? const SizedBox()
+                                  //         : listInformasi(),
 
                                   controller.showPkwt.value == false
                                       ? const SizedBox()
@@ -1179,8 +1179,9 @@ class _DashboardState extends State<Dashboard> {
             ),
           ),
           // _isVisible
-          //     ?
-          Column(
+          controller.showAbsen.value == false
+          ? SizedBox()
+          :Column(
             children: [
               const Divider(
                 thickness: 1,

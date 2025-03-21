@@ -19,69 +19,113 @@ class DailyTaskAtasan extends StatefulWidget {
   State<DailyTaskAtasan> createState() => _DailyTaskAtasanState();
 }
 
-
 class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
   @override
   void initState() {
     super.initState();
     controller.getTimeNow();
-    
   }
+
   final DailyTaskController controller = Get.put(DailyTaskController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(backgroundColor: Constanst.colorWhite,
-        elevation: 0,
-        leadingWidth: 50,
-        titleSpacing: 0,
-        centerTitle: true,
-        title: const Text("Daily Task")),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  filterData(),
-                  Expanded(child: status())
-                ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight) * 1,
+        child: AppBar(
+            backgroundColor: Constanst.colorWhite,
+            elevation: 0,
+            // leadingWidth: controller.statusFormPencarian.value ? 50 : 16,
+            titleSpacing: 0,
+            centerTitle: true,
+            title: Text(
+              "Daily Task",
+              style: GoogleFonts.inter(
+                  color: Constanst.fgPrimary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18),
+            ),
+            leading: IconButton(
+              icon: Icon(
+                Iconsax.arrow_left,
+                color: Constanst.fgPrimary,
+                size: 24,
               ),
+              onPressed: () {
+                Get.back();
+              },
             ),
-            Expanded(
-              child: Obx(() {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: controller.allTask.isEmpty
-                      ? Center(
-                          child: Text('Sedang memuat data, sabar ya'),
-                        )
-                      : listAbsen(),
-                );
-              }
-                    ),
-            ),
-          ],
-        ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  var em_id = controller.emId.value;
+                  UtilsAlert.showLoadingIndicator(context);
+                  controller.generateAndOpenPdf(em_id);
+                },
+                icon: Icon(
+                  Iconsax.document_text,
+                  color: Constanst.fgPrimary,
+                  size: 24,
+                ),
+                padding: EdgeInsets.only(right: 16.0),
+              )
+            ]),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: filterData(),
+          ),
+          Expanded(
+            child: Obx(() {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: controller.allTask.isEmpty
+                    ? Center(
+                        child: Text('Sedang memuat data, sabar ya'),
+                      )
+                    : listAbsen(),
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 
   Widget listAbsen() {
+    String filter = controller.filterStatus.value;
+
+    // Saring daftar task berdasarkan filter yang dipilih
+    List<DailyTaskModel> filteredTasks = controller.allTask.where((task) {
+      if (filter == "Semua") {
+        return true;
+      } else if (filter == 'Ongoing') {
+        return task.breakoutTime != 0;
+      } else if (filter == 'Finished') {
+        return task.breakoutNote == task.breakoutPict && task.breakoutNote != 0;
+      }
+      return false;
+    }).toList();
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      itemCount: controller.allTask.length,
+      itemCount: filteredTasks.length,
       itemBuilder: (context, index) {
-        DateTime now = DateTime.now();
-        DateTime date = DateTime(now.year, now.month, index + 1);
+        // DateTime now = DateTime.now();
+        // DateTime date = DateTime(now.year, now.month, index + 1);
 
-        DailyTaskModel taskForDate = controller.allTask.firstWhere(
-          (task) => task.date == date.toString().substring(0, 10),
-          orElse: () => DailyTaskModel(),
-        );
+        // DailyTaskModel taskForDate = controller.allTask.firstWhere(
+        //   (task) => task.date == date.toString().substring(0, 10),
+        //   orElse: () => DailyTaskModel(),
+        // );
+
+        DailyTaskModel task = filteredTasks[index];
+        DateTime date = DateTime.parse(task.date);
 
         // return Obx(() {
-          return tampilan2(taskForDate, date);
+        return tampilan2(task, date);
         // });
       },
     );
@@ -112,66 +156,6 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
     print('ini waktu 1${AppData.informasiUser![0].startTime}');
     int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
     int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
-
-    //alur normal
-    // if (totalMinutes1 < totalMinutes2) {
-    //   startTime = DateTime.parse(
-    //       '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
-    //   endTime = DateTime.parse(
-    //       '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
-
-    //   //alur beda hari
-    // } else if (totalMinutes1 > totalMinutes2) {
-    //   var waktu3 =
-    //       TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
-    //   int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
-
-    //   if (totalMinutes2 > totalMinutes3) {
-    //     print("masuk sini view las user");
-    //     var today;
-    //     if (index.atten_date!.isNotEmpty) {
-    //       today = DateTime.parse(index.atten_date!);
-    //     }
-    //     var yesterday = today.add(const Duration(days: 1));
-    //     startDate = DateFormat('yyyy-MM-dd').format(yesterday);
-    //     endDate = DateFormat('yyyy-MM-dd').format(today);
-    //     startTime = DateTime.parse(
-    //         '$startDate ${AppData.informasiUser![0].startTime}:00');
-    //     endTime =
-    //         DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
-    //     print('ini  bener gakl lu${startTime.isAfter(today)}');
-    //   } else {
-    //     var today;
-    //     print('masa lu kosong sih ${index.atten_date}');
-    //     // if (index.atten_date!.isNotEmpty) {
-    //     //   today = DateTime.parse(index.atten_date!);
-    //     // } else {
-    //     //   today = DateTime.now();
-    //     // }
-    //     today = DateTime.now();
-    //     var yesterday = today.add(const Duration(days: 1));
-
-    //     startDate = DateFormat('yyyy-MM-dd').format(today);
-    //     endDate = DateFormat('yyyy-MM-dd').format(yesterday);
-
-    //     startTime = DateTime.parse(
-    //         '$startDate ${AppData.informasiUser![0].startTime}:00'); // Waktu kemarin
-    //     endTime =
-    //         DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
-    //     print(
-    //         'ini  bener gakl lu${startTime.isBefore(today)}'); // Waktu hari ini
-    //     print('ini  bener gakl lu${startTime}'); // Waktu hari ini
-    //     print('ini  bener gakl lu${endTime}'); // Waktu hari ini
-    //   }
-    // } else {
-    //   startTime = AppData.informasiUser![0].startTime;
-    //   endTime = AppData.informasiUser![0].endTime;
-
-    //   startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    //   endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    //   print(
-    //       "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
-    // }
     var tipeAbsen = AppData.informasiUser![0].tipeAbsen;
     var tipeAlpha = AppData.informasiUser![0].tipeAlpha;
     var list = tipeAlpha.toString().split(',').map(int.parse).toList();
@@ -219,184 +203,191 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
         controller.tipeAlphaAbsen.value = 0;
       }
     }
+    String statusString =
+        index.breakoutNote == index.breakoutPict && index.breakoutNote != 0
+            ? 'Finished'
+            : (int.tryParse(index.breakoutTime.toString())! <=
+                        int.tryParse(index.breakoutPict.toString())! &&
+                    index.breakoutTime != 0)
+                ? 'Ongoing'
+                : '';
+    Color statusColor =
+        index.breakoutNote == index.breakoutPict && index.breakoutNote != 0
+            ? Colors.green
+            : Colors.orange;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: InkWell(
         customBorder: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12))),
         onTap: () async {
-          UtilsAlert.showLoadingIndicator(context);
-          await controller.loadTask(index.id);
-          Get.to(DetailDailyTask(index.id));
+          if (index.atten_date != null) {
+            UtilsAlert.showLoadingIndicator(context);
+            await controller.loadTask(index.id);
+            Get.to(DetailDailyTask(index.id));
+          }
         },
-        child: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(width: 1, color: Constanst.fgBorder)),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 15,
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Constanst.colorNeutralBgSecondary,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8.0),
-                        bottomLeft: Radius.circular(8.0),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  color: index.atten_date == null
+                      ? Constanst.colorNeutralBgSecondary
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(width: 1, color: Constanst.fgBorder)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 15,
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: index.atten_date != null
+                              ? Constanst.colorNeutralBgSecondary
+                              : Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8.0),
+                            bottomLeft: Radius.circular(8.0),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                          child: index.namaHariLibur != null ||
+                                  index.offDay.toString() != '0'
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                        DateFormat('d').format(
+                                            DateFormat('yyyy-MM-dd').parse(
+                                                index.date ?? date.toString())),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                          color: Constanst.fgPrimary,
+                                        )),
+                                    Text(
+                                        DateFormat('EEEE', 'id').format(
+                                            DateFormat('yyyy-MM-dd').parse(
+                                                index.date ?? date.toString())),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w400,
+                                          color: Constanst.fgPrimary,
+                                        )),
+                                  ],
+                                )
+                              : Column(
+                                  children: [
+                                    Text(
+                                        DateFormat('d').format(
+                                            DateFormat('yyyy-MM-dd')
+                                                .parse(index.date)),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.red,
+                                        )),
+                                    Text(
+                                        DateFormat('EEEE', 'id').format(
+                                            DateFormat('yyyy-MM-dd')
+                                                .parse(index.date)),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.red,
+                                        )),
+                                  ],
+                                ),
+                        ),
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
-                      child: index.namaHariLibur != null || index.offDay.toString() != '0'
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                    DateFormat('d').format(
-                                        DateFormat('yyyy-MM-dd').parse(
-                                            index.date ?? date.toString())),
-                                    style: GoogleFonts.inter(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: Constanst.fgPrimary,
-                                    )),
-                                Text(
-                                    DateFormat('EEEE', 'id').format(
-                                        DateFormat('yyyy-MM-dd').parse(
-                                            index.date ?? date.toString())),
-                                    style: GoogleFonts.inter(
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w400,
-                                      color: Constanst.fgPrimary,
-                                    )),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                Text(
-                                    DateFormat('d').format(
-                                        DateFormat('yyyy-MM-dd')
-                                            .parse(index.date)),
-                                    style: GoogleFonts.inter(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.red,
-                                    )),
-                                Text(
-                                    DateFormat('EEEE', 'id').format(
-                                        DateFormat('yyyy-MM-dd')
-                                            .parse(index.date)),
-                                    style: GoogleFonts.inter(
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.red,
-                                    )),
-                              ],
-                            ),
-                    ),
                   ),
-                ),
-              ),
-              Expanded(
-                flex: 85,
-                child: index.atten_date == "" || index.atten_date == null
-                    ?
-                    //tidak ada absen
-                    index.namaHariLibur != null
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 18),
-                            child: TextLabell(
-                              text: index.namaHariLibur,
-                              weight: FontWeight.w500,
-                            ))
-                        : index.namaTugasLuar != null
-                            ? const Padding(
-                                padding: EdgeInsets.only(left: 18),
+                  Expanded(
+                    flex: 85,
+                    child: index.atten_date == "" || index.atten_date == null
+                        ?
+                        //tidak ada absen
+                        index.namaHariLibur != null
+                            ? Padding(
+                                padding: const EdgeInsets.only(left: 18),
                                 child: TextLabell(
-                                  text: "Tugas Luar",
+                                  text: index.namaHariLibur,
                                   weight: FontWeight.w500,
                                 ))
-                            : index.namaDinasLuar != null
+                            : index.namaTugasLuar != null
                                 ? const Padding(
                                     padding: EdgeInsets.only(left: 18),
                                     child: TextLabell(
-                                      text: "Dinas Luar",
+                                      text: "Tugas Luar",
                                       weight: FontWeight.w500,
                                     ))
-                                : index.namaCuti != null
+                                : index.namaDinasLuar != null
                                     ? const Padding(
                                         padding: EdgeInsets.only(left: 18),
                                         child: TextLabell(
-                                          text: "Cuti",
+                                          text: "Dinas Luar",
                                           weight: FontWeight.w500,
                                         ))
-                                    : index.namaSakit != null
-                                        ? Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 18),
+                                    : index.namaCuti != null
+                                        ? const Padding(
+                                            padding: EdgeInsets.only(left: 18),
                                             child: TextLabell(
-                                              text:
-                                                  "Sakit : ${index.namaSakit}",
+                                              text: "Cuti",
                                               weight: FontWeight.w500,
                                             ))
-                                        : index.namaIzin != null
+                                        : index.namaSakit != null
                                             ? Padding(
                                                 padding: const EdgeInsets.only(
                                                     left: 18),
                                                 child: TextLabell(
                                                   text:
-                                                      "Izin : ${index.namaIzin}",
+                                                      "Sakit : ${index.namaSakit}",
                                                   weight: FontWeight.w500,
                                                 ))
-                                            : index.offDay.toString() == '0'
-                                                ? const Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left: 18),
-                                                    child: TextLabell(
-                                                      text: "Hari Libur Kerja",
-                                                      weight: FontWeight.w500,
-                                                    ))
-                                                : const Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left: 18),
+                                            : index.namaIzin != null
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 18),
                                                     child: TextLabell(
                                                       text:
-                                                          "Belum ada task",
+                                                          "Izin : ${index.namaIzin}",
                                                       weight: FontWeight.w500,
                                                     ))
-                    : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          index.atten_date != "" || index.atten_date != null
-                              ? controller.tipeAlphaAbsen.value == 1 &&
-                                      (endTime.isBefore(now))
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(top: 12),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Iconsax.info_circle,
-                                            size: 15,
-                                            color: Constanst.infoLight,
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          TextLabell(
-                                            text:
-                                                "ALPHA ${controller.catatanAlpha.value}",
-                                            weight: FontWeight.w400,
-                                            size: 11.0,
-                                          ),
-                                        ],
-                                      ))
-                                  : index.namaHariLibur != null
+                                                : index.offDay.toString() == '0'
+                                                    ? const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 18),
+                                                        child: TextLabell(
+                                                          text:
+                                                              "Hari Libur Kerja",
+                                                          weight:
+                                                              FontWeight.w500,
+                                                        ))
+                                                    : const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 18),
+                                                        child: TextLabell(
+                                                          text:
+                                                              "Belum ada task",
+                                                          weight:
+                                                              FontWeight.w500,
+                                                        ))
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              index.atten_date != "" || index.atten_date != null
+                                  ? controller.tipeAlphaAbsen.value == 1 &&
+                                          (endTime.isBefore(now))
                                       ? Padding(
                                           padding:
                                               const EdgeInsets.only(top: 12),
@@ -411,16 +402,18 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                                                 width: 10,
                                               ),
                                               TextLabell(
-                                                text: index.namaHariLibur,
+                                                text:
+                                                    "ALPHA ${controller.catatanAlpha.value}",
                                                 weight: FontWeight.w400,
                                                 size: 11.0,
                                               ),
                                             ],
                                           ))
-                                      : index.namaTugasLuar != null
+                                      : index.namaHariLibur != null
                                           ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 4.0),
                                               child: Row(
                                                 children: [
                                                   Icon(
@@ -429,20 +422,20 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                                                     color: Constanst.infoLight,
                                                   ),
                                                   const SizedBox(
-                                                    width: 10,
+                                                    width: 4,
                                                   ),
                                                   TextLabell(
-                                                    text: index.namaTugasLuar,
+                                                    text: index.namaHariLibur,
                                                     weight: FontWeight.w400,
                                                     size: 11.0,
                                                   ),
                                                 ],
                                               ))
-                                          : index.namaDinasLuar != null
+                                          : index.namaTugasLuar != null
                                               ? Padding(
                                                   padding:
-                                                      const EdgeInsets.only(
-                                                          top: 12),
+                                                      const EdgeInsets.symmetric(
+                                                          vertical: 4.0),
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -452,21 +445,21 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                                                             Constanst.infoLight,
                                                       ),
                                                       const SizedBox(
-                                                        width: 10,
+                                                        width: 4,
                                                       ),
                                                       TextLabell(
                                                         text:
-                                                            index.namaDinasLuar,
+                                                            index.namaTugasLuar,
                                                         weight: FontWeight.w400,
                                                         size: 11.0,
                                                       ),
                                                     ],
                                                   ))
-                                              : index.namaCuti != null
+                                              : index.namaDinasLuar != null
                                                   ? Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 12),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 4),
                                                       child: Row(
                                                         children: [
                                                           Icon(
@@ -476,23 +469,23 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                                                                 .infoLight,
                                                           ),
                                                           const SizedBox(
-                                                            width: 10,
+                                                            width: 4,
                                                           ),
                                                           TextLabell(
-                                                            text:
-                                                                index.namaCuti,
+                                                            text: index
+                                                                .namaDinasLuar,
                                                             weight:
                                                                 FontWeight.w400,
                                                             size: 11.0,
                                                           ),
                                                         ],
                                                       ))
-                                                  : index.namaSakit != null
+                                                  : index.namaCuti != null
                                                       ? Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                  .only(
-                                                                  top: 12),
+                                                                  .symmetric(
+                                                                  vertical: 4),
                                                           child: Row(
                                                             children: [
                                                               Icon(
@@ -503,11 +496,11 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                                                                     .infoLight,
                                                               ),
                                                               const SizedBox(
-                                                                width: 10,
+                                                                width: 4,
                                                               ),
                                                               TextLabell(
                                                                 text: index
-                                                                    .namaSakit,
+                                                                    .namaCuti,
                                                                 weight:
                                                                     FontWeight
                                                                         .w400,
@@ -515,75 +508,146 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                                                               ),
                                                             ],
                                                           ))
-                                                      : index.offDay
-                                                                  .toString() ==
-                                                              '0'
+                                                      : index.namaSakit != null
                                                           ? Padding(
                                                               padding:
                                                                   const EdgeInsets
-                                                                      .only(
-                                                                      left: 18),
-                                                              child: const TextLabell(
-                                                                text:
-                                                                    "Hari Libur Kerja",
-                                                                weight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                size: 11.0,
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          4.0),
+                                                              child: Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    Iconsax
+                                                                        .info_circle,
+                                                                    size: 15,
+                                                                    color: Constanst
+                                                                        .infoLight,
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 4,
+                                                                  ),
+                                                                  TextLabell(
+                                                                    text: index
+                                                                        .namaSakit,
+                                                                    weight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    size: 11.0,
+                                                                  ),
+                                                                ],
                                                               ))
-                                                          : SizedBox()
-                              : const SizedBox(),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 18),
-                            child: Text(
-                              "Lihat task",
-                              style: GoogleFonts.inter(
-                                  color: Constanst
-                                      .fgPrimary,
-                                  fontWeight:
-                                      FontWeight.w500,
-                                  fontSize: 14),
-                            ),
+                                                          : index.offDay.toString() ==
+                                                                  '0'
+                                                              ? Padding(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          4.0),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Icon(
+                                                                        Iconsax
+                                                                            .info_circle,
+                                                                        size:
+                                                                            15,
+                                                                        color: Constanst
+                                                                            .infoLight,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            4,
+                                                                      ),
+                                                                      const TextLabell(
+                                                                        text:
+                                                                            "Hari Libur Kerja",
+                                                                        weight:
+                                                                            FontWeight.w300,
+                                                                        size:
+                                                                            11.0,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              : SizedBox()
+                                  : const SizedBox(),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 18, top: 4.0),
+                                child: Text(
+                                  "Lihat task",
+                                  style: GoogleFonts.inter(
+                                      color: Constanst.fgPrimary,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 18.0,
+                                    right: 8.0,
+                                    top: 8.0,
+                                    bottom: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Finish: ${index.breakoutNote.toString()}',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Ongoing: ${index.breakoutTime.toString()}',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Jumlah: ${index.breakoutPict.toString()}',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 18.0, right: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Finish: ${index.breakoutNote.toString()}',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                Text(
-                                  'Ongoing: ${index.breakoutTime.toString()}',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                Text(
-                                  'Jumlah: ${index.breakoutPict.toString()}',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        
-                        ],
+                  )
+                ],
+              ),
+            ),
+            index.atten_date == null
+                ? SizedBox()
+                : Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-              )
-            ],
-          ),
+                      child: Text(
+                        statusString,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: statusColor,
+                        ),
+                      ),
+                    ),
+                  ),
+          ],
         ),
       ),
     );
@@ -649,75 +713,82 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                     ),
                     Expanded(
                       child: SingleChildScrollView(
-                        controller: scrollController, // Controller untuk scroll
-                        // physics: const BouncingScrollPhysics(),
+                        controller: scrollController,
                         child: Obx(() {
                           return Column(
                             children: List.generate(
-                                controller.monitoringList.length, (index) {
-                                  var monitoring =  controller.monitoringList[0];
-                              var full_name =
-                                  monitoring[index]['full_name'];
-                              var em_id = monitoring[index]['em_id'];
-                              var isSelected =
-                                  controller.tempNamaStatus1.value == full_name;
+                              controller.monitoringList[0].length,
+                              (index) {
+                                var monitoring = controller.monitoringList[0];
+                                var full_name = monitoring[index]['full_name'];
+                                var em_id = monitoring[index]
+                                    ['em_id']; // Perbaikan di sini
 
-                              return InkWell(
-                                onTap: () {
-                                  controller.tempNamaStatus1.value = full_name;
-                                  controller.emId.value = em_id;
-                                  controller.loadAllTask(controller.emId.value);
-                                  Navigator.pop(context);
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 16, 16, 16),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const SizedBox(width: 20),
-                                          Text(
-                                            full_name.toString(),
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16,
-                                              color: Constanst.fgPrimary,
+                                var isSelected =
+                                    controller.tempNamaStatus1.value ==
+                                        full_name;
+
+                                return InkWell(
+                                  onTap: () {
+                                    controller.tempNamaStatus1.value =
+                                        full_name;
+                                    controller.emId.value = em_id;
+                                    controller.atasanStatus.value = 'draft';
+                                    controller
+                                        .loadAllTask(controller.emId.value);
+                                    Navigator.pop(context);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        0, 16, 16, 16),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const SizedBox(width: 20),
+                                            Text(
+                                              full_name.toString(),
+                                              style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                                color: Constanst.fgPrimary,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        height: 20,
-                                        width: 20,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: isSelected ? 2 : 1,
-                                            color: isSelected
-                                                ? Constanst.onPrimary
-                                                : Constanst.onPrimary
-                                                    .withOpacity(0.5),
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          ],
                                         ),
-                                        child: isSelected
-                                            ? Container(
-                                                decoration: BoxDecoration(
-                                                  color: Constanst.onPrimary,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              )
-                                            : null,
-                                      ),
-                                    ],
+                                        Container(
+                                          height: 20,
+                                          width: 20,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: isSelected ? 2 : 1,
+                                              color: isSelected
+                                                  ? Constanst.onPrimary
+                                                  : Constanst.onPrimary
+                                                      .withOpacity(0.5),
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: isSelected
+                                              ? Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Constanst.onPrimary,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            }),
+                                );
+                              },
+                            ),
                           );
                         }),
                       ),
@@ -756,7 +827,7 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
           padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            // crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Obx(
                 () => Text(
@@ -769,12 +840,10 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                 ),
               ),
               const SizedBox(width: 16),
-              Expanded(
-                child: Icon(
-                  Iconsax.arrow_down_1,
-                  size: 18,
-                  color: Constanst.fgSecondary,
-                ),
+              Icon(
+                Iconsax.arrow_down_1,
+                size: 18,
+                color: Constanst.fgSecondary,
               ),
             ],
           ),
@@ -790,6 +859,7 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -822,7 +892,7 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                         this.controller.bulanSelectedSearchHistory.refresh();
                         this.controller.tahunSelectedSearchHistory.refresh();
                         this.controller.bulanDanTahunNow.refresh();
-
+                        controller.atasanStatus.value = 'draft';
                         controller.date.value = time;
                         controller.loadAllTask(controller.emId.value);
                       }
@@ -837,38 +907,89 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                     padding: const EdgeInsets.only(
                         top: 8.0, bottom: 8.0, left: 12.0, right: 12.0),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              Constanst.convertDateBulanDanTahun(
-                                  controller.bulanDanTahunNow.value),
-                              style: GoogleFonts.inter(
-                                  color: Constanst.fgSecondary,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: Icon(
-                                Iconsax.arrow_down_1,
-                                color: Constanst.fgSecondary,
-                                size: 18,
-                              ),
-                            )
-                          ],
+                        Text(
+                          Constanst.convertDateBulanDanTahun(
+                              controller.bulanDanTahunNow.value),
+                          style: GoogleFonts.inter(
+                              color: Constanst.fgSecondary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: Icon(
+                            Iconsax.arrow_down_1,
+                            color: Constanst.fgSecondary,
+                            size: 18,
+                          ),
+                        )
                       ],
                     ),
                   ),
                 ),
               ),
+              SizedBox(width: 8.0),
+              status(),
+              SizedBox(width: 8.0),
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  controller.filterStatus.value = value;
+                  print('ini value $value');
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: "Semua",
+                    child: Text("Semua"),
+                  ),
+                  PopupMenuItem(
+                    value: "Ongoing",
+                    child: Text("Ongoing"),
+                  ),
+                  PopupMenuItem(
+                    value: "Finished",
+                    child: Text("Finish"),
+                  ),
+                ],
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(
+                        color: Constanst
+                            .border), // Ganti dengan Constanst.border jika ada
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 12.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        controller.filterStatus.value,
+                        style: GoogleFonts.inter(
+                            color: Constanst
+                                .fgSecondary, // Ganti dengan Constanst.fgSecondary jika ada
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Iconsax.arrow_down_1,
+                        color: Constanst.fgSecondary,
+                        size: 18,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // SizedBox(width: 8.0),
+              // status()
             ],
           ),
         ),
       ),
     );
   }
-
 }

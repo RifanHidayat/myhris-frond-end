@@ -1,10 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
-import 'package:pdf/widgets.dart';
+import 'package:open_file_plus/open_file_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:siscom_operasional/model/daily_task_model.dart';
 import 'package:siscom_operasional/screen/daily_task/daily_task.dart';
 import 'package:siscom_operasional/utils/api.dart';
@@ -12,18 +17,14 @@ import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 
-import 'package:siscom_operasional/model/daily_task_model.dart';
-import 'package:siscom_operasional/utils/api.dart';
-import 'package:siscom_operasional/utils/app_data.dart';
-
-
 class DailyTaskController extends GetxController {
   var tipeAlphaAbsen = 0.obs;
   var catatanAlpha = ''.obs;
   var allTask = <DailyTaskModel>[].obs;
   var listTask = [].obs;
-
   var idTask = ''.obs;
+  var tanggalTaskOld = ''.obs;
+  var listTaskPdf = [].obs;
   var tanggalTask = TextEditingController().obs;
   var task = [].obs;
   var catatan = TextEditingController().obs;
@@ -42,6 +43,10 @@ class DailyTaskController extends GetxController {
   var tempTitle = ''.obs;
   var tempTanggalSelesai = ''.obs;
   var tempStatus = 0.obs;
+  var filterStatus = 'Semua'.obs;
+  var statusDraft = ''.obs;
+  var atasanStatus = ''.obs;
+  var isFormChanged = false.obs;
 
   @override
   void onReady() async {
@@ -73,6 +78,7 @@ class DailyTaskController extends GetxController {
           tempNamaStatus1.value = monitoringList[0][0]['full_name'];
           emId.value = monitoringList[0][0]['em_id'];
           print('ini emid dari monitoring ${emId.value}');
+          atasanStatus.value = 'draft';
           loadAllTask(emId.value);
         } else {
           // Get.snackbar("error", "gagal");
@@ -82,18 +88,21 @@ class DailyTaskController extends GetxController {
   }
 
   void kirimDailyTask() {
-    if (tanggalTask.value.text == '' || tanggalTask.value.text == '') {
-      Get.back();
-      UtilsAlert.showToast('Tanggal Tidak boleh kosong');
-      return;
+    if (statusDraft.value != 'draft') {
+      if (tanggalTask.value.text == '' || tanggalTask.value.text == '') {
+        Get.back();
+        UtilsAlert.showToast('Tanggal Tidak boleh kosong');
+        return;
+      }
+      bool isTaskEmpty = listTask.any((task) =>
+          task['judul'].trim().isEmpty || task['task'].trim().isEmpty);
+      if (isTaskEmpty) {
+        Get.back();
+        UtilsAlert.showToast('Judul task atau rincian tidak boleh kosong');
+        return;
+      }
     }
-    bool isTaskEmpty = listTask.any(
-        (task) => task['judul'].trim().isEmpty || task['task'].trim().isEmpty);
-    if (isTaskEmpty) {
-      Get.back();
-      UtilsAlert.showToast('Judul task atau rincian tidak boleh kosong');
-      return;
-    }
+
     var polaInput =
         DateFormat('EEEE, dd-MM-yyyy', 'id'); // 'id' untuk lokal Indonesia
     var polaOutput = DateFormat('yyyy-MM-dd');
@@ -112,42 +121,80 @@ class DailyTaskController extends GetxController {
     Map<String, dynamic> body = {
       'atten_date': atten_date,
       'em_id': emId,
-      'id': listTask.isEmpty ? "" : task[0]['daily_task_id'],
+      'tanggal_old': tanggalTaskOld.value,
       'list_task': listTask,
+      'status': statusDraft.value,
     };
-    
-    if (statusForm.value == false) {
-      var connect = Api.connectionApi("post", body, "insertTaskDaily");
-      connect.then((dynamic res) {
-        var valueBody = jsonDecode(res.body);
-        if (res.statusCode == 200) {
-          print(valueBody);
-          Get.back();
-          Get.back();
-          loadAllTask(emId);
-          UtilsAlert.showToast(valueBody.message);
-        } else {
-          UtilsAlert.showToast(valueBody['message']);
-          print(valueBody['message']);
-          Get.back();
-        }
-      });
+    if (statusDraft != 'draft') {
+      if (statusForm.value == false) {
+        var connect = Api.connectionApi("post", body, "insertTaskDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            Get.back();
+            Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody.message);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            Get.back();
+          }
+        });
+      } else {
+        body['id'] = listTask.isEmpty ? "" : task[0]['daily_task_id'];
+        var connect = Api.connectionApi("post", body, "updateTaskDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            Get.back();
+            Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody['message']);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            Get.back();
+          }
+        });
+      }
     } else {
-      var connect = Api.connectionApi("post", body, "updateTaskDaily");
-      connect.then((dynamic res) {
-        var valueBody = jsonDecode(res.body);
-        if (res.statusCode == 200) {
-          print(valueBody);
-          Get.back();
-          Get.back();
-          loadAllTask(emId);
-          UtilsAlert.showToast(valueBody['message']);
-        } else {
-          UtilsAlert.showToast(valueBody['message']);
-          print(valueBody['message']);
-          Get.back();
-        }
-      });
+      if (statusForm.value == false) {
+        var connect = Api.connectionApi("post", body, "insertDraftDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            // Get.back();
+            // Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody.message);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            // Get.back();
+          }
+        });
+      } else {
+        body['id'] = listTask.isEmpty ? "" : task[0]['daily_task_id'];
+        var connect = Api.connectionApi("post", body, "updateDraftDaily");
+        connect.then((dynamic res) {
+          var valueBody = jsonDecode(res.body);
+          if (res.statusCode == 200) {
+            print(valueBody);
+            // Get.back();
+            // Get.back();
+            loadAllTask(emId);
+            UtilsAlert.showToast(valueBody['message']);
+          } else {
+            UtilsAlert.showToast(valueBody['message']);
+            print(valueBody['message']);
+            // Get.back();
+          }
+        });
+      }
     }
   }
 
@@ -159,25 +206,31 @@ class DailyTaskController extends GetxController {
     tanggal.value = '${dt.year}-${dt.month}-${dt.hour}';
   }
 
+  void setFormChanged() {
+    isFormChanged.value = true;
+  }
+
+  void resetFormState() {
+    isFormChanged.value = false;
+  }
+
   void loadAllTask(emId) {
     allTask.clear();
     Map<String, dynamic> body = {
       'atten_date': tanggal.value,
+      'atasanStatus': atasanStatus.value,
       'em_id': emId,
       'bulan': bulanSelectedSearchHistory.value,
       'tahun': tahunSelectedSearchHistory.value,
-
     };
     var connect = Api.connectionApi("post", body, "getAllTaskDaily");
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-
         print('ini data daily ${valueBody['data']}');
         for (var element in valueBody['data'][0]) {
           allTask.add(DailyTaskModel(
               date: element['date'] ?? '',
-
               id: element['id'] ?? 0,
               em_id: element['em_id'] ?? "",
               atten_date: element['tgl_buat'],
@@ -211,13 +264,11 @@ class DailyTaskController extends GetxController {
               namaHariLibur: element['hari_libur'],
               jamKerja: element['jam_kerja'],
               jamPulang: element['jam_pulang'],
-
               breakoutTime: element['total_status_0'],
               breakoutNote: element['total_status_1'],
               breakoutPict: element['jumlah_task'],
-
               breakoutPlace: element['place_break_out'],
-              breakinTime: element['breakin_time'],
+              breakinTime: element['status_pengajuan'],
               breakinNote: element['breakin_note'],
               breakinPict: element['breakin_pict'],
               breakinPlace: element['place_break_in'],
@@ -263,4 +314,278 @@ class DailyTaskController extends GetxController {
     }
   }
 
+  Future<void> loadTaskPDF(em_id) async {
+    listTaskPdf.clear();
+    Map<String, dynamic> body = {'em_id': em_id};
+    try {
+      var res = await Api.connectionApi("post", body, "getTaskDailyPDF");
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        var dataList =
+            valueBody['data'] is List ? valueBody['data'] : [valueBody['data']];
+        listTaskPdf.addAll(dataList);
+        print('ini task $listTaskPdf');
+        Get.back();
+      } else {
+        print("Error: ${res.statusCode} - ${res.body}");
+        Get.back();
+      }
+    } catch (e) {
+      print("Exception saat load task: $e");
+      Get.back();
+    }
+  }
+
+  Future<void> generateAndOpenPdf(em_id) async {
+    await loadTaskPDF(em_id);
+    final pdf = pw.Document();
+    final pdfColor = Colors.red;
+    final int colorInt = pdfColor.value;
+    final imageData = await rootBundle.load('assets/icon.png');
+    final user = listTaskPdf[0];
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return [
+            // Header
+            pw.Center(
+              child: pw.Column(
+                children: [
+                  pw.SizedBox(height: 30),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    children: [
+                      pw.SizedBox(
+                        width: 70,
+                        child: pw.Image(
+                          pw.MemoryImage(imageData.buffer.asUint8List()),
+                          width: 70,
+                        ),
+                      ),
+                      pw.SizedBox(width: 25),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'PT . SHAN INFORMASI SISTEM',
+                            style: pw.TextStyle(
+                              fontSize: 24,
+                              color: PdfColor.fromInt(colorInt),
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                          pw.SizedBox(height: 8),
+                          pw.Text(
+                            'BEST SOLUTION FOR BUSINESS CONTROL',
+                            style: pw.TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 12),
+                  pw.Divider(thickness: 1),
+                ],
+              ),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // Title
+            pw.Center(
+              child: pw.Text(
+                'DAILY TASK',
+                style:
+                    pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+              ),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // Informasi Karyawan
+            _buildInfoRow("NAMA KARYAWAN", user['full_name']),
+            _buildInfoRow("JABATAN", user['jabatan']),
+            _buildInfoRow("POSISI", user['posisi']),
+            _buildInfoRow(
+                "PERIODE BULAN", Constanst.convertGetMonth(user['tgl_buat'])),
+
+            pw.SizedBox(height: 20),
+
+            // Tabel Task
+            _buildTaskTable(),
+          ];
+        },
+      ),
+    );
+
+    // Simpan PDF
+    final outputDir = await getTemporaryDirectory();
+    final filePath = '${outputDir.path}/daily_task_report.pdf';
+    final file = File(filePath);
+    await file.writeAsBytes(await pdf.save());
+
+    // Buka PDF
+    final result = await OpenFile.open(filePath);
+    if (result.type != ResultType.done) {
+      // Get.snackbar('Error', 'Failed to open PDF', snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+// Fungsi untuk membuat row informasi karyawan
+  pw.Widget _buildInfoRow(String title, String value) {
+    return pw.Container(
+      padding: pw.EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Expanded(
+            flex: 24,
+            child: pw.Text(title,
+                style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold, fontSize: 10.0)),
+          ),
+          pw.Text(":"),
+          pw.SizedBox(width: 4),
+          pw.Expanded(
+            flex: 68,
+            child: pw.Text(value,
+                style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.normal, fontSize: 10.0)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildTaskTable() {
+    final headers = [
+      "No",
+      "Tanggal",
+      "Hari",
+      "Judul",
+      "Rincian Task",
+      "Tingkat Kesulitan",
+      "Status",
+      "Tgl Finish",
+      "Durasi"
+    ];
+
+    final data = listTaskPdf.asMap().entries.map((entry) {
+      int index = entry.key + 1;
+      var task = entry.value;
+
+      var level;
+      switch (task['level']) {
+        case '1':
+          level = 'Sangat Mudah';
+          break;
+        case '2':
+          level = 'Mudah';
+          break;
+        case '3':
+          level = 'Normal';
+          break;
+        case '4':
+          level = 'Sulit';
+          break;
+        case '5':
+          level = 'Sangat Sulit';
+          break;
+        default:
+          level = "Tidak Diketahui";
+          break;
+      }
+
+      DateTime? tglBuat =
+          task['tgl_buat'] != null ? DateTime.tryParse(task['tgl_buat']) : null;
+      DateTime? tglFinish = task['tgl_finish'] != null
+          ? DateTime.tryParse(task['tgl_finish'])
+          : null;
+
+      String durasi = "-";
+      if (tglBuat != null && tglFinish != null) {
+        durasi = '${tglFinish.difference(tglBuat).inDays.toString()} Hari';
+      }
+
+      return [
+        index.toString(),
+        Constanst.convertDate1(task['tgl_buat']),
+        Constanst.convertGetDay(task['tgl_buat']),
+        task['judul'],
+        task['rincian'],
+        level.toString(),
+        task['status']?.toString() == '0' ? 'Ongoing' : 'Finish',
+        task['tgl_finish'] == null
+            ? '-'
+            : Constanst.convertDate1(task['tgl_finish']),
+        durasi
+      ];
+    }).toList();
+
+    return pw.Table(
+      border: pw.TableBorder.all(width: 1),
+      columnWidths: {
+        0: pw.FixedColumnWidth(40), // No
+        1: pw.FixedColumnWidth(80), // Tanggal
+        2: pw.FixedColumnWidth(80), // Hari
+        3: pw.FixedColumnWidth(80), // Judul
+        4: pw.FixedColumnWidth(160), // Rincian Task
+        5: pw.FixedColumnWidth(120), // Tingkat Kesulitan
+        6: pw.FixedColumnWidth(80), // Status
+        7: pw.FixedColumnWidth(80), // Tgl Finish
+        8: pw.FixedColumnWidth(80), // Durasi
+      },
+      children: [
+        // Header Tabel
+        pw.TableRow(
+          decoration: pw.BoxDecoration(color: PdfColors.grey300),
+          children: headers.map((header) {
+            return pw.Padding(
+              padding: pw.EdgeInsets.all(8),
+              child: pw.Text(
+                header,
+                style:
+                    pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 6.0),
+                textAlign: pw.TextAlign.center,
+              ),
+            );
+          }).toList(),
+        ),
+
+        ...data.map((row) {
+          return pw.TableRow(
+            children: row.asMap().entries.map((entry) {
+              int colIndex = entry.key;
+              var cell = entry.value;
+
+              // Jika kolom ke-4 (index 4) yaitu "Rincian Task", gunakan justify
+              if (colIndex == 4) {
+                return pw.Padding(
+                  padding: pw.EdgeInsets.all(6),
+                  child: pw.Text(
+                    cell,
+                    textAlign: pw.TextAlign.justify,
+                    style: pw.TextStyle(fontSize: 6.0),
+                  ),
+                );
+              }
+
+              return pw.Padding(
+                padding: pw.EdgeInsets.all(6),
+                child: pw.Text(
+                  cell,
+                  textAlign: pw.TextAlign.center,
+                  style: pw.TextStyle(fontSize: 6.0),
+                ),
+              );
+            }).toList(),
+          );
+        }).toList(),
+      ],
+    );
+  }
 }

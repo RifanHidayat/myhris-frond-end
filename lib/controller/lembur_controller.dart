@@ -579,6 +579,11 @@ class LemburController extends GetxController {
             negativeBtnText: "Tidak",
             style: 1,
             buttonStatus: 1,
+            negativeBtnPressed: (){
+              loadDataLembur();
+              Get.back();
+              Get.back();
+            },
             positiveBtnPressed: () async {
               var global = globalCt.dataHrd[0];
               print('ini glonal hrd ${global}');

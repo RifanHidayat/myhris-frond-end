@@ -203,14 +203,14 @@ class SuratTeguranDetail extends StatelessWidget {
                         height: 30,
                       ),
                       Text(
-                        '1. Surat Teguran Lisan ini berlaku 3 (Tiga) bulan sejak surat ini di keluarkan',
+                        '1. Surat Teguran Lisan ini berlaku 1 (Satu) bulan sejak surat ini di keluarkan',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
                         height: 15,
                       ),
                       Text(
-                        '2. Jika dalam kurun waktu 3 (Tiga) bulan kedepan sejak surat teguran lisan di terbitkan saudara didapati kembali melakukan tindakan pelanggaran, maka perusahaan akan memberikan Surat Peringatan ke 1 (Satu) untuk saudara. ',
+                        '2. Jika dalam kurun waktu 1 (Satu) bulan kedepan sejak surat teguran lisan di terbitkan saudara didapati kembali melakukan tindakan pelanggaran, maka perusahaan akan memberikan Surat Peringatan ke 1 (Satu) untuk saudara. ',
                         textAlign: TextAlign.start,
                       ),
                       SizedBox(
