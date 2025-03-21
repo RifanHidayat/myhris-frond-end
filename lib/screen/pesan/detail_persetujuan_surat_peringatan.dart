@@ -91,42 +91,6 @@ class _DetailSuratPeringatanState
                             height: 16,
                           ),
                           Obx(() {
-                            var tl = controller.searchTl;
-                             return controller.searchTl.isNotEmpty
-                              ? Container(
-                                decoration: BoxDecoration(
-                                  color: Constanst.infoLight1,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Iconsax.info_circle5,
-                                      color: Constanst.colorPrimary,
-                                      size: 26,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        tl[0]['status'] == 'Approve'
-                                        ? "Karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}"
-                                        : 'Karyawan ${tl[0]['nama']} mempunyai teguran lisan dengan nomor ${tl[0]['nomor']}, status: ${tl[0]['status']}',
-                                        textAlign: TextAlign.left,
-                                        style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.w400,
-                                            color: Constanst.fgSecondary,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                              : SizedBox();
-                            }
-                          ),
-                          const SizedBox(height: 12),
-                          Obx(() {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -214,50 +178,281 @@ class _DetailSuratPeringatanState
                           const SizedBox(
                             height: 16,
                           ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                  child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextButtonWidget(
+                                  title: "Kembali",
+                                  onTap: () => Navigator.pop(Get.context!),
+                                  colorButton: Colors.red,
+                                  colortext: Colors.white,
+                                  border: BorderRadius.circular(8.0),
+                                ),
+                              )),
+                              Expanded(
+                                  child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextButtonWidget(
+                                  title: "Menyetujui",
+                                  onTap: () {
+                                    validasiMenyetujui(true, em_id);
+                                  },
+                                  colorButton: Constanst.colorPrimary,
+                                  colortext: Colors.white,
+                                  border: BorderRadius.circular(8.0),
+                                ),
+                              ))
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    )
+                  ],
+                ),
+              );
+            });
+      },
+    );
+  }
+
+  void showBottomAlasanReject(em_id) {
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+            initialChildSize: 0.8, // 80% layar
+            minChildSize: 0.5, // Bisa mengecil
+            maxChildSize: 1.0, // Bisa full screen
+            expand: false,
+            builder: (context, scrollController) {
+              return SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Iconsax.close_circle,
+                                color: Colors.red,
+                                size: 24,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8, top: 2),
+                                child: Text(
+                                  "Alasan Tolak Pengajuan",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14),
+                                ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
                           Obx(() {
-                            return controller.statusPemgajuanSP.value !=
-                                    'teguran_lisan'
-                                ? SizedBox()
-                                : Column(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                Constanst.borderStyle1,
-                                            border: Border.all(
-                                                width: 1.0,
-                                                color: const Color.fromARGB(
-                                                    255, 211, 205, 205))),
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 8,
-                                          ),
-                                          child: TextField(
-                                            cursorColor: Colors.black,
-                                            controller:
-                                                controller.alasanReject.value,
-                                            maxLines: null,
-                                            maxLength: 225,
-                                            autofocus: true,
-                                            decoration: new InputDecoration(
-                                                border: InputBorder.none,
-                                                hintText:
-                                                    "Pelanggaran yang di lakukan"),
-                                            keyboardType:
-                                                TextInputType.multiline,
-                                            textInputAction:
-                                                TextInputAction.done,
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 2.0,
-                                                color: Colors.black),
+                            var tl = controller.searchTl;
+                            return tl.isNotEmpty && tl[0]['status'] == 'Approve'
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      color: Constanst.infoLight1,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Iconsax.info_circle5,
+                                          color: Constanst.colorPrimary,
+                                          size: 26,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            tl[0]['status'] == 'Approve'
+                                                ? "Karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}"
+                                                : 'Karyawan ${tl[0]['nama']} mempunyai teguran lisan dengan nomor ${tl[0]['nomor']}, status: ${tl[0]['status']}',
+                                            textAlign: TextAlign.left,
+                                            style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w400,
+                                                color: Constanst.fgSecondary,
+                                                fontSize: 14),
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        height: 16,
-                                      ),
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox();
+                          }),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          Obx(() {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: List.generate(
+                                  controller.listStatusPengajuanSPTolak.length,
+                                  (index) {
+                                var data = controller
+                                    .listStatusPengajuanSPTolak[index];
+                                return controller.statusPemgajuanSP.value ==
+                                        data['value']
+                                    ? Padding(
+                                        padding: EdgeInsets.only(top: 12),
+                                        child: InkWell(
+                                          onTap: () {
+                                           
+                                              controller
+                                                      .statusPemgajuanSP.value =
+                                                  data['value'].toString();
+                                            
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Constanst.infoLight1,
+                                              border: Border.all(
+                                                  width: 1,
+                                                  color: Constanst.infoLight),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                height: 30,
+                                                child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 5,
+                                                        left: 5,
+                                                        bottom: 5),
+                                                    child: Row(
+                                                      children: [
+                                                        TextLabell(
+                                                          text: data['name'],
+                                                        ),
+                                                      ],
+                                                    ))),
+                                          ),
+                                        ),
+                                      )
+                                    : InkWell(
+                                        onTap: () {
+                                          if (controller.searchTl.isEmpty){
+                                            controller.statusPemgajuanSP.value =
+                                                data['value'].toString();
+                                          }else{
+                                            if (controller.searchTl[0]
+                                                      ['status'] ==
+                                                  'Approve' &&
+                                              data['value'] ==
+                                                  'teguran_lisan') {
+                                            UtilsAlert.showToast(
+                                                'Karyawan ini saat ini memiliki teguran lisan yang masih aktif, sehingga tidak dapat menerima teguran lisan tambahan.');
+                                          } else {
+                                            controller.statusPemgajuanSP.value =
+                                                data['value'].toString();
+                                          }
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: EdgeInsets.only(top: 12),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  width: 1,
+                                                  color: Constanst.secondary),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                height: 30,
+                                                child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 5,
+                                                        left: 5,
+                                                        bottom: 5),
+                                                    child: Row(
+                                                      children: [
+                                                        TextLabell(
+                                                          text: data['name'],
+                                                        ),
+                                                      ],
+                                                    ))),
+                                          ),
+                                        ),
+                                      );
+                              }),
+                            );
+                          }),
+                          SizedBox(height: 12),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: Constanst.borderStyle1,
+                                border: Border.all(
+                                    width: 1.0,
+                                    color: Color.fromARGB(255, 211, 205, 205))),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                left: 8,
+                                bottom: 8,
+                              ),
+                              child: TextField(
+                                cursorColor: Colors.black,
+                                controller: controller.alasanReject.value,
+                                maxLines: null,
+                                maxLength: 225,
+                                autofocus: true,
+                                decoration: new InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Alasan Menolak"),
+                                keyboardType: TextInputType.multiline,
+                                textInputAction: TextInputAction.done,
+                                style: TextStyle(
+                                    fontSize: 12.0,
+                                    height: 2.0,
+                                    color: Colors.black),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          Obx(
+                            () => controller.statusPemgajuanSP.value ==
+                                    'teguran_lisan'
+                                ? Column(
+                                    children: [
                                       TextLabell(
                                         text: "Konsekuensi",
                                         size: 12,
@@ -391,8 +586,9 @@ class _DetailSuratPeringatanState
                                         height: 16,
                                       ),
                                     ],
-                                  );
-                          }),
+                                  )
+                                : SizedBox(),
+                          ),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -411,9 +607,18 @@ class _DetailSuratPeringatanState
                                   child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: TextButtonWidget(
-                                  title: "Menyetujui",
+                                  title: "Tolak",
                                   onTap: () {
-                                    validasiMenyetujui(true, em_id);
+                                    print("tes");
+                                    if (controller.alasanReject.value.text !=
+                                        "") {
+                                      // UtilsAlert.showLoadingIndicator(context);
+                                      // Navigator.pop(Get.corntext!);
+                                      validasiMenyetujui(false, em_id);
+                                    } else {
+                                      UtilsAlert.showToast(
+                                          "Harap isi alasan terlebih dahulu");
+                                    }
                                   },
                                   colorButton: Constanst.colorPrimary,
                                   colortext: Colors.white,
@@ -425,137 +630,13 @@ class _DetailSuratPeringatanState
                         ],
                       ),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 30,
                     )
                   ],
                 ),
               );
             });
-      },
-    );
-  }
-
-  void showBottomAlasanReject(em_id) {
-    showModalBottomSheet(
-      context: Get.context!,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20.0),
-        ),
-      ),
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Iconsax.close_circle,
-                        color: Colors.red,
-                        size: 24,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 8, top: 2),
-                        child: Text(
-                          "Alasan Tolak Pengajuan",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: Constanst.borderStyle1,
-                        border: Border.all(
-                            width: 1.0,
-                            color: Color.fromARGB(255, 211, 205, 205))),
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          left: 8,
-                          bottom: MediaQuery.of(context).viewInsets.bottom),
-                      child: TextField(
-                        cursorColor: Colors.black,
-                        controller: controller.alasanReject.value,
-                        maxLines: null,
-                        maxLength: 225,
-                        autofocus: true,
-                        decoration: new InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Alasan Menolak"),
-                        keyboardType: TextInputType.multiline,
-                        textInputAction: TextInputAction.done,
-                        style: TextStyle(
-                            fontSize: 12.0, height: 2.0, color: Colors.black),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextButtonWidget(
-                          title: "Kembali",
-                          onTap: () => Navigator.pop(Get.context!),
-                          colorButton: Colors.red,
-                          colortext: Colors.white,
-                          border: BorderRadius.circular(8.0),
-                        ),
-                      )),
-                      Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextButtonWidget(
-                          title: "Tolak",
-                          onTap: () {
-                            print("tes");
-                            if (controller.alasanReject.value.text != "") {
-                              // UtilsAlert.showLoadingIndicator(context);
-                              // Navigator.pop(Get.corntext!);
-                              validasiMenyetujui(false, em_id);
-                            } else {
-                              UtilsAlert.showToast(
-                                  "Harap isi alasan terlebih dahulu");
-                            }
-                          },
-                          colorButton: Constanst.colorPrimary,
-                          colortext: Colors.white,
-                          border: BorderRadius.circular(8.0),
-                        ),
-                      ))
-                    ],
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            )
-          ],
-        );
       },
     );
   }
@@ -653,7 +734,6 @@ class _DetailSuratPeringatanState
     controller.fetchAlasan(widget.idxDetail);
     super.initState();
     var emId = AppData.informasiUser![0].em_id;
-
 
     if (controllerGlobal.valuePolaPersetujuan.value.toString() == "1") {
       if (controller.detailData[0]['nama_approve1'] == "" ||
@@ -1127,7 +1207,7 @@ class _DetailSuratPeringatanState
                             SizedBox(
                               height: 16,
                             ),
-                            controller.listAlasan.isEmpty
+                            controller.listAlasan.isEmpty || controller.listAlasan.every((element) => element['name'].trim().isEmpty)
                                 ? SizedBox()
                                 : Column(
                                     children: [

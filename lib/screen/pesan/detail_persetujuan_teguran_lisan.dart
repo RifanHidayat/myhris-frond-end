@@ -724,7 +724,11 @@ class _DetailTeguranLisanState extends State<DetailPersetujuanTeguranLisan> {
                             SizedBox(
                               height: 16,
                             ),
-                            controller.listAlasan.isEmpty
+                            controller.listAlasan.isEmpty ||
+                                    controller.listAlasan.every((element) =>
+                                        (element["name"] ?? "")
+                                            .trim()
+                                            .isEmpty)
                                 ? SizedBox()
                                 : Column(
                                     children: [

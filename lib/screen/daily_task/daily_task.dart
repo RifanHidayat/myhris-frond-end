@@ -51,29 +51,43 @@ class _DailyTaskState extends State<DailyTask> {
             )
           ]),
           child: AppBar(
-            backgroundColor: Constanst.colorWhite,
-            elevation: 0,
-            // leadingWidth: controller.statusFormPencarian.value ? 50 : 16,
-            titleSpacing: 0,
-            centerTitle: true,
-            title: Text(
-              "Daily Task",
-              style: GoogleFonts.inter(
-                  color: Constanst.fgPrimary,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18),
-            ),
-            leading: IconButton(
-              icon: Icon(
-                Iconsax.arrow_left,
-                color: Constanst.fgPrimary,
-                size: 24,
+              backgroundColor: Constanst.colorWhite,
+              elevation: 0,
+              // leadingWidth: controller.statusFormPencarian.value ? 50 : 16,
+              titleSpacing: 0,
+              centerTitle: true,
+              title: Text(
+                "Daily Task",
+                style: GoogleFonts.inter(
+                    color: Constanst.fgPrimary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 18),
               ),
-              onPressed: () {
-                Get.back();
-              },
-            ),
-          ),
+              leading: IconButton(
+                icon: Icon(
+                  Iconsax.arrow_left,
+                  color: Constanst.fgPrimary,
+                  size: 24,
+                ),
+                onPressed: () {
+                  Get.back();
+                },
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    var em_id = AppData.informasiUser![0].em_id;
+                    UtilsAlert.showLoadingIndicator(context);
+                    controller.generateAndOpenPdf(em_id);
+                  },
+                  icon: Icon(
+                    Iconsax.document_text,
+                    color: Constanst.fgPrimary,
+                    size: 24,
+                  ),
+                  padding: EdgeInsets.only(right: 16.0),
+                )
+              ]),
         ),
       ),
       body: Column(
@@ -117,6 +131,9 @@ class _DailyTaskState extends State<DailyTask> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
+                controller.tanggalTaskOld.value = '';
+                controller.tanggalTask.value.text =
+                    Constanst.convertDate("${DateTime.now()}");
                 controller.statusForm.value = false;
                 Get.to(FormDailyTask());
               },
@@ -151,10 +168,14 @@ class _DailyTaskState extends State<DailyTask> {
       if (filter == "Semua") {
         return true;
       } else if (filter == 'Ongoing') {
-        return task.breakoutTime != 0 && task.breakinTime != 'draft';;
+        return task.breakoutTime != 0 && task.breakinTime != 'draft';
+        ;
       } else if (filter == 'Finished') {
-        return task.breakoutNote == task.breakoutPict && task.breakoutNote != 0 && task.breakinTime != 'draft';;
-      } else if (filter == 'Draft'){
+        return task.breakoutNote == task.breakoutPict &&
+            task.breakoutNote != 0 &&
+            task.breakinTime != 'draft';
+        ;
+      } else if (filter == 'Draft') {
         return task.breakinTime == 'draft';
       }
       return false;
@@ -167,7 +188,6 @@ class _DailyTaskState extends State<DailyTask> {
         DateTime date = DateTime.parse(task.date);
 
         return tampilan2(task, date);
-
       },
     );
     // });
@@ -244,20 +264,20 @@ class _DailyTaskState extends State<DailyTask> {
         controller.tipeAlphaAbsen.value = 0;
       }
     }
-    String statusString =
-    index.breakinTime == 'draft'
-                ? 'Draft'
-       : index.breakoutNote == index.breakoutPict && index.breakoutNote != 0
+    String statusString = index.breakinTime == 'draft'
+        ? 'Draft'
+        : index.breakoutNote == index.breakoutPict && index.breakoutNote != 0
             ? 'Finished'
-                : (int.tryParse(index.breakoutTime.toString())! <=
-                            int.tryParse(index.breakoutPict.toString())! &&
-                        index.breakoutTime != 0)
-                    ? 'Ongoing'
-                    : '';
-    Color statusColor =
-        index.breakoutNote == index.breakoutPict && index.breakoutNote !=0 && index.breakinTime != 'draft'
-            ? Colors.green
-            : Colors.orange;
+            : (int.tryParse(index.breakoutTime.toString())! <=
+                        int.tryParse(index.breakoutPict.toString())! &&
+                    index.breakoutTime != 0)
+                ? 'Ongoing'
+                : '';
+    Color statusColor = index.breakoutNote == index.breakoutPict &&
+            index.breakoutNote != 0 &&
+            index.breakinTime != 'draft'
+        ? Colors.green
+        : Colors.orange;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: InkWell(
@@ -267,6 +287,16 @@ class _DailyTaskState extends State<DailyTask> {
           if (index.atten_date != null) {
             UtilsAlert.showLoadingIndicator(context);
             await controller.loadTask(index.id);
+            if (index.date != null) {
+              // print('ini date ${}')
+              controller.tanggalTask.value.text =
+                  Constanst.convertDate(index.date ?? "${DateTime.now()}");
+            } else {
+              controller.tanggalTask.value.text =
+                  Constanst.convertDate("${DateTime.now()}");
+            }
+            controller.tanggalTaskOld.value = index.date.toString();
+            print('ini tanggal lama ${controller.tanggalTaskOld.value}');
             controller.statusForm.value = true;
             Get.to(FormDailyTask());
           } else {
@@ -278,6 +308,8 @@ class _DailyTaskState extends State<DailyTask> {
               controller.tanggalTask.value.text =
                   Constanst.convertDate("${DateTime.now()}");
             }
+            controller.tanggalTaskOld.value = index.date.toString();
+            print('ini tanggal lama ${controller.tanggalTaskOld.value}');
             controller.tanggalTask.refresh();
             controller.statusForm.value = false;
             Get.to(FormDailyTask());
@@ -287,7 +319,9 @@ class _DailyTaskState extends State<DailyTask> {
           children: [
             Container(
               decoration: BoxDecoration(
-                  // color: Colors.wh,
+                  color: index.atten_date == null
+                      ? Constanst.colorNeutralBgSecondary
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(width: 1, color: Constanst.fgBorder)),
               child: Row(
@@ -301,7 +335,9 @@ class _DailyTaskState extends State<DailyTask> {
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Constanst.colorNeutralBgSecondary,
+                          color: index.atten_date != null
+                              ? Constanst.colorNeutralBgSecondary
+                              : Colors.white,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(8.0),
                             bottomLeft: Radius.circular(8.0),

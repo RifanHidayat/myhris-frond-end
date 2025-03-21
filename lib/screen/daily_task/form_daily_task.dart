@@ -27,14 +27,6 @@ class _FormDailyTaskState extends State<FormDailyTask> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('ini list task init state ${controller.listTask} ');
       if (controller.statusForm.value == true) {
-        print('ini isinya apa sih ${controller.task}');
-        if (controller.task.isEmpty) {
-          controller.tanggalTask.value.text =
-              Constanst.convertDate("${DateTime.now()}");
-        } else {
-          controller.tanggalTask.value.text =
-              Constanst.convertDate(controller.task[0]['tgl_buat']);
-        }
       } else {
         controller.listTask.clear();
       }
@@ -46,11 +38,15 @@ class _FormDailyTaskState extends State<FormDailyTask> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (controller.isFormChanged.value == false) {
-          bool? confirmExit = await _showExitConfirmationDialog(context);
-          return confirmExit ?? false;
+        if (controller.listTask.isEmpty) {
+          return true;
+        } else {
+          if (controller.isFormChanged.value == false) {
+            bool? confirmExit = await _showExitConfirmationDialog(context);
+            return confirmExit ?? false;
+          }
+          return true;
         }
-        return true;
       },
       child: Scaffold(
         backgroundColor: Constanst.coloBackgroundScreen,
@@ -74,14 +70,18 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                 size: 24,
               ),
               onPressed: () async {
-                if (controller.isFormChanged.value == false) {
-                  bool? confirmExit =
-                      await _showExitConfirmationDialog(context);
-                  if (confirmExit ?? false) {
+                if (controller.listTask.isEmpty) {
+                  Navigator.of(context).pop();
+                } else {
+                  if (controller.isFormChanged.value == false) {
+                    bool? confirmExit =
+                        await _showExitConfirmationDialog(context);
+                    if (confirmExit ?? false) {
+                      Navigator.of(context).pop();
+                    }
+                  } else {
                     Navigator.of(context).pop();
                   }
-                } else {
-                  Navigator.of(context).pop();
                 }
               },
             )),
@@ -666,10 +666,13 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                                                       "id_ID")
                                                   .parse(controller
                                                       .tanggalTask.value.text);
-                                                    
-                                                    print('ini taskDate : ${taskDate}');
-                                                    print('ini dateSelect : ${dateSelect}');
-                                                    print('ini datetime now : ${DateTime.now()}');
+
+                                              print(
+                                                  'ini taskDate : ${taskDate}');
+                                              print(
+                                                  'ini dateSelect : ${dateSelect}');
+                                              print(
+                                                  'ini datetime now : ${DateTime.now()}');
                                               if (taskDate
                                                   .isAfter(dateSelect)) {
                                                 UtilsAlert.showToast(

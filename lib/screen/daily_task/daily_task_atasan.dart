@@ -30,13 +30,47 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Constanst.colorWhite,
-          elevation: 0,
-          leadingWidth: 50,
-          titleSpacing: 0,
-          centerTitle: true,
-          title: const Text("Daily Task")),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight) * 1,
+        child: AppBar(
+            backgroundColor: Constanst.colorWhite,
+            elevation: 0,
+            // leadingWidth: controller.statusFormPencarian.value ? 50 : 16,
+            titleSpacing: 0,
+            centerTitle: true,
+            title: Text(
+              "Daily Task",
+              style: GoogleFonts.inter(
+                  color: Constanst.fgPrimary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18),
+            ),
+            leading: IconButton(
+              icon: Icon(
+                Iconsax.arrow_left,
+                color: Constanst.fgPrimary,
+                size: 24,
+              ),
+              onPressed: () {
+                Get.back();
+              },
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  var em_id = controller.emId.value;
+                  UtilsAlert.showLoadingIndicator(context);
+                  controller.generateAndOpenPdf(em_id);
+                },
+                icon: Icon(
+                  Iconsax.document_text,
+                  color: Constanst.fgPrimary,
+                  size: 24,
+                ),
+                padding: EdgeInsets.only(right: 16.0),
+              )
+            ]),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -197,6 +231,9 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
           children: [
             Container(
               decoration: BoxDecoration(
+                  color: index.atten_date == null
+                      ? Constanst.colorNeutralBgSecondary
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(width: 1, color: Constanst.fgBorder)),
               child: Row(
@@ -210,7 +247,9 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Constanst.colorNeutralBgSecondary,
+                          color: index.atten_date != null
+                              ? Constanst.colorNeutralBgSecondary
+                              : Colors.white,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(8.0),
                             bottomLeft: Radius.circular(8.0),
@@ -674,75 +713,82 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                     ),
                     Expanded(
                       child: SingleChildScrollView(
-                        controller: scrollController, // Controller untuk scroll
-                        // physics: const BouncingScrollPhysics(),
+                        controller: scrollController,
                         child: Obx(() {
                           return Column(
                             children: List.generate(
-                                controller.monitoringList.length, (index) {
-                              var monitoring = controller.monitoringList[0];
-                              var full_name = monitoring[index]['full_name'];
-                              var em_id = monitoring[index]['em_id'];
-                              var isSelected =
-                                  controller.tempNamaStatus1.value == full_name;
+                              controller.monitoringList[0].length,
+                              (index) {
+                                var monitoring = controller.monitoringList[0];
+                                var full_name = monitoring[index]['full_name'];
+                                var em_id = monitoring[index]
+                                    ['em_id']; // Perbaikan di sini
 
-                              return InkWell(
-                                onTap: () {
-                                  controller.tempNamaStatus1.value = full_name;
-                                  controller.emId.value = em_id;
-                                  controller.atasanStatus.value = 'draft';
-                                  controller.loadAllTask(controller.emId.value);
-                                  Navigator.pop(context);
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 16, 16, 16),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const SizedBox(width: 20),
-                                          Text(
-                                            full_name.toString(),
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16,
-                                              color: Constanst.fgPrimary,
+                                var isSelected =
+                                    controller.tempNamaStatus1.value ==
+                                        full_name;
+
+                                return InkWell(
+                                  onTap: () {
+                                    controller.tempNamaStatus1.value =
+                                        full_name;
+                                    controller.emId.value = em_id;
+                                    controller.atasanStatus.value = 'draft';
+                                    controller
+                                        .loadAllTask(controller.emId.value);
+                                    Navigator.pop(context);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        0, 16, 16, 16),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const SizedBox(width: 20),
+                                            Text(
+                                              full_name.toString(),
+                                              style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                                color: Constanst.fgPrimary,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        height: 20,
-                                        width: 20,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: isSelected ? 2 : 1,
-                                            color: isSelected
-                                                ? Constanst.onPrimary
-                                                : Constanst.onPrimary
-                                                    .withOpacity(0.5),
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          ],
                                         ),
-                                        child: isSelected
-                                            ? Container(
-                                                decoration: BoxDecoration(
-                                                  color: Constanst.onPrimary,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              )
-                                            : null,
-                                      ),
-                                    ],
+                                        Container(
+                                          height: 20,
+                                          width: 20,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: isSelected ? 2 : 1,
+                                              color: isSelected
+                                                  ? Constanst.onPrimary
+                                                  : Constanst.onPrimary
+                                                      .withOpacity(0.5),
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: isSelected
+                                              ? Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Constanst.onPrimary,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            }),
+                                );
+                              },
+                            ),
                           );
                         }),
                       ),
