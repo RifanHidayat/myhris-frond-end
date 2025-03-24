@@ -1348,7 +1348,7 @@ class DashboardController extends GetxController {
         connect.then((dynamic res) async {
           if (res.statusCode == 200) {
             var valueBody = jsonDecode(res.body);
-            print("cek data absen ini mah  new ${valueBody['offiline']}");
+            print("cek data absen ini mah  new ${valueBody}");
             var data = valueBody['data'];
             List wfh = valueBody['wfh'];
             List offiline = valueBody['offiline'];

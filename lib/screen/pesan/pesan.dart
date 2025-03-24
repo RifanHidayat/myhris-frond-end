@@ -34,6 +34,7 @@ class _PesanState extends State<Pesan> {
     controller.clearFilter();
     controller.getTimeNow();
     controller.loadNotifikasi();
+    controller.loadNotifikasiApproval();
     // setState(() {
 
     // });
@@ -45,6 +46,7 @@ class _PesanState extends State<Pesan> {
     // refreshData();
     controller.getTimeNow();
     controller.loadNotifikasi();
+    controller.loadNotifikasiApproval();
   }
 
   @override
@@ -312,7 +314,7 @@ class _PesanState extends State<Pesan> {
 
   Widget pageViewPesan() {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Column(
         children: [
           TabBar(
@@ -324,6 +326,48 @@ class _PesanState extends State<Pesan> {
             labelColor: Constanst.onPrimary,
             unselectedLabelColor: Constanst.fgSecondary,
             tabs: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    height: 22,
+                    width: 22,
+                    decoration: BoxDecoration(
+                        color: Constanst.colorStateDangerBg,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(100.0),
+                        ),
+                        border: Border.all(
+                          width: 1.0,
+                          color: Constanst.colorStateDangerBorder,
+                        )),
+                    child: Center(
+                      child: Obx(
+                        () => Text(
+                          "${controller.jumlahRiwayat.value}".length > 2
+                              ? '${"${controller.jumlahRiwayat.value}".substring(0, 2)}+'
+                              : "${controller.jumlahRiwayat.value}",
+                          style: GoogleFonts.inter(
+                              color: Constanst.colorStateOnDangerBg,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                    child: Text(
+                      "Pending Approval",
+                      style: GoogleFonts.inter(
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -407,46 +451,7 @@ class _PesanState extends State<Pesan> {
                   ),
                 ],
               ),
-              // Column(
-              //   crossAxisAlignment: CrossAxisAlignment.end,
-              //   children: [
-              //     Container(
-              //       height: 22,
-              //       width: 22,
-              //       decoration: BoxDecoration(
-              //           color: Constanst.colorStateDangerBg,
-              //           borderRadius: const BorderRadius.all(
-              //             Radius.circular(100.0),
-              //           ),
-              //           border: Border.all(
-              //             width: 1.0,
-              //             color: Constanst.colorStateDangerBorder,
-              //           )),
-              //       child: Center(
-              //         child: Obx(
-              //           () => Text(
-              //             "${controller.jumlahRiwayat.value}".length > 2
-              //                 ? '${"${controller.jumlahRiwayat.value}".substring(0, 2)}+'
-              //                 : "${controller.jumlahRiwayat.value}",
-              //             style: GoogleFonts.inter(
-              //                 color: Constanst.colorStateOnDangerBg,
-              //                 fontSize: 12,
-              //                 fontWeight: FontWeight.w500),
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //     Padding(
-              //       padding: const EdgeInsets.only(left: 12.0, right: 12.0),
-              //       child: Text(
-              //         "Riwayat",
-              //         style: GoogleFonts.inter(
-              //             fontSize: 16, fontWeight: FontWeight.w500),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-            ],
+              ],
           ),
           Divider(
             thickness: 1,
@@ -457,9 +462,10 @@ class _PesanState extends State<Pesan> {
             child: TabBarView(
               physics: const BouncingScrollPhysics(),
               children: [
+                screenApproval(),
+                // Text('Aku adalah pending approval'),
                 screenNotifikasi(),
                 screenPersetujuan(),
-                // screenRiwayat(),
               ],
             ),
           ),
@@ -577,6 +583,249 @@ class _PesanState extends State<Pesan> {
                                         ['notifikasi'][idx]['em_id_pengajuan'];
                                 var idDetail = controller.listNotifikasi
                                     .value[index]['notifikasi'][idx]['idx'];
+                                return Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: view == 0
+                                            ? Constanst.colorButton2
+                                            : Colors.transparent,
+                                        borderRadius: Constanst.borderStyle1,
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          print(
+                                              "wkwkwk: ${controller.listNotifikasi.value[index]['notifikasi'][idx]}");
+
+                                          if (emIdPengaju !=
+                                                  AppData.informasiUser![0]
+                                                      .em_id &&
+                                              idDetail != null) {
+                                            if (view == 0) {
+                                              controller
+                                                  .aksilihatNotif(idNotif);
+                                            }
+                                            print('ini id detail notifikasi ${idDetail.toString()}');
+                                            print('ini id detail notifikasi ${emId.toString()}');
+                                            print('ini id detail notifikasi ${emIdPengaju.toString()}');
+                                            controller.routeApprovalNotif(
+                                              title: titleNotif,
+                                              emIdPengaju:
+                                                  emIdPengaju.toString(),
+                                              idx: idDetail.toString(),
+                                              delegasi: emId.toString(),
+                                              url: urlRoute,
+                                            );
+                                          } else if (emIdPengaju.toString() ==
+                                              AppData.informasiUser![0].em_id) {
+                                            if (view == 0) {
+                                              controller
+                                                  .aksilihatNotif(idNotif);
+                                            }
+                                            controller.redirectToPage(
+                                                urlRoute, idDetail);
+                                          } else {
+                                            if (view == 0) {
+                                              controller
+                                                  .aksilihatNotif(idNotif);
+                                            }
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              16.0, 12.0, 16.0, 12.0),
+                                          child: IntrinsicHeight(
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                statusNotif == 1
+                                                    ? Icon(
+                                                        Iconsax.tick_circle,
+                                                        color: Constanst.color5,
+                                                        size: 24,
+                                                      )
+                                                    : statusNotif == 2
+                                                        ? Icon(
+                                                            Iconsax.sms5,
+                                                            color: Constanst
+                                                                .fgSecondary,
+                                                            size: 24,
+                                                          )
+                                                        : statusNotif == 0
+                                                            ? Icon(
+                                                                Iconsax
+                                                                    .close_circle,
+                                                                color: Constanst
+                                                                    .color4,
+                                                                size: 24,
+                                                              )
+                                                            : const SizedBox(),
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 5),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Text(
+                                                                titleNotif,
+                                                                style: GoogleFonts.inter(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    color: Constanst
+                                                                        .fgPrimary,
+                                                                    fontSize:
+                                                                        16),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 4),
+                                                        Text(
+                                                          deskripsiNotif,
+                                                          style: GoogleFonts.inter(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              color: Constanst
+                                                                  .fgSecondary,
+                                                              fontSize: 14),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 8),
+                                                        Text(
+                                                          "$jam WIB",
+                                                          textAlign:
+                                                              TextAlign.right,
+                                                          style: GoogleFonts.inter(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              color: Constanst
+                                                                  .fgSecondary,
+                                                              fontSize: 14),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Divider(
+                                      thickness: 1,
+                                      height: 0,
+                                      color: Constanst.fgBorder,
+                                    ),
+                                  ],
+                                );
+                              }),
+                        ),
+                      ],
+                    );
+                  }),
+    );
+  }
+
+  Widget screenApproval() {
+    return RefreshIndicator(
+      onRefresh: refreshData,
+      child: controller.isLoading.value
+          ? UtilsAlert.shimmerNotifikasiInbox(context)
+          : controller.listNotifikasiApproval.isEmpty
+              ? SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    alignment: Alignment.center,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/amico.svg',
+                          height: 250,
+                          width: 250,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Anda tidak memiliki Notifikasi",
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                              color: Constanst.fgPrimary,
+                              fontSize: 16),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: controller.listNotifikasiApproval.length,
+                  physics: controller.listNotifikasiApproval.length <= 10
+                      ? const AlwaysScrollableScrollPhysics()
+                      : const BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    var tanggalNotif =
+                        controller.listNotifikasiApproval[index]['tanggal'];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(16.0, 24.0, 0.0, 4.0),
+                          child: Text(
+                            // Constanst.convertDate(tanggalNotif.toString()),
+                            // tanggalNotif,
+                            tanggalNotif == "Hari ini"
+                                ? tanggalNotif
+                                : Constanst.convertDate6(
+                                    DateFormat('dd-MM-yyyy')
+                                        .parseStrict(tanggalNotif)
+                                        .toString()),
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                                color: Constanst.fgSecondary,
+                                fontSize: 14),
+                          ),
+                        ),
+                        Obx(
+                          () => ListView.builder(
+                              itemCount: controller.listNotifikasiApproval[index]['notifikasi'].length,
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, idx) {
+                                var idNotif = controller.listNotifikasiApproval[index]['notifikasi'][idx]['id'];
+                                var titleNotif = controller.listNotifikasiApproval[index]['notifikasi'][idx]['title'];
+                                var deskripsiNotif =
+                                    controller.listNotifikasiApproval[index]
+                                        ['notifikasi'][idx]['deskripsi'];
+                                var urlRoute = controller.listNotifikasiApproval[index]['notifikasi'][idx]['url'];
+                                var jam = controller.listNotifikasiApproval[index]
+                                    ['notifikasi'][idx]['jam'];
+                                var statusNotif = controller.listNotifikasiApproval[index]['notifikasi'][idx]['status'];
+                                var view = controller.listNotifikasiApproval[index]['notifikasi'][idx]['view'];
+                                var emId = controller.listNotifikasiApproval[index]['notifikasi'][idx]['em_id'];
+                                var emIdPengaju =
+                                    controller.listNotifikasiApproval[index]
+                                        ['notifikasi'][idx]['em_id_pengajuan'];
+                                var idDetail = controller.listNotifikasiApproval[index]['notifikasi'][idx]['idx'];
                                 return Column(
                                   children: [
                                     Container(

@@ -2080,7 +2080,7 @@ class AbsenController extends GetxController {
                   'lokasi': alamatUserFoto.value,
                   'latLang': latLangAbsen,
 
-                  // 'waktu': timeString.value,
+                  'waktu': timeString.value,
                   // // 'gambar': validasiGambar,
                   // 'reg_type': regType.value,
                   // 'gambar': base64fotoUser.value,

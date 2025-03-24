@@ -113,8 +113,8 @@ class AktifitasController extends GetxController {
   @override
   void onReady() async {
     getTimeNow();
-    loadAktifitas();
-    getInformasiAktivitas();
+    // loadAktifitas();
+    // getInformasiAktivitas();
     controllerScroll.addListener(listenScrolling);
     controllerScroll.addListener(scrollListener);
     super.onReady();
@@ -182,6 +182,7 @@ class AktifitasController extends GetxController {
     var connect = Api.connectionApi("post", body, "load_aktifitas");
     connect.then((dynamic res) {
       var valueBody = jsonDecode(res.body);
+      print('ini load aktifitas $valueBody');
       for (var element in valueBody['data']) {
         var getList = element['createdDate'].split('T');
         var tanggal = getList[0];

@@ -32,6 +32,7 @@ import 'package:siscom_operasional/screen/pesan/persetujuan_surat_peringatan.dar
 import 'package:siscom_operasional/screen/pesan/persetujuan_teguran_lisan.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_wfh.dart';
+import 'package:siscom_operasional/screen/teguran_lisan.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
@@ -48,6 +49,7 @@ class PesanController extends GetxController {
   var selectedView = 0.obs;
 
   var listNotifikasi = [].obs;
+  var listNotifikasiApproval = [].obs;
   var dataScreenPersetujuan = [].obs;
   var riwayatPersetujuan = [].obs;
   var allRiwayatPersetujuan = [].obs;
@@ -105,6 +107,7 @@ class PesanController extends GetxController {
   void onReady() async {
     getTimeNow();
     loadNotifikasi();
+    loadNotifikasiApproval();
     super.onReady();
   }
 
@@ -929,7 +932,7 @@ class PesanController extends GetxController {
         idx,
       );
         }
-    else {}
+    else  {}
   }
 
   // void routeApprovalNotifFCm({
@@ -1101,6 +1104,47 @@ class PesanController extends GetxController {
   //     });
   //   } else {}
   // }
+
+  void loadNotifikasiApproval() {
+    isLoading.value = true;
+    listNotifikasiApproval.clear();
+    var dataUser = AppData.informasiUser;
+    var getEmid = dataUser![0].em_id;
+    var dt = DateTime.now();
+    var tanggalSekarang =
+        Constanst.convertDate1("${dt.year}-${dt.month}-${dt.day}");
+    var getBulan = dt.month <= 9 ? "0${dt.month}" : dt.month;
+    Map<String, dynamic> body = {
+      'em_id': getEmid,
+      'bulan': getBulan,
+      'tahun': dt.year
+    };
+    var connect = Api.connectionApi("post", body, "load_notifikasi_approval");
+    connect.then((dynamic res) async {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        for (var element in valueBody['data']) {
+          var tanggalDataApi = Constanst.convertDate1("${element['tanggal']}");
+          var filterTanggal =
+              tanggalDataApi == tanggalSekarang ? 'Hari ini' : tanggalDataApi;
+          List listNotif = element['notifikasi'];
+          listNotif.sort((a, b) {
+            return b['id'].compareTo(a['id']);
+          });
+          var data = {
+            'tanggal': filterTanggal,
+            'notifikasi': listNotif,
+          };
+          listNotifikasiApproval.add(data);
+        }
+        this.listNotifikasiApproval.refresh();
+        hitungNotifikasiBelumDibaca();
+        isLoading.value = false;
+      }
+    }).catchError((error) {
+      isLoading.value = false;
+    });
+  }
 
   void loadNotifikasi() {
     isLoading.value = true;
