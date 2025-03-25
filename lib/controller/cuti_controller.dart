@@ -970,13 +970,13 @@ class CutiController extends GetxController {
           if (valueBody['status'] == true) {
             var stringTanggal =
                 "${dariTanggal.value.text} sd ${sampaiTanggal.value.text}";
-            kirimNotifikasiToDelegasi(
-                getFullName,
-                convertTanggalBikinPengajuan,
-                validasiDelegasiSelected,
-                validasiDelegasiSelectedToken,
-                stringTanggal,
-                typeNotifFcm);
+            // kirimNotifikasiToDelegasi(
+            //     getFullName,
+            //     convertTanggalBikinPengajuan,
+            //     validasiDelegasiSelected,
+            //     validasiDelegasiSelectedToken,
+            //     stringTanggal,
+            //     typeNotifFcm);
             // kirimNotifikasiToReportTo(getFullName, convertTanggalBikinPengajuan,
             //     getEmid, "Cuti", stringTanggal);
             Navigator.pop(Get.context!);

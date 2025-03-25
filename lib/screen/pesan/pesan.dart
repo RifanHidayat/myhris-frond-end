@@ -344,9 +344,9 @@ class _PesanState extends State<Pesan> {
                     child: Center(
                       child: Obx(
                         () => Text(
-                          "${controller.jumlahRiwayat.value}".length > 2
-                              ? '${"${controller.jumlahRiwayat.value}".substring(0, 2)}+'
-                              : "${controller.jumlahRiwayat.value}",
+                          "${controller.jumlahNotifikasiBelumDibacaApproval.value}".length > 2
+                              ? '${"${controller.jumlahNotifikasiBelumDibacaApproval.value}".substring(0, 2)}+'
+                              : "${controller.jumlahNotifikasiBelumDibacaApproval.value}",
                           style: GoogleFonts.inter(
                               color: Constanst.colorStateOnDangerBg,
                               fontSize: 12,
@@ -647,7 +647,7 @@ class _PesanState extends State<Pesan> {
                                                       )
                                                     : statusNotif == 2
                                                         ? Icon(
-                                                            Iconsax.sms5,
+                                                            Iconsax.notification,
                                                             color: Constanst
                                                                 .fgSecondary,
                                                             size: 24,
@@ -838,7 +838,7 @@ class _PesanState extends State<Pesan> {
                                       child: InkWell(
                                         onTap: () {
                                           print(
-                                              "wkwkwk: ${controller.listNotifikasi.value[index]['notifikasi'][idx]}");
+                                              "wkwkwk: ${controller.listNotifikasiApproval.value[index]['notifikasi'][idx]}");
 
                                           if (emIdPengaju !=
                                                   AppData.informasiUser![0]
@@ -846,11 +846,11 @@ class _PesanState extends State<Pesan> {
                                               idDetail != null) {
                                             if (view == 0) {
                                               controller
-                                                  .aksilihatNotif(idNotif);
+                                                  .aksilihatNotifApproval(idNotif);
                                             }
-                                            print('ini id detail notifikasi ${idDetail.toString()}');
-                                            print('ini id detail notifikasi ${emId.toString()}');
-                                            print('ini id detail notifikasi ${emIdPengaju.toString()}');
+                                            // print('ini id detail notifikasi ${idDetail.toString()}');
+                                            // print('ini id detail notifikasi ${emId.toString()}');
+                                            // print('ini id detail notifikasi ${emIdPengaju.toString()}');
                                             controller.routeApprovalNotif(
                                               title: titleNotif,
                                               emIdPengaju:
@@ -859,20 +859,7 @@ class _PesanState extends State<Pesan> {
                                               delegasi: emId.toString(),
                                               url: urlRoute,
                                             );
-                                          } else if (emIdPengaju.toString() ==
-                                              AppData.informasiUser![0].em_id) {
-                                            if (view == 0) {
-                                              controller
-                                                  .aksilihatNotif(idNotif);
-                                            }
-                                            controller.redirectToPage(
-                                                urlRoute, idDetail);
-                                          } else {
-                                            if (view == 0) {
-                                              controller
-                                                  .aksilihatNotif(idNotif);
-                                            }
-                                          }
+                                          } 
                                         },
                                         child: Padding(
                                           padding: const EdgeInsets.fromLTRB(

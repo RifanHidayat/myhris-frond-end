@@ -113,8 +113,8 @@ class AktifitasController extends GetxController {
   @override
   void onReady() async {
     getTimeNow();
-    // loadAktifitas();
-    // getInformasiAktivitas();
+    loadAktifitas();
+    getInformasiAktivitas();
     controllerScroll.addListener(listenScrolling);
     controllerScroll.addListener(scrollListener);
     super.onReady();

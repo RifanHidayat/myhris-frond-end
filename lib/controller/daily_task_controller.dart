@@ -47,6 +47,23 @@ class DailyTaskController extends GetxController {
   var statusDraft = ''.obs;
   var atasanStatus = ''.obs;
   var isFormChanged = false.obs;
+  var branchList = <String>[
+    'Semua Cabang',
+    'PT. SHAN INFORMASI SISTEM',
+    'PT. REFORMASI ANUGERAH JAVA JAYA',
+  ].obs;
+
+  int getBranchIdByName(String branchName) {
+    Map<String, int> branchMapping = {
+      'Semua Cabang': -1,
+      'PT. SHAN INFORMASI SISTEM': 1,
+      'PT. REFORMASI ANUGERAH JAVA JAYA': 2,
+    };
+
+    return branchMapping[branchName] ?? -1;
+  }
+
+  var selectedBranch = 'Semua Cabang'.obs;
 
   @override
   void onReady() async {
@@ -81,7 +98,7 @@ class DailyTaskController extends GetxController {
           atasanStatus.value = 'draft';
           loadAllTask(emId.value);
         } else {
-          // Get.snackbar("error", "gagal");
+          Get.snackbar("error", "gagal");
         }
       },
     );
@@ -408,12 +425,12 @@ class DailyTaskController extends GetxController {
 
             pw.SizedBox(height: 20),
 
-            // Informasi Karyawan
             _buildInfoRow("NAMA KARYAWAN", user['full_name']),
+            _buildInfoRow("DIVISI", user['divisi']),
             _buildInfoRow("JABATAN", user['jabatan']),
             _buildInfoRow("POSISI", user['posisi']),
             _buildInfoRow(
-                "PERIODE BULAN", Constanst.convertGetMonth(user['tgl_buat'])),
+                "PERIODE BULAN", Constanst.convertGetMonth(user['tgl_buat']).toUpperCase()),
 
             pw.SizedBox(height: 20),
 
@@ -515,12 +532,12 @@ class DailyTaskController extends GetxController {
       DateTime? tglBuat =
           task['tgl_buat'] != null ? DateTime.tryParse(task['tgl_buat']) : null;
       DateTime? tglFinish = task['tgl_finish'] != null
-          ? DateTime.tryParse(task['tgl_finish'] + 1)
+          ? DateTime.tryParse(task['tgl_finish'])
           : null;
 
       String durasi = "-";
       if (tglBuat != null && tglFinish != null) {
-        durasi = '${tglFinish.difference(tglBuat).inDays.toString()} Hari';
+        durasi = '${tglFinish.difference(tglBuat).inDays + 1} Hari';
       }
 
       data.add([
@@ -583,21 +600,19 @@ class DailyTaskController extends GetxController {
         pw.TableRow(
           verticalAlignment: pw.TableCellVerticalAlignment.middle,
           children: [
-            lastDate == currentDate
-                ? pw.Container(height: 0, width: 0)
+            tanggalRowSpan[currentDate] != null && lastDate == currentDate
+                ? pw.SizedBox.shrink()
                 : pw.Container(
                     alignment: pw.Alignment.center,
                     padding: pw.EdgeInsets.all(6),
                     child: pw.Text(row[0], style: pw.TextStyle(fontSize: 6.0)),
-                    
                   ),
-            lastDate == currentDate
-                ? pw.Container(height: 0, width: 0)
+            tanggalRowSpan[currentDate] != null && lastDate == currentDate
+                ? pw.SizedBox.shrink()
                 : pw.Container(
                     alignment: pw.Alignment.center,
                     padding: pw.EdgeInsets.all(6),
                     child: pw.Text(row[1], style: pw.TextStyle(fontSize: 6.0)),
-                    
                   ),
             for (int i = 2; i < row.length; i++)
               pw.Padding(

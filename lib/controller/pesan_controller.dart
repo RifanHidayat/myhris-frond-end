@@ -67,6 +67,7 @@ class PesanController extends GetxController {
   var jumlahApproveSuratPeringatan = 0.obs;
   var jumlahApproveTeguranLIsan = 0.obs;
   var jumlahNotifikasiBelumDibaca = 0.obs;
+  var jumlahNotifikasiBelumDibacaApproval = 0.obs;
   var jumlahCheckin = 0.obs;
 
   var jumlahPersetujuan = 0.obs;
@@ -1138,7 +1139,7 @@ class PesanController extends GetxController {
           listNotifikasiApproval.add(data);
         }
         this.listNotifikasiApproval.refresh();
-        hitungNotifikasiBelumDibaca();
+        hitungNotifikasiBelumDibacaApproval();
         isLoading.value = false;
       }
     }).catchError((error) {
@@ -1200,6 +1201,19 @@ class PesanController extends GetxController {
     this.jumlahNotifikasiBelumDibaca.refresh();
   }
 
+  void hitungNotifikasiBelumDibacaApproval() {
+    var data = [];
+    listNotifikasiApproval.value.forEach((element) {
+      element['notifikasi'].forEach((element1) {
+        if (element1['view'] == 0) {
+          data.add(element1);
+        }
+      });
+    });
+    jumlahNotifikasiBelumDibacaApproval.value = data.length;
+    this.jumlahNotifikasiBelumDibacaApproval.refresh();
+  }
+
   void aksilihatNotif(id) {
     var pisahkanData = [];
     listNotifikasi.value.forEach((element) {
@@ -1212,6 +1226,20 @@ class PesanController extends GetxController {
     });
     this.listNotifikasi.refresh();
     hitungNotifikasiBelumDibaca();
+    updateDataNotif(pisahkanData);
+  }
+  void aksilihatNotifApproval(id) {
+    var pisahkanData = [];
+    listNotifikasiApproval.value.forEach((element) {
+      element['notifikasi'].forEach((element1) {
+        if (element1['id'] == id) {
+          element1['view'] = 1;
+          pisahkanData.add(element1);
+        }
+      });
+    });
+    this.listNotifikasiApproval.refresh();
+    hitungNotifikasiBelumDibacaApproval();
     updateDataNotif(pisahkanData);
   }
 
