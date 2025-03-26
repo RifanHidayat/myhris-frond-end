@@ -374,8 +374,7 @@ class _PersetujuanLemburState extends State<PersetujuanLembur>
                         title: typeAjuan,
                         idxDetail: "$idx",
                         delegasi: delegasi,
-                        emIds: emIds,
-                        dinilai: dinilai));
+                        emIds: emIds));
                   },
                   child: Container(
                     decoration: BoxDecoration(

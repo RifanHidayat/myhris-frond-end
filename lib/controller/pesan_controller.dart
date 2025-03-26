@@ -813,9 +813,11 @@ class PesanController extends GetxController {
             emId: emIdPengaju,
             title: 'Lembur',
             idxDetail: idx,
-            delegasi: delegasi),
+            delegasi: delegasi,
+            ),
         idx,
       );
+      print('ini idx $idx');
     } else if (title == "Approval Cuti" || url == "Cuti") {
       loadAndNavigate(
         'Cuti',

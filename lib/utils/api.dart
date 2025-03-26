@@ -28,7 +28,7 @@ class Api {
    static var basicUrl = "http://kantor.membersis.com:2627/";
 //
   // API LOCAL
-  // static var basicUrl = "http://192.168.20.6:2627/";
+  // static var basicUrl = "http://192.168.20.10:2627/";
 
   static var urlImage = 'https://imagehris.siscom.id:4431';
 
@@ -211,7 +211,7 @@ class ApiRequest {
   // static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API LOCAL
-  // static var basicUrl = "http://192.168.20.6:2627/";
+  // static var basicUrl = "http://192.168.20.10:2627/";
 
   // API DEV
    static var basicUrl = "http://kantor.membersis.com:2627/";

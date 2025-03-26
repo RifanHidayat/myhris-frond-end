@@ -21,7 +21,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailPersetujuanLembur extends StatefulWidget {
-  String? title, idxDetail, emId, delegasi, emIds, emIdPengaju, dinilai;
+  String? title, idxDetail, emId, delegasi, emIds, emIdPengaju;
 
   DetailPersetujuanLembur(
       {Key? key,
@@ -29,8 +29,7 @@ class DetailPersetujuanLembur extends StatefulWidget {
       this.idxDetail,
       this.emId,
       this.delegasi,
-      this.emIds,
-      this.dinilai})
+      this.emIds})
       : super(key: key);
   @override
   _DetailPersetujuanLemburState createState() =>
@@ -329,7 +328,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                       ),
                                     ),
                                     SizedBox(width: 10),
-                                    widget.dinilai == "N"
+                                    controller.detailData[0]['dinilai'] == 'N'
                                         ? SizedBox()
                                         : SizedBox(
                                             width: 50,
@@ -545,7 +544,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                 ),
                               ),
                               SizedBox(width: 10),
-                              widget.dinilai == 'N'
+                              controller.detailData[0]['dinilai'] == 'N'
                                   ? SizedBox()
                                   : SizedBox(
                                       width: 50,
@@ -1029,7 +1028,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
           ),
         ),
       ),
-      bottomNavigationBar: typeAjuan == "Approve2" && widget.dinilai == "Y"
+      bottomNavigationBar: typeAjuan == "Approve2" && diNilai == "Y"
           ? Padding(
               padding: const EdgeInsets.all(16.0),
               child: SizedBox(
@@ -1651,7 +1650,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                   color: Constanst.border,
                                 ),
                               ),
-                              widget.dinilai == 'N'
+                              diNilai == 'N'
                                   ? SizedBox()
                                   : Container(
                                       child: Column(
@@ -1689,7 +1688,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                       ),
                                     ),
 
-                              widget.dinilai == "Y" &&
+                              diNilai == "Y" &&
                                       controller.detailData[0]
                                               ['approve_status'] !=
                                           'Pending'
