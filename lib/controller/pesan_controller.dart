@@ -761,7 +761,7 @@ class PesanController extends GetxController {
         tahunSelectedSearchHistory.value,
         'persetujuan');
 
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       bool exists = controllerApproval.listData
           .any((element) => element['id'].toString() == idx.toString());
 
@@ -776,20 +776,20 @@ class PesanController extends GetxController {
             tahunSelectedSearchHistory.value,
             'riwayat');
 
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 2), () {
         bool existsInHistory = controllerApproval.listData
             .any((element) => element['id'].toString() == idx.toString());
 
         if (!existsInHistory) {
           print('Data tidak ditemukan di keduanya');
-          Future.delayed(const Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 2), () {
             Get.back();
             UtilsAlert.showToast('Data sudah tidak tersedia');
             return;
           });
         } else {
           print('Data ditemukan di riwayat');
-          Future.delayed(const Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 2), () {
             Get.back();
             Get.to(detailPage());
           });
@@ -817,7 +817,7 @@ class PesanController extends GetxController {
             ),
         idx,
       );
-      print('ini idx $idx');
+      // print('ini idx $idx, $');
     } else if (title == "Approval Cuti" || url == "Cuti") {
       loadAndNavigate(
         'Cuti',
