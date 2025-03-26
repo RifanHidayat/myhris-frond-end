@@ -903,271 +903,258 @@ class DashboardController extends GetxController {
     }
 
     if (index.atten_date == "" ||
-            index.atten_date == null ||
-            index.namaHariLibur != null ||
-            index.namaCuti != null ||
-            (index.namaLembur != null && (index.atten_date?.length ?? 0) <= 1 ) ||
-            index.namaSakit != null ||
-            index.namaIzin != null &&
-                (controllerAbsensi.statusAbsen.value == 'pulang_cepat'
-                    ? index.namaIzin.toLowerCase() != "izin datang terlambat"
-                    : index.namaIzin.toLowerCase() != "izin pulang cepat") ||
-            index.namaTugasLuar != null ||
-            index.offDay.toString() == '0' ||
-            text == "" ||
-            (controllerAbsensi.statusAbsen.value == 'pulang_cepat' &&
-                DateTime.parse("${index.date} ${jaamPulang}")
-                    .isBefore(DateTime.parse("${index.date} $jamKeluar")))) {
+        index.atten_date == null ||
+        index.namaHariLibur != null ||
+        index.namaCuti != null ||
+        (index.namaLembur != null && (index.atten_date?.length ?? 0) <= 1) ||
+        index.namaSakit != null ||
+        index.namaIzin != null &&
+            (controllerAbsensi.statusAbsen.value == 'pulang_cepat'
+                ? index.namaIzin.toLowerCase() != "izin datang terlambat"
+                : index.namaIzin.toLowerCase() != "izin pulang cepat") ||
+        index.namaTugasLuar != null ||
+        index.offDay.toString() == '0' ||
+        text == "" ||
+        (controllerAbsensi.statusAbsen.value == 'pulang_cepat' &&
+            DateTime.parse("${index.date} ${jaamPulang}")
+                .isBefore(DateTime.parse("${index.date} $jamKeluar")))) {
       return SizedBox();
     } else {
       return Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: InkWell(
-              customBorder: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12))),
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(width: 1, color: Constanst.fgBorder)),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 15,
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Container(
-                          height: index.turunan!.isNotEmpty &&
-                                  index.statusView == true
-                              ? int.parse(index.turunan!.length.toString()) *
-                                      55 +
-                                  28
-                              : 50,
-                          decoration: BoxDecoration(
-                            color: Constanst.colorNeutralBgSecondary,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(8.0),
-                              bottomLeft: Radius.circular(8.0),
-                            ),
-                          ),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(top: 5.0, bottom: 5.0),
-                            child: index.namaHariLibur == null ||
-                                    index.namaHariLibur == ""
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                          DateFormat('d').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Constanst.fgPrimary,
-                                          )),
-                                      Text(
-                                          DateFormat('EEEE', 'id').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w400,
-                                            color: Constanst.fgPrimary,
-                                          )),
-                                    ],
-                                  )
-                                : Column(
-                                    children: [
-                                      Text(
-                                          DateFormat('d').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.red,
-                                          )),
-                                      Text(
-                                          DateFormat('EEEE', 'id').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.red,
-                                          )),
-                                    ],
-                                  ),
-                          ),
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: InkWell(
+          customBorder: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12))),
+          onTap: () {},
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(width: 1, color: Constanst.fgBorder)),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 15,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      height: index.turunan!.isNotEmpty &&
+                              index.statusView == true
+                          ? int.parse(index.turunan!.length.toString()) * 55 +
+                              28
+                          : 50,
+                      decoration: BoxDecoration(
+                        color: Constanst.colorNeutralBgSecondary,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(8.0),
+                          bottomLeft: Radius.circular(8.0),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 85,
-                      child:
-
-                          //     ada asen
-                          Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 8, left: 6, right: 6),
-                            child: TextLabell(
-                              text: text,
-                              color: Colors.black.withOpacity(0.5),
-                              size: 11.0,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12, bottom: 1),
-                            child: InkWell(
-                              onTap: () {
-                                // controllerAbsensi.historySelected(
-                                //     index.id, 'history');
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                        child: index.namaHariLibur == null ||
+                                index.namaHariLibur == ""
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 38,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Icon(
-                                                Iconsax.login_1,
-                                                color: Constanst.color5,
-                                                size: 16,
-                                              ),
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 4),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        jamMasuk,
-                                                        style:
-                                                            GoogleFonts.inter(
-                                                                color: Constanst
-                                                                    .fgPrimary,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontSize: 16),
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        regType == 0
-                                                            ? "Face Recognition"
-                                                            : "Photo",
-                                                        style: GoogleFonts.inter(
-                                                            color: Constanst
-                                                                .fgSecondary,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize: 10),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
+                                  Text(
+                                      DateFormat('d').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.fgPrimary,
+                                      )),
+                                  Text(
+                                      DateFormat('EEEE', 'id').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w400,
+                                        color: Constanst.fgPrimary,
+                                      )),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  Text(
+                                      DateFormat('d').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.red,
+                                      )),
+                                  Text(
+                                      DateFormat('EEEE', 'id').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.red,
+                                      )),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 85,
+                  child:
+
+                      //     ada asen
+                      Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 8, left: 6, right: 6),
+                        child: TextLabell(
+                          text: text,
+                          color: Colors.black.withOpacity(0.5),
+                          size: 11.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12, bottom: 1),
+                        child: InkWell(
+                          onTap: () {
+                            // controllerAbsensi.historySelected(
+                            //     index.id, 'history');
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 38,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            Iconsax.login_1,
+                                            color: Constanst.color5,
+                                            size: 16,
                                           ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Expanded(
-                                        flex: 38,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 4),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Icon(
-                                                Iconsax.logout_14,
-                                                color: Constanst.color4,
-                                                size: 16,
-                                              ),
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 4),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        jamKeluar,
-                                                        style:
-                                                            GoogleFonts.inter(
-                                                                color: Constanst
-                                                                    .fgPrimary,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontSize: 16),
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        regType == 0
-                                                            ? "Face Recognition"
-                                                            : "Photo",
-                                                        style: GoogleFonts.inter(
-                                                            color: Constanst
-                                                                .fgSecondary,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize: 10),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ],
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 4),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    jamMasuk,
+                                                    style: GoogleFonts.inter(
+                                                        color:
+                                                            Constanst.fgPrimary,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 16),
                                                   ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    regType == 0
+                                                        ? "Face Recognition"
+                                                        : "Photo",
+                                                    style: GoogleFonts.inter(
+                                                        color: Constanst
+                                                            .fgSecondary,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 10),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Expanded(
+                                    flex: 38,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            Iconsax.logout_14,
+                                            color: Constanst.color4,
+                                            size: 16,
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 4),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    jamKeluar,
+                                                    style: GoogleFonts.inter(
+                                                        color:
+                                                            Constanst.fgPrimary,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 16),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    regType == 0
+                                                        ? "Face Recognition"
+                                                        : "Photo",
+                                                    style: GoogleFonts.inter(
+                                                        color: Constanst
+                                                            .fgSecondary,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 10),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    )
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                )
+              ],
             ),
-          );
+          ),
+        ),
+      );
     }
   }
 
@@ -1343,153 +1330,102 @@ class DashboardController extends GetxController {
         // });
       }
     } else {
-      var connect = Api.connectionApi("post", body, "view_last_absen_user2");
-      Future.delayed(const Duration(milliseconds: 500), () {
-        connect.then((dynamic res) async {
-          if (res.statusCode == 200) {
-            var valueBody = jsonDecode(res.body);
-            print("cek data absen ini mah  new ${valueBody['offiline']}");
-            var data = valueBody['data'];
-            List wfh = valueBody['wfh'];
-            List offiline = valueBody['offiline'];
-            // print("cek data absen ini mah  new ${offiline[0]['signout_time']}");
+      try {
+        var response =
+            await Api.connectionApi("post", body, "view_last_absen_user2");
 
-            status.value = data.toString();
-            // print("hasil status.value ${status.value}");
-            if (wfh.isEmpty) {
-              if (data.isEmpty) {
-                AppData.statusAbsen = false;
-                signoutTime.value = '00:00:00';
-                signinTime.value = '00:00:00';
-                breakinTime.value = '00:00:00';
-                breakoutTime.value = '00:00:00';
-                controllerAbsensi.absenStatus.value = false;
-                dashboardStatusAbsen.value = false;
-              } else {
-                wfhlokasi.value =
-                    valueBody['data'][0]['place_in'].toString() == "WFH"
-                        ? true
-                        : false;
+        if (response.statusCode != 200) {
+          isLoading.value = false;
+          return;
+        }
 
-                AppData.statusAbsen =
-                    data[0]['signout_time'] == "00:00:00" ? true : false;
-                dashboardStatusAbsen.value =
-                    data[0]['signout_time'] == "00:00:00" ? true : false;
+        var valueBody = jsonDecode(response.body);
+        print("Cek data absen: ${valueBody}");
 
-                signoutTime.value = data[0]['signout_time'].toString();
-                signinTime.value = data[0]['signin_time'].toString();
-                breakinTime.value = data[0]['breakin_time'].toString() != "null"
-                    ? data[0]['breakin_time'].toString()
-                    : "00:00:00";
-                breakoutTime.value =
-                    data[0]['breakout_time'].toString() != "null"
-                        ? data[0]['breakout_time'].toString()
-                        : "00:00:00";
-                trx.value = data[0]['trx'].toString() ?? "";
-                print("hasil signinTime wfh ${signinTime.value}");
-                // print("hasil signinTime ${status.value}");
-              }
-            } else {
-              wfhstatus.value = wfh.isEmpty ? false : true;
-              controllerAbsensi.absenStatus.value = wfh.isEmpty ? false : true;
-              approveStatus.value = valueBody['wfh'][0]['status'].toString();
-              // if (data.isEmpty) {
-              signinTime.value = wfh[0]['signing_time'].toString();
-              controllerAbsensi.nomorAjuan.value =
-                  wfh[0]['nomor_ajuan'].toString();
-              // status.value = wfh[0]['status'].toString();
+        var data = valueBody['data'] ?? [];
+        List wfh = valueBody['wfh'] ?? [];
+        List offline = valueBody['offiline'] ?? [];
 
-              // status.value = "ad";
-              // controllerAbsensi.absenStatus.value = true;
-              print("hasil signinTime ini yak${signinTime.value}");
-              print("hasil signinTime ${status.value}");
-            }
+        status.value = data.toString();
 
-            if (offiline.isEmpty) {
-              if (data.isEmpty) {
-                AppData.statusAbsen = false;
-                signoutTime.value = '00:00:00';
-                signinTime.value = '00:00:00';
-                breakinTime.value = '00:00:00';
-                breakoutTime.value = '00:00:00';
-                controllerAbsensi.absenStatus.value = false;
-                dashboardStatusAbsen.value = false;
-              } else {
-                AppData.statusAbsen =
-                    data[0]['signout_time'] == "00:00:00" ? true : false;
-                dashboardStatusAbsen.value =
-                    data[0]['signout_time'] == "00:00:00" ? true : false;
+        if (data.isEmpty) {
+          _resetAbsenStatus();
+        } else {
+          _updateAbsenStatus(data[0]);
+        }
 
-                // signoutTime.value = data[0]['signout_time'].toString();
-                // signinTime.value = data[0]['signin_time'];
-                pendingSigninApr.value = false;
-                pendingSignoutApr.value = false;
-                absenOfflineStatus.value = false;
-                absenOfflineStatusOut.value = false;
+        if (wfh.isNotEmpty) {
+          _updateWFHStatus(wfh[0]);
+        }
 
-                breakinTime.value = data[0]['breakin_time'].toString() != "null"
-                    ? data[0]['breakin_time'].toString()
-                    : "00:00:00";
-                breakoutTime.value =
-                    data[0]['breakout_time'].toString() != "null"
-                        ? data[0]['breakout_time'].toString()
-                        : "00:00:00";
-                trx.value = data[0]['trx'].toString() ?? "";
-                print("hasil signinTime offoline ${signinTime.value}");
-                print("hasil signinTime ${signoutTime.value}");
-              }
-            } else {
-              controllerAbsensi.absenStatus.value =
-                  offiline.isEmpty ? false : true;
-              approveStatus.value =
-                  valueBody['offiline'][0]['status'].toString();
-              // if (data.isEmpty) {
-              textPendingMasuk.value =
-                  offiline[0]['signing_time'] == '00:00:00' ? true : false;
-              textPendingKeluar.value =
-                  offiline[0]['signout_time'] == '00:00:00' ? true : false;
-              pendingSigninApr.value =
-                  offiline[0]['signing_time'] == '00:00:00' ? false : true;
-              pendingSignoutApr.value =
-                  offiline[0]['signout_time'] == '00:00:00' ? false : true;
-              absenOfflineStatus.value =
-                  offiline[0]['signing_time'] == '00:00:00' ? false : true;
-              absenOfflineStatusOut.value =
-                  offiline[0]['signout_time'] == '00:00:00' ? false : true;
+        if (offline.isNotEmpty) {
+          _updateOfflineStatus(offline[0], data.isNotEmpty ? data[0] : null);
+        }
 
-              signinTime.value = offiline[0]['signing_time'] == '00:00:00'
-                  ? data[0]['signin_time']
-                  : offiline[0]['signing_time'];
-              signoutTime.value = offiline[0]['signout_time'] == '00:00:00'
-                  ? data[0]['signout_time']
-                  : offiline[0]['signout_time'];
-              controllerAbsensi.nomorAjuan.value =
-                  offiline[0]['nomor_ajuan'].toString();
-              // status.value = wfh[0]['status'].toString();
-
-              // status.value = "ad";
-              // controllerAbsensi.absenStatus.value = true;
-              print("hasil signinTime ini yak${signinTime.value}");
-              print("hasil signinTime ${status.value}");
-            }
-
-            // AppData.textPendingMasuk = textPendingMasuk.value;
-            // AppData.textPendingKeluar = textPendingKeluar.value;
-
-            AppData.signingTime = signinTime.value;
-            AppData.signoutTime = signoutTime.value;
-            AppData.statusAbsenOffline = absenOfflineStatus.value;
-
-            print("hasil signinTime ${signinTime.value}");
-            print("hasil signoutTime ${signoutTime.value}");
-            print("hasil signinTime ${AppData.signingTime}");
-            print("hasil signinTime ${AppData.signoutTime}");
-          } else {
-            isLoading.value = false;
-          }
-        });
-      });
+        print("Hasil signinTime: ${signinTime.value}");
+        print("Hasil signoutTime: ${signoutTime.value}");
+      } catch (e) {
+        print("Error fetching absen: $e");
+        isLoading.value = false;
+      }
     }
+  }
+
+  void _resetAbsenStatus() {
+    AppData.statusAbsen = false;
+    signoutTime.value = '00:00:00';
+    signinTime.value = '00:00:00';
+    breakinTime.value = '00:00:00';
+    breakoutTime.value = '00:00:00';
+    wfhstatus.value = false;
+    controllerAbsensi.absenStatus.value = false;
+    dashboardStatusAbsen.value = false;
+  }
+
+  void _updateAbsenStatus(Map<String, dynamic> data) {
+    wfhlokasi.value = data['place_in'] == "WFH";
+    AppData.statusAbsen = data['signout_time'] == "00:00:00";
+    dashboardStatusAbsen.value = data['signout_time'] == "00:00:00";
+    signoutTime.value = data['signout_time'] ?? '00:00:00';
+    signinTime.value = data['signin_time'] ?? '00:00:00';
+    breakinTime.value = data['breakin_time'] ?? '00:00:00';
+    breakoutTime.value = data['breakout_time'] ?? '00:00:00';
+    trx.value = data['trx'] ?? "";
+  }
+
+  void _updateWFHStatus(Map<String, dynamic> wfhData) {
+    wfhstatus.value = true;
+    controllerAbsensi.absenStatus.value = true;
+    approveStatus.value = wfhData['status'] ?? "";
+    signinTime.value = wfhData['signing_time'] ?? "00:00:00";
+    controllerAbsensi.nomorAjuan.value = wfhData['nomor_ajuan'] ?? "";
+  }
+
+  void _updateOfflineStatus(
+      Map<String, dynamic> offlineData, Map<String, dynamic>? data) {
+    controllerAbsensi.absenStatus.value = true;
+    approveStatus.value = offlineData['status'] ?? "";
+
+    textPendingMasuk.value = offlineData['signing_time'] == '00:00:00';
+    textPendingKeluar.value = offlineData['signout_time'] == '00:00:00';
+
+    pendingSigninApr.value = !textPendingMasuk.value;
+    pendingSignoutApr.value = !textPendingKeluar.value;
+
+    absenOfflineStatus.value = !textPendingMasuk.value;
+    absenOfflineStatusOut.value = !textPendingKeluar.value;
+
+    signinTime.value =
+        (offlineData['signing_time'] == '00:00:00' && data != null)
+            ? data['signin_time']
+            : offlineData['signing_time'];
+
+    signoutTime.value =
+        (offlineData['signout_time'] == '00:00:00' && data != null)
+            ? data['signout_time']
+            : offlineData['signout_time'];
+
+    controllerAbsensi.nomorAjuan.value = offlineData['nomor_ajuan'] ?? "";
   }
 
   void widgetButtomSheetOfflineAbsen(
@@ -2831,9 +2767,8 @@ class DashboardController extends GetxController {
   void _updateMenuStatus(String menuName) {
     switch (menuName.trim()) {
       case 'Pengajuan Absensi':
-      sortcardPengajuan
-                    .add({"id": 1, "nama_pengajuan": "Pengajuan Absensi"});
-      break;
+        sortcardPengajuan.add({"id": 1, "nama_pengajuan": "Pengajuan Absensi"});
+        break;
       case "Absensi":
         controllerAbsensi.showButtonlaporan.value = true;
         break;
@@ -2936,8 +2871,8 @@ class DashboardController extends GetxController {
             (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
         showMonitDaily.value = menusUtama.any((menu) =>
             menu['url'].toString().toLowerCase().trim() == "dailytask");
-        showAbsen.value = menusUtama.any((menu) =>
-            menu['url'].toString().toLowerCase().trim() == "absen");
+        showAbsen.value = menusUtama.any(
+            (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
       }
     } catch (error) {
       print("Terjadi kesalahan: $error");
@@ -2955,8 +2890,8 @@ class DashboardController extends GetxController {
           (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
       showMonitDaily.value = menusUtama.any(
           (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
-      showAbsen.value = menusUtama.any((menu) =>
-            menu['url'].toString().toLowerCase().trim() == "absen");
+      showAbsen.value = menusUtama.any(
+          (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
     }
   }
 
