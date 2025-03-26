@@ -840,7 +840,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
   @override
   void initState() {
     controller.getDetailData(
-        widget.idxDetail, widget.emId, widget.title, widget.delegasi);
+
     print('ini emIdz user ${widget.emIds}');
     controller.infoIds(widget.emIds == null
         ? controllerApproval.detailData[0]['em_ids']

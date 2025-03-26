@@ -67,11 +67,14 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
         minSdkVersion 24
         targetSdkVersion 34
+
         versionCode 10
+
         versionName "1.0.0"
         multiDexEnabled true
 
     }
+
 
 //         buildTypes {
 //        release {
@@ -98,6 +101,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
     
 
     // signingConfigs {
@@ -106,14 +110,14 @@ android {
     //         keyAlias keystoreProperties['keyAlias']
     //         keyPassword keystoreProperties['keyPassword']
     //         storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-    //         storePassword 1 ['storePassword']
+    //        storePassword keystoreProperties['storePassword']
     //     }
     // }
     // buildTypes {
     //     release {
     //         // TODO: Add your own signing config for the release build.
     //         // Signing with the debug keys for now, so `flutter run --release` works.
-    //        signingConfig signingConfigs.debug
+    //        signingConfig signingConfigs.release
     //     }
     // }
      aaptOptions {
