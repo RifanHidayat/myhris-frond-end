@@ -842,9 +842,9 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
     controller.getDetailData(
 
     print('ini emIdz user ${widget.emIds}');
-    controller.infoIds(widget.emIds == null
-        ? controllerApproval.detailData[0]['em_ids']
-        : widget.emIds);
+    print('ini emIdz user ${controllerApproval.detailData[0]['em_ids']}');
+    // Future.delayed(Duration(seconds: 2));
+    controller.infoIds(controllerApproval.detailData[0]['em_ids']);
     controller.infoTask(widget.idxDetail);
 
     super.initState();
@@ -1630,7 +1630,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                           fontWeight: FontWeight.bold),
                                     )
                                   : Text(
-                                      "${controller.fullNameDelegasi.value}",
+                                      "${controller.detailData[0]['nama_delegasi']}",
                                       style: GoogleFonts.inter(
                                           color: Constanst.fgPrimary,
                                           fontWeight: FontWeight.w500,

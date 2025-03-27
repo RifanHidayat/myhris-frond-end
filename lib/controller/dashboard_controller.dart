@@ -138,6 +138,7 @@ class DashboardController extends GetxController {
   var isPauseCamera = true;
   var jumlahData = 0.obs;
   var departementAkses = [].obs;
+  var hideAudit = false.obs;
 
   var timeString = "".obs;
   var dateNow = "".obs;
