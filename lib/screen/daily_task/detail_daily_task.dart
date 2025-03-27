@@ -36,13 +36,12 @@ class _DetailDailyTaskState extends State<DetailDailyTask> {
         titleSpacing: 0,
         centerTitle: true,
         title: const Text("Detail Daily Task"),
-
-      appBar: AppBar(title: Text('Detail Your Task')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(FormDailyTask());
-        },
-        child: Icon(Icons.add),
+ 
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Get.to(FormDailyTask());
+      //   },
+      //   child: Icon(Icons.add),
 
       ),
       body: widget.id == null || widget.id == 0

@@ -20,7 +20,7 @@ class Api {
 
   // API PROD
 
-  // static var basicUrl = "http://mobilehris.siscom.id:3009/";
+ static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   //  static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
@@ -29,7 +29,7 @@ class Api {
 //
   // API LOCAL
 
-  static var basicUrl = "http://192.168.20.8:2627/";
+//  static var basicUrl = "http://192.168.20.8:2627/";
 
 
 
@@ -214,11 +214,11 @@ class ApiRequest {
           .encode('aplikasioperasionalsiscom:siscom@ptshaninformasi#2022@'));
 
   // API PROD
-  // static var basicUrl = "http://mobilehris.siscom.id:3009/";
+   static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API LOCAL
 
-  static var basicUrl = "http://192.168.20.8:2627/";
+  //static var basicUrl = "http://192.168.20.8:2627/";
 
 
 
