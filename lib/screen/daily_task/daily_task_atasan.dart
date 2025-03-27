@@ -654,156 +654,138 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
   }
 
   void showBottomStatus(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16.0),
-        ),
-      ),
-      isScrollControlled: true, // Ini memastikan modal bisa di-scroll
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6, // Ukuran awal modal sheet
-          minChildSize: 0.4, // Ukuran minimum modal sheet
-          maxChildSize: 0.9, // Ukuran maksimal modal sheet
-          expand: false,
-          builder: (context, scrollController) {
-            return SafeArea(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Karyawan",
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18,
-                              color: Constanst.fgPrimary,
-                            ),
-                          ),
-                          InkWell(
-                            customBorder: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8))),
-                            onTap: () => Navigator.pop(context),
-                            child: Icon(
-                              Icons.close,
-                              size: 26,
-                              color: Constanst.fgSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                      child: Divider(
-                        thickness: 1,
-                        height: 0,
-                        color: Constanst.border,
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: scrollController,
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+    ),
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) {
+          return SafeArea(
+            child: Column(
+              children: [
+                // Header dengan Dropdown Filter Cabang
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Dropdown Filter Cabang
+                      Expanded(
                         child: Obx(() {
-                          return Column(
-                            children: List.generate(
-                              controller.monitoringList[0].length,
-                              (index) {
-                                var monitoring = controller.monitoringList[0];
-                                var full_name = monitoring[index]['full_name'];
-                                var em_id = monitoring[index]
-                                    ['em_id']; // Perbaikan di sini
-
-                                var isSelected =
-                                    controller.tempNamaStatus1.value ==
-                                        full_name;
-
-                                return InkWell(
-                                  onTap: () {
-                                    controller.tempNamaStatus1.value =
-                                        full_name;
-                                    controller.emId.value = em_id;
-                                    controller.atasanStatus.value = 'draft';
-                                    controller
-                                        .loadAllTask(controller.emId.value);
-                                    Navigator.pop(context);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        0, 16, 16, 16),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const SizedBox(width: 20),
-                                            Text(
-                                              full_name.toString(),
-                                              style: GoogleFonts.inter(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 16,
-                                                color: Constanst.fgPrimary,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          height: 20,
-                                          width: 20,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              width: isSelected ? 2 : 1,
-                                              color: isSelected
-                                                  ? Constanst.onPrimary
-                                                  : Constanst.onPrimary
-                                                      .withOpacity(0.5),
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: isSelected
-                                              ? Container(
-                                                  decoration: BoxDecoration(
-                                                    color: Constanst.onPrimary,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                )
-                                              : null,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
+                          return DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: controller.selectedBranch.value,
+                              onChanged: (newValue) {
+                                controller.selectedBranch.value = newValue!;
                               },
+                              items: controller.branchList.toSet().map((branch) {
+                                return DropdownMenuItem<String>(
+                                  value: branch,
+                                  child: Text(branch, style: GoogleFonts.inter(fontSize: 16)),
+                                );
+                              }).toList(),
                             ),
                           );
                         }),
                       ),
-                    ),
-                  ],
+
+                      // Tombol Tutup
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, size: 26, color: Colors.black54),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        );
-      },
-    ).then((value) {
-      // print('Bottom sheet closed');
-    });
-  }
+
+                // Divider
+                const Divider(thickness: 1, height: 0, color: Colors.grey),
+
+                // List Karyawan
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Obx(() {
+                      int selectedBranchId = controller.getBranchIdByName(controller.selectedBranch.value);
+                      var monitorings = controller.monitoringList[0];
+
+                      var filteredList = monitorings.where((item) {
+                        return selectedBranchId == -1 || item['branch_id'] == selectedBranchId;
+                      }).toList();
+
+                      return Column(
+                        children: List.generate(filteredList.length, (index) {
+                          var monitoring = filteredList;
+                          var full_name = monitoring[index]['full_name'];
+                          var em_id = monitoring[index]['em_id'];
+
+                          var isSelected = controller.tempNamaStatus1.value == full_name;
+
+                          return InkWell(
+                            onTap: () {
+                              controller.tempNamaStatus1.value = full_name;
+                              controller.emId.value = em_id;
+                              controller.atasanStatus.value = 'draft';
+                              controller.loadAllTask(controller.emId.value);
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    full_name,
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: isSelected ? Constanst.onPrimary : Colors.black87,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 20,
+                                    width: 20,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        width: isSelected ? 2 : 1,
+                                        color: isSelected ? Constanst.onPrimary : Colors.grey,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: isSelected
+                                        ? Container(
+                                            decoration: BoxDecoration(
+                                              color: Constanst.onPrimary,
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                      );
+                    }),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
   Widget status() {
     return Container(

@@ -47,6 +47,23 @@ class DailyTaskController extends GetxController {
   var statusDraft = ''.obs;
   var atasanStatus = ''.obs;
   var isFormChanged = false.obs;
+  var branchList = <String>[
+    'Semua Cabang',
+    'PT. SHAN INFORMASI SISTEM',
+    'PT. REFORMASI ANUGERAH JAVA JAYA',
+  ].obs;
+
+  int getBranchIdByName(String branchName) {
+    Map<String, int> branchMapping = {
+      'Semua Cabang': -1,
+      'PT. SHAN INFORMASI SISTEM': 1,
+      'PT. REFORMASI ANUGERAH JAVA JAYA': 2,
+    };
+
+    return branchMapping[branchName] ?? -1;
+  }
+
+  var selectedBranch = 'Semua Cabang'.obs;
 
   @override
   void onReady() async {
@@ -81,7 +98,7 @@ class DailyTaskController extends GetxController {
           atasanStatus.value = 'draft';
           loadAllTask(emId.value);
         } else {
-          // Get.snackbar("error", "gagal");
+          Get.snackbar("error", "gagal");
         }
       },
     );
@@ -308,9 +325,11 @@ class DailyTaskController extends GetxController {
         Get.back();
       } else {
         print("Error: ${res.statusCode} - ${res.body}");
+        Get.back();
       }
     } catch (e) {
       print("Exception saat load task: $e");
+      Get.back();
     }
   }
 
@@ -406,12 +425,12 @@ class DailyTaskController extends GetxController {
 
             pw.SizedBox(height: 20),
 
-            // Informasi Karyawan
             _buildInfoRow("NAMA KARYAWAN", user['full_name']),
+            _buildInfoRow("DIVISI", user['divisi']),
             _buildInfoRow("JABATAN", user['jabatan']),
             _buildInfoRow("POSISI", user['posisi']),
             _buildInfoRow(
-                "PERIODE BULAN", Constanst.convertGetMonth(user['tgl_buat'])),
+                "PERIODE BULAN", Constanst.convertGetMonth(user['tgl_buat']).toUpperCase()),
 
             pw.SizedBox(height: 20),
 
@@ -465,7 +484,6 @@ class DailyTaskController extends GetxController {
     final headers = [
       "No",
       "Tanggal",
-      "Hari",
       "Judul",
       "Rincian Task",
       "Tingkat Kesulitan",
@@ -474,9 +492,20 @@ class DailyTaskController extends GetxController {
       "Durasi"
     ];
 
-    final data = listTaskPdf.asMap().entries.map((entry) {
+    final Map<String, int> tanggalRowSpan = {};
+    final List<List<String>> data = [];
+
+    // Proses data untuk mengecek jumlah kemunculan tanggal
+    listTaskPdf.asMap().entries.forEach((entry) {
       int index = entry.key + 1;
       var task = entry.value;
+      String tanggal = Constanst.convertDate(task['tgl_buat']);
+
+      if (tanggalRowSpan.containsKey(tanggal)) {
+        tanggalRowSpan[tanggal] = tanggalRowSpan[tanggal]! + 1;
+      } else {
+        tanggalRowSpan[tanggal] = 1;
+      }
 
       var level;
       switch (task['level']) {
@@ -508,13 +537,12 @@ class DailyTaskController extends GetxController {
 
       String durasi = "-";
       if (tglBuat != null && tglFinish != null) {
-        durasi = '${tglFinish.difference(tglBuat).inDays.toString()} Hari';
+        durasi = '${tglFinish.difference(tglBuat).inDays + 1} Hari';
       }
 
-      return [
+      data.add([
         index.toString(),
-        Constanst.convertDate1(task['tgl_buat']),
-        Constanst.convertGetDay(task['tgl_buat']),
+        tanggal,
         task['judul'],
         task['rincian'],
         level.toString(),
@@ -523,21 +551,20 @@ class DailyTaskController extends GetxController {
             ? '-'
             : Constanst.convertDate1(task['tgl_finish']),
         durasi
-      ];
-    }).toList();
+      ]);
+    });
 
     return pw.Table(
       border: pw.TableBorder.all(width: 1),
       columnWidths: {
         0: pw.FixedColumnWidth(40), // No
-        1: pw.FixedColumnWidth(80), // Tanggal
-        2: pw.FixedColumnWidth(80), // Hari
-        3: pw.FixedColumnWidth(80), // Judul
-        4: pw.FixedColumnWidth(160), // Rincian Task
-        5: pw.FixedColumnWidth(120), // Tingkat Kesulitan
-        6: pw.FixedColumnWidth(80), // Status
-        7: pw.FixedColumnWidth(80), // Tgl Finish
-        8: pw.FixedColumnWidth(80), // Durasi
+        1: pw.FixedColumnWidth(80), // Hari
+        2: pw.FixedColumnWidth(80), // Judul
+        3: pw.FixedColumnWidth(160), // Rincian Task
+        4: pw.FixedColumnWidth(120), // Tingkat Kesulitan
+        5: pw.FixedColumnWidth(80), // Status
+        6: pw.FixedColumnWidth(80), // Tgl Finish
+        7: pw.FixedColumnWidth(80), // Durasi
       },
       children: [
         // Header Tabel
@@ -556,36 +583,54 @@ class DailyTaskController extends GetxController {
           }).toList(),
         ),
 
-        ...data.map((row) {
-          return pw.TableRow(
-            children: row.asMap().entries.map((entry) {
-              int colIndex = entry.key;
-              var cell = entry.value;
-
-              // Jika kolom ke-4 (index 4) yaitu "Rincian Task", gunakan justify
-              if (colIndex == 4) {
-                return pw.Padding(
-                  padding: pw.EdgeInsets.all(6),
-                  child: pw.Text(
-                    cell,
-                    textAlign: pw.TextAlign.justify,
-                    style: pw.TextStyle(fontSize: 6.0),
-                  ),
-                );
-              }
-
-              return pw.Padding(
-                padding: pw.EdgeInsets.all(6),
-                child: pw.Text(
-                  cell,
-                  textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontSize: 6.0),
-                ),
-              );
-            }).toList(),
-          );
-        }).toList(),
+        ..._buildMergedTableRows(data, tanggalRowSpan),
       ],
     );
+  }
+
+  List<pw.TableRow> _buildMergedTableRows(
+      List<List<String>> data, Map<String, int> tanggalRowSpan) {
+    List<pw.TableRow> rows = [];
+    String lastDate = "";
+
+    for (var row in data) {
+      String currentDate = row[1];
+
+      rows.add(
+        pw.TableRow(
+          verticalAlignment: pw.TableCellVerticalAlignment.middle,
+          children: [
+            tanggalRowSpan[currentDate] != null && lastDate == currentDate
+                ? pw.SizedBox.shrink()
+                : pw.Container(
+                    alignment: pw.Alignment.center,
+                    padding: pw.EdgeInsets.all(6),
+                    child: pw.Text(row[0], style: pw.TextStyle(fontSize: 6.0)),
+                  ),
+            tanggalRowSpan[currentDate] != null && lastDate == currentDate
+                ? pw.SizedBox.shrink()
+                : pw.Container(
+                    alignment: pw.Alignment.center,
+                    padding: pw.EdgeInsets.all(6),
+                    child: pw.Text(row[1], style: pw.TextStyle(fontSize: 6.0)),
+                  ),
+            for (int i = 2; i < row.length; i++)
+              pw.Padding(
+                padding: pw.EdgeInsets.all(6),
+                child: pw.Text(
+                  row[i],
+                  textAlign:
+                      (i == 3) ? pw.TextAlign.justify : pw.TextAlign.center,
+                  style: pw.TextStyle(fontSize: 6.0),
+                ),
+              ),
+          ],
+        ),
+      );
+
+      lastDate = currentDate;
+    }
+
+    return rows;
   }
 }

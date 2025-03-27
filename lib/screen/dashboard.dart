@@ -17,6 +17,7 @@ import 'package:new_version_plus/new_version_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:siscom_operasional/controller/absen_controller.dart';
+import 'package:siscom_operasional/controller/audit_controller.dart';
 import 'package:siscom_operasional/controller/auth_controller.dart';
 import 'package:siscom_operasional/controller/bpjs.dart';
 import 'package:siscom_operasional/controller/chat_controller.dart';
@@ -38,6 +39,7 @@ import 'package:siscom_operasional/screen/absen/face_id_registration.dart';
 import 'package:siscom_operasional/screen/absen/facee_id_detection.dart';
 import 'package:siscom_operasional/screen/absen/loading_absen.dart';
 import 'package:siscom_operasional/screen/akun/personal_info.dart';
+import 'package:siscom_operasional/screen/audit/audit_screen.dart';
 import 'package:siscom_operasional/screen/chatting/history.dart';
 import 'package:siscom_operasional/screen/daily_task/daily_task.dart';
 
@@ -95,6 +97,7 @@ class _DashboardState extends State<Dashboard> {
   final authController = Get.put(AuthController());
   final chatController = Get.put(ChatController());
   final internetController = Get.put(InternetController());
+  final auditController = Get.put(AuditController());
 
   var intervalTracking = "";
   final WebSocketChannel channel =
@@ -3163,6 +3166,89 @@ class _DashboardState extends State<Dashboard> {
                     ),
             ],
           ),
+          controller.hideAudit.value == false
+              ? SizedBox()
+              : const SizedBox(
+                  height: 8,
+                ),
+          controller.hideAudit.value == false
+              ? SizedBox()
+              : Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Constanst.colorStateInfoBorder,
+                      width: 1.0,
+                    ),
+                    borderRadius: Constanst.borderStyle2,
+                  ),
+                  child: Material(
+                    borderRadius: Constanst.borderStyle2,
+                    color: Constanst.infoLight1,
+                    child: InkWell(
+                      customBorder: RoundedRectangleBorder(
+                        borderRadius: Constanst.borderStyle2,
+                      ),
+                      onTap: () {
+                        auditController.fetchAuditData();
+                        internetController.isConnected.value
+                            ? Get.to(AuditScreen())
+                            : UtilsAlert.showDialogCheckInternet();
+                      },
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(8.0, 10.0, 4.0, 10.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Iconsax.chart_square5,
+                                    color: Constanst.infoLight,
+                                    size: 26,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Audit",
+                                          style: GoogleFonts.inter(
+                                              color: Constanst.fgPrimary,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          "Lacak dan evaluasi aktivitas kerja",
+                                          style: GoogleFonts.inter(
+                                              color: Constanst.fgPrimary,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Constanst.fgSecondary,
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
         ],
       ),
     );
