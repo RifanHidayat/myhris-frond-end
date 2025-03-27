@@ -3189,12 +3189,12 @@ class _DashboardState extends State<Dashboard> {
                     ),
             ],
           ),
-          controller.hideAudit.value == false
+          controller.hideAudit.value == true
               ? SizedBox()
               : const SizedBox(
                   height: 8,
                 ),
-          controller.hideAudit.value == false
+          controller.hideAudit.value == true
               ? SizedBox()
               : Container(
                   decoration: BoxDecoration(
@@ -3212,7 +3212,7 @@ class _DashboardState extends State<Dashboard> {
                         borderRadius: Constanst.borderStyle2,
                       ),
                       onTap: () {
-                        auditController.fetchAuditData();
+                        // auditController.fetchAuditData();
                         internetController.isConnected.value
                             ? Get.to(AuditScreen())
                             : UtilsAlert.showDialogCheckInternet();
