@@ -858,7 +858,6 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 Row(
                   children: [
-
                     Text(
                       "VERSI APLIKASI SAAT INI : ${controller.statuz.value}",
                       style: GoogleFonts.inter(
@@ -891,10 +890,6 @@ class _DashboardState extends State<Dashboard> {
                       fontWeight: FontWeight.w500),
 
                   overflow: TextOverflow.ellipsis, // Untuk menghindari overflow
-
-                  overflow:
-                      TextOverflow.ellipsis, // Untuk menghindari overflow
-
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -928,7 +923,6 @@ class _DashboardState extends State<Dashboard> {
                             : Colors.red)
                   ],
                 )
-
               : Padding(
                   padding: const EdgeInsets.only(left: 16.0),
                   child: Column(
@@ -941,9 +935,7 @@ class _DashboardState extends State<Dashboard> {
                               imageUrl:
                                   "${Api.UrlfotoProfile}${AppData.informasiUser![0].em_image}",
                               progressIndicatorBuilder:
-
                                   (context, url, downloadProgress) => Container(
-
                                 alignment: Alignment.center,
                                 height:
                                     MediaQuery.of(context).size.height * 0.5,
@@ -968,13 +960,11 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       SizedBox(height: 4),
                       Container(
-
                           height: 12,
                           width: 12,
                           color: internetController.isConnected.value
                               ? Colors.green
                               : Colors.red)
-
                     ],
                   ),
                 ),
@@ -982,13 +972,11 @@ class _DashboardState extends State<Dashboard> {
           //   flex: 15,
           //   child: SizedBox(),
 
-
           //         )
           //       ],
           //     ),
           //   ),
           // ),
-
 
           // child: Stack(
           //   children: [

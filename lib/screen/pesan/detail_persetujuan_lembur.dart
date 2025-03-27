@@ -367,9 +367,9 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
                                                               .text
                                                               .length),
                                                     );
-                                                    
                                                   }
-                                                  controller.updateTotalPercentage();
+                                                  controller
+                                                      .updateTotalPercentage();
                                                 }
                                               },
                                             ),
@@ -839,7 +839,7 @@ class _DetailPersetujuanLemburState extends State<DetailPersetujuanLembur> {
 
   @override
   void initState() {
-    controller.getDetailData(
+    // controller.getDetailData(
 
     print('ini emIdz user ${widget.emIds}');
     print('ini emIdz user ${controllerApproval.detailData[0]['em_ids']}');
