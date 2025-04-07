@@ -24,6 +24,7 @@ class DailyTaskController extends GetxController {
   var listTask = [].obs;
   var idTask = ''.obs;
   var tanggalTaskOld = ''.obs;
+  var filterBranch = ''.obs;
   var listTaskPdf = [].obs;
   var tanggalTask = TextEditingController().obs;
   var task = [].obs;
@@ -47,11 +48,7 @@ class DailyTaskController extends GetxController {
   var statusDraft = ''.obs;
   var atasanStatus = ''.obs;
   var isFormChanged = false.obs;
-  var branchList = <String>[
-    'Semua Cabang',
-    'PT. SHAN INFORMASI SISTEM',
-    'PT. REFORMASI ANUGERAH JAVA JAYA',
-  ].obs;
+  var branchList = [].obs;
 
   int getBranchIdByName(String branchName) {
     Map<String, int> branchMapping = {
@@ -70,17 +67,38 @@ class DailyTaskController extends GetxController {
     await getTimeNow();
   }
 
-  void updateStatus(int index, String status) {
-    listTask[index]['dropdown'] = status;
-    listTask[index]['tgl_finish'] == '' &&
-            listTask[index]['dropdown'] == 'Finished'
-        ? listTask[index]['tgl_finish'] =
-            Constanst.convertDate("${DateTime.now()}")
-        : listTask[index]['dropdown'] == 'Ongoing'
-            ? listTask[index]['tgl_finish'] = ''
-            : listTask[index]['tgl_finish'];
-    listTask.refresh();
+  
+  void getBranch() {
+    var connect = Api.connectionApi('get', {}, 'cabang');
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        branchList.clear();
+        var valueBody = jsonDecode(res.body);
+        print('ini get barnch ${valueBody['data']}');
+        branchList.add({'name':'Semua Cabang', 'id':-1 });
+        for (var data in valueBody['data']) {
+          branchList.add(data);
+          print('ini branch list $branchList');
+        }
+        // List data = valueBody['data'];
+        // if (data.isNotEmpty) {
+        //   var listFirst = data.firstWhere((element) => element['name'] != null,
+        //       orElse: () => null);
+        //   if (listFirst != null) {
+        //     var fullName = listFirst['name'] ?? "";
+        //     String namaUserPertama = "$fullName";
+        //     filterBranch.value = namaUserPertama;
+        //   }
+        // }
+        // branchList.refresh;
+        // filterBranch.refresh;
+        // print(branchList);
+      } else {
+        print('error ${res.body}');
+      }
+    });
   }
+
 
   void getMonitor() async {
     monitoringList.clear();
@@ -217,10 +235,12 @@ class DailyTaskController extends GetxController {
 
   Future<void> getTimeNow() async {
     var dt = DateTime.parse(AppData.endPeriode);
-    bulanSelectedSearchHistory.value = "${dt.month}";
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    bulanSelectedSearchHistory.value = "${twoDigits(dt.month)}";
     tahunSelectedSearchHistory.value = "${dt.year}";
-    bulanDanTahunNow.value = "${dt.month}-${dt.year}";
-    tanggal.value = '${dt.year}-${dt.month}-${dt.hour}';
+    bulanDanTahunNow.value = "${twoDigits(dt.month)}-${dt.year}";
+    tanggal.value = '${dt.year}-${twoDigits(dt.month)}-${dt.hour}';
+    print('ini tanggal sekarang $bulanSelectedSearchHistory');
   }
 
   void setFormChanged() {
@@ -300,7 +320,11 @@ class DailyTaskController extends GetxController {
   Future<void> loadTask(id) async {
     listTask.clear();
     task.clear();
-    Map<String, dynamic> body = {'id': id};
+    Map<String, dynamic> body = {
+      'id': id,
+      'bulan': bulanSelectedSearchHistory.value,
+      'tahun': tahunSelectedSearchHistory.value
+    };
     try {
       var res = await Api.connectionApi("post", body, "getTaskDaily");
       if (res.statusCode == 200) {
@@ -335,7 +359,11 @@ class DailyTaskController extends GetxController {
 
   Future<void> loadTaskPDF(em_id) async {
     listTaskPdf.clear();
-    Map<String, dynamic> body = {'em_id': em_id};
+    Map<String, dynamic> body = {
+      'em_id': em_id,
+      'bulan': bulanSelectedSearchHistory.value,
+      'tahun': tahunSelectedSearchHistory.value
+    };
     try {
       var res = await Api.connectionApi("post", body, "getTaskDailyPDF");
       if (res.statusCode == 200) {
@@ -429,8 +457,8 @@ class DailyTaskController extends GetxController {
             _buildInfoRow("DIVISI", user['divisi']),
             _buildInfoRow("JABATAN", user['jabatan']),
             _buildInfoRow("POSISI", user['posisi']),
-            _buildInfoRow(
-                "PERIODE BULAN", Constanst.convertGetMonth(user['tgl_buat']).toUpperCase()),
+            _buildInfoRow("PERIODE BULAN",
+                Constanst.convertGetMonth(user['tgl_buat']).toUpperCase()),
 
             pw.SizedBox(height: 20),
 
@@ -495,64 +523,81 @@ class DailyTaskController extends GetxController {
     final Map<String, int> tanggalRowSpan = {};
     final List<List<String>> data = [];
 
-    // Proses data untuk mengecek jumlah kemunculan tanggal
-    listTaskPdf.asMap().entries.forEach((entry) {
-      int index = entry.key + 1;
-      var task = entry.value;
+    final Map<String, List<Map<String, dynamic>>> groupedByTanggal = {};
+
+    for (var task in listTaskPdf) {
       String tanggal = Constanst.convertDate(task['tgl_buat']);
+      groupedByTanggal.putIfAbsent(tanggal, () => []).add(task);
+    }
 
-      if (tanggalRowSpan.containsKey(tanggal)) {
-        tanggalRowSpan[tanggal] = tanggalRowSpan[tanggal]! + 1;
-      } else {
-        tanggalRowSpan[tanggal] = 1;
+    int no = 1;
+
+    final sortedEntries = groupedByTanggal.entries.toList()
+      ..sort((a, b) {
+        // Sort berdasarkan tanggal
+        final dateA =
+            DateTime.tryParse(a.value[0]['tgl_buat'] ?? '') ?? DateTime(2000);
+        final dateB =
+            DateTime.tryParse(b.value[0]['tgl_buat'] ?? '') ?? DateTime(2000);
+        return dateA.compareTo(dateB);
+      });
+    for (var entry in sortedEntries) {
+      final tanggal = entry.key;
+      final tasks = entry.value;
+
+      for (int i = 0; i < tasks.length; i++) {
+        var task = tasks[i];
+
+        var level;
+        switch (task['level']) {
+          case '1':
+            level = 'Sangat Mudah';
+            break;
+          case '2':
+            level = 'Mudah';
+            break;
+          case '3':
+            level = 'Normal';
+            break;
+          case '4':
+            level = 'Sulit';
+            break;
+          case '5':
+            level = 'Sangat Sulit';
+            break;
+          default:
+            level = "Tidak Diketahui";
+        }
+
+        DateTime? tglBuat = task['tgl_buat'] != null
+            ? DateTime.tryParse(task['tgl_buat'])
+            : null;
+        DateTime? tglFinish = task['tgl_finish'] != null
+            ? DateTime.tryParse(task['tgl_finish'])
+            : null;
+
+        String durasi = "-";
+        if (tglBuat != null && tglFinish != null) {
+          durasi = '${tglFinish.difference(tglBuat).inDays + 1} Hari';
+        }
+
+        data.add([
+          i == 0 ? no.toString() : '', // No hanya di baris pertama per tanggal
+          i == 0 ? tanggal : '', // Tanggal hanya di baris pertama per tanggal
+          task['judul'],
+          task['rincian'],
+          level.toString(),
+          task['status']?.toString() == '0' ? 'Ongoing' : 'Finish',
+          task['tgl_finish'] == null
+              ? '-'
+              : Constanst.convertDate1(task['tgl_finish']),
+          durasi
+        ]);
       }
 
-      var level;
-      switch (task['level']) {
-        case '1':
-          level = 'Sangat Mudah';
-          break;
-        case '2':
-          level = 'Mudah';
-          break;
-        case '3':
-          level = 'Normal';
-          break;
-        case '4':
-          level = 'Sulit';
-          break;
-        case '5':
-          level = 'Sangat Sulit';
-          break;
-        default:
-          level = "Tidak Diketahui";
-          break;
-      }
-
-      DateTime? tglBuat =
-          task['tgl_buat'] != null ? DateTime.tryParse(task['tgl_buat']) : null;
-      DateTime? tglFinish = task['tgl_finish'] != null
-          ? DateTime.tryParse(task['tgl_finish'])
-          : null;
-
-      String durasi = "-";
-      if (tglBuat != null && tglFinish != null) {
-        durasi = '${tglFinish.difference(tglBuat).inDays + 1} Hari';
-      }
-
-      data.add([
-        index.toString(),
-        tanggal,
-        task['judul'],
-        task['rincian'],
-        level.toString(),
-        task['status']?.toString() == '0' ? 'Ongoing' : 'Finish',
-        task['tgl_finish'] == null
-            ? '-'
-            : Constanst.convertDate1(task['tgl_finish']),
-        durasi
-      ]);
-    });
+      no++; // Naikkan nomor setelah satu kelompok tanggal selesai
+    }
+    ;
 
     return pw.Table(
       border: pw.TableBorder.all(width: 1),

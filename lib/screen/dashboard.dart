@@ -3125,6 +3125,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                             onTap: () {
                               controllerDaily.getMonitor();
+                              controllerDaily.getBranch();
                               // controllerDaily.loadAllTask('SIS202412070');
                               internetController.isConnected.value
                                   ? Get.to(DailyTaskAtasan())

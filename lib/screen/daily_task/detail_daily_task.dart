@@ -42,132 +42,149 @@ class _DetailDailyTaskState extends State<DetailDailyTask> {
             ),
     );
   }
-Widget descMasuk() {
-  return Obx(() {
-    return controller.task.isEmpty
-        ? const Center(child: Text('Tunggu Sebentar ya'))
-        : ReorderableListView.builder(
-            itemCount: controller.task.length,
-            onReorder: (oldIndex, newIndex) {
-              if (newIndex > oldIndex) newIndex--; // Karena list bergeser saat dipindah
-              final item = controller.task.removeAt(oldIndex);
-              controller.task.insert(newIndex, item);
-            },
-            itemBuilder: (context, index) {
-              final data = controller.task[index];
 
-              int level = int.tryParse(data["level"].toString()) ?? 0;
-              int status = int.tryParse(data['status'].toString()) ?? 0;
+  Widget buildStars(int level) {
+    List<Widget> stars = [];
+    for (int i = 0; i < 5; i++) {
+      if (i < level) {
+        stars.add(Icon(Icons.star, size: 16, color: Colors.amber));
+      } else {
+        stars.add(Icon(Icons.star_border, size: 16, color: Colors.grey));
+      }
+    }
+    return Row(children: stars);
+  }
 
-              List<String> difficultyLabels = [
-                "Tidak Diketahui",
-                "Sangat Mudah",
-                "Mudah",
-                "Normal",
-                "Sulit",
-                "Sangat Sulit"
-              ];
-              List<IconData> difficultyIcons = [
-                Icons.help_outline,
-                Icons.star_border,
-                Icons.star_half,
-                Icons.star,
-                Icons.whatshot,
-                Icons.local_fire_department
-              ];
+  Widget descMasuk() {
+    return Obx(() {
+      return controller.task.isEmpty
+          ? const Center(child: Text('Tunggu Sebentar ya'))
+          : ReorderableListView.builder(
+              itemCount: controller.task.length,
+              onReorder: (oldIndex, newIndex) {
+                if (newIndex > oldIndex)
+                  newIndex--; // Karena list bergeser saat dipindah
+                final item = controller.task.removeAt(oldIndex);
+                controller.task.insert(newIndex, item);
+              },
+              itemBuilder: (context, index) {
+                final data = controller.task[index];
 
-              String difficultyLabel = level >= 1 && level <= 5
-                  ? difficultyLabels[level]
-                  : difficultyLabels[0];
-              IconData difficultyIcon = level >= 1 && level <= 5
-                  ? difficultyIcons[level]
-                  : difficultyIcons[0];
+                int level = int.tryParse(data["level"].toString()) ?? 0;
+                int status = int.tryParse(data['status'].toString()) ?? 0;
 
-              String statusLabel = status == 1 ? "Finished" : "Ongoing";
-              Color statusColor = status == 1 ? Colors.green : Colors.orange;
+                List<String> difficultyLabels = [
+                  "Tidak Diketahui",
+                  "Sangat Mudah",
+                  "Mudah",
+                  "Normal",
+                  "Sulit",
+                  "Sangat Sulit"
+                ];
+                List<IconData> difficultyIcons = [
+                  Icons.help_outline,
+                  Icons.star_outline,
+                  Icons.star_outline,
+                  Icons.star,
+                  Icons.whatshot,
+                  Icons.local_fire_department
+                ];
 
-              return ListTile(
-                key: ValueKey(data), // Wajib untuk ReorderableListView
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        data['judul'],
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                String difficultyLabel = level >= 1 && level <= 5
+                    ? difficultyLabels[level]
+                    : difficultyLabels[0];
+                Object difficultyIcon = level >= 1 && level <= 5
+                    ? buildStars(level)
+                    : difficultyIcons[0];
+
+                String statusLabel = status == 1 ? "Finished" : "Ongoing";
+                Color statusColor = status == 1 ? Colors.green : Colors.orange;
+
+                return ListTile(
+                  key: ValueKey(data), // Wajib untuk ReorderableListView
+                  title: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          data['judul'],
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        statusLabel,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: statusColor,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 4),
-                    Text(
-                      data['rincian'],
-                      style: GoogleFonts.inter(fontSize: 14),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(difficultyIcon, size: 18, color: Colors.grey),
-                        const SizedBox(width: 6),
-                        Text(
-                          difficultyLabel,
-                          style: const TextStyle(
+                        child: Text(
+                          statusLabel,
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (status == 1)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          'Selesai Pada: ${Constanst.convertDate(data['tgl_finish'])}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey,
+                            color: statusColor,
                           ),
                         ),
                       ),
-                    const SizedBox(height: 6),
-                    if (index != controller.task.length - 1)
-                      Divider(
-                        height: 0,
-                        thickness: 1,
-                        color: Constanst.fgBorder,
+                    ],
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 4),
+                      Text(
+                        data['rincian'],
+                        style: GoogleFonts.inter(fontSize: 14),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
-                ), // Ikon drag
-              );
-            },
-          );
-  });
-}
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          level >= 1 && level <= 5
+                              ? buildStars(level)
+                              : Icon(Icons.help_outline,
+                                  size: 18, color: Colors.grey),
+                          const SizedBox(width: 6),
+                          Text(
+                            difficultyLabel,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (status == 1)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            'Selesai Pada: ${Constanst.convertDate(data['tgl_finish'])}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 6),
+                      if (index != controller.task.length - 1)
+                        Divider(
+                          height: 0,
+                          thickness: 1,
+                          color: Constanst.fgBorder,
+                        ),
+                    ],
+                  ), // Ikon drag
+                );
+              },
+            );
+    });
+  }
 }

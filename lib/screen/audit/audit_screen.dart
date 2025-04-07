@@ -40,7 +40,7 @@ class _AuditScreenState extends State<AuditScreen> {
         leadingWidth: 50,
         titleSpacing: 0,
         centerTitle: true,
-        title: const Text("Adit"),
+        title: const Text("Audit"),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -688,8 +688,8 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
                               },
                               items: controller.branchList.toSet().map((branch) {
                                 return DropdownMenuItem<String>(
-                                  value: branch,
-                                  child: Text(branch, style: GoogleFonts.inter(fontSize: 16)),
+                                  value: branch['name'],
+                                  child: Text(branch['name'], style: GoogleFonts.inter(fontSize: 16)),
                                 );
                               }).toList(),
                             ),
@@ -800,6 +800,7 @@ class _DailyTaskAtasanState extends State<DailyTaskAtasan> {
           if (controller.allTask.isEmpty) {
             // Get.snackbar("Error", "Data tidak tersedia.");
           } else {
+            print('ini cabang user ${AppData.informasiUser![0].branchId}');
             showBottomStatus(Get.context!);
             // Get.snackbar("${controller.monitoringList.length}", "ddd");
             const CircularProgressIndicator();

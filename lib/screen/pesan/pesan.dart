@@ -358,7 +358,7 @@ class _PesanState extends State<Pesan> {
                   Padding(
                     padding: const EdgeInsets.only(left: 12.0, right: 12.0),
                     child: Text(
-                      "Pending Approval",
+                      "Pending",
                       style: GoogleFonts.inter(
                           fontSize: 16, fontWeight: FontWeight.w500),
                       maxLines: 1,
