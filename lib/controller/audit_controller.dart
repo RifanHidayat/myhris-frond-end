@@ -9,6 +9,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
+import 'package:siscom_operasional/utils/custom_dialog.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
@@ -26,11 +27,11 @@ class AuditController extends GetxController {
   var tempNamaStatus1 = ''.obs;
   var emId = ''.obs;
   var filterStatus = ''.obs;
-  var tempFilterStatus = 'Semua'.obs;
+  var tempFilterStatus = 'Semua Status'.obs;
   var filterTipeForm = ''.obs;
-  var tempFilterTipeForm = 'Semua'.obs;
+  var tempFilterTipeForm = 'Semua Tipe Form'.obs;
   var filterStatusAudit = ''.obs;
-  var tempfilterStatusAudit = 'Semua'.obs;
+  var tempfilterStatusAudit = 'Semua Status Audit'.obs;
   var offset = 0.obs;
   var isLoadingMore = false.obs;
   var alasanReject = TextEditingController().obs;
@@ -151,6 +152,8 @@ class AuditController extends GetxController {
     }
     isLoadingMore.value = true;
     Map<String, dynamic> body = {
+      'tahun': tahunSelectedSearchHistory.value,
+      'bulan': bulanSelectedSearchHistory.value,
       'em_id': emId.value,
       'offset': offset.value,
       'limit': 5,
@@ -348,7 +351,7 @@ class AuditController extends GetxController {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "$categoryAjuan - $namaTypeAjuan",
+                          "$categoryAjuan",
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
@@ -504,7 +507,8 @@ class AuditController extends GetxController {
                     ),
                   ),
                 ),
-                typeAjuan == 'Approve2'
+                typeAjuan == 'Approve2' ||
+                        detailData['status_audit'] == 'Rejected'
                     ? Padding(
                         padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
                         child: Container(
@@ -523,7 +527,46 @@ class AuditController extends GetxController {
                           child: ElevatedButton(
                             onPressed: () {
                               Get.back();
-                              showBottomApproval(detailData);
+                              detailData['status_audit'] == 'Rejected'
+                                  ? showGeneralDialog(
+                                      barrierDismissible: false,
+                                      context: Get.context!,
+                                      barrierColor:
+                                          Colors.black54, // space around dialog
+                                      transitionDuration:
+                                          Duration(milliseconds: 200),
+                                      transitionBuilder:
+                                          (context, a1, a2, child) {
+                                        return ScaleTransition(
+                                          scale: CurvedAnimation(
+                                              parent: a1,
+                                              curve: Curves.elasticOut,
+                                              reverseCurve:
+                                                  Curves.easeOutCubic),
+                                          child: CustomDialog(
+                                            // our custom dialog
+                                            title: "Peringatan",
+                                            content:
+                                                "Apakah Anda yakin ingin membatalkan penolakan? "
+                                                "Surat Peringatan atau Teguran Lisan yang sudah diterbitkan "
+                                                "akan ditarik kembali.",
+                                            positiveBtnText: "Batalkan",
+                                            negativeBtnText: "Kembali",
+                                            style: 1,
+                                            buttonStatus: 1,
+                                            positiveBtnPressed: () {
+                                              approvAudit(detailData);
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      pageBuilder: (BuildContext context,
+                                          Animation animation,
+                                          Animation secondaryAnimation) {
+                                        return null!;
+                                      },
+                                    )
+                                  : showBottomApproval(detailData);
                             },
                             style: ElevatedButton.styleFrom(
                                 foregroundColor: Constanst.color4,
@@ -535,12 +578,15 @@ class AuditController extends GetxController {
                                 // padding: EdgeInsets.zero,
                                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
                             child: Text(
-                              detailData['status_audit'] == ''
+                              detailData['status_audit'] == 'Rejected'
                                   ? 'Approve'
                                   : 'Reject',
                               style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w500,
-                                  color: Constanst.color4,
+                                  color:
+                                      detailData['status_audit'] == 'Rejected'
+                                          ? Constanst.color5
+                                          : Constanst.color4,
                                   fontSize: 14),
                             ),
                           ),
@@ -1011,8 +1057,10 @@ class AuditController extends GetxController {
 
   void approvAudit(detailData) {
     Map<String, dynamic> body = {
-      'status': detailData['status'],
-      'tipe_form': detailData['tipe_form'],
+      'konsekuensi': statusPemgajuanIzin.value,
+      'list_konsekuensi': konsekuemsiList,
+      'status': detailData['status_audit'] == 'Rejected' ? '' : 'Rejected',
+      'tipe_form': detailData['tipe_pengajuan'],
       'full_name': detailData['full_name']
     };
     var connect =
@@ -1022,6 +1070,8 @@ class AuditController extends GetxController {
       if (res.statusCode == 200) {
         Get.back();
         Get.back();
+        statusPemgajuanIzin.value = '';
+        konsekuemsiList.clear();
         UtilsAlert.showToast(valueBody['message']);
       } else {
         UtilsAlert.showToast(valueBody['message']);

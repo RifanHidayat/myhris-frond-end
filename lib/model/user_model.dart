@@ -52,6 +52,7 @@ class UserModel {
   var tipeAbsen;
   var tipeAlpha;
   var periodeAwal;
+  var isAudit;
   
 
   UserModel({
@@ -103,8 +104,8 @@ class UserModel {
     this.lamaBekerjaFormat,
     this.tipeAbsen,
     this.tipeAlpha,
-    this.periodeAwal
-    
+    this.periodeAwal,
+    this.isAudit,
   });
 
   Map<String, dynamic> toMap() {
@@ -158,7 +159,7 @@ class UserModel {
       "tipe_absen": tipeAbsen,
       'tipe_alpha': tipeAlpha,
       "periode_awal": periodeAwal,
-      
+      'is_audit': isAudit
     };
   }
 
@@ -212,7 +213,8 @@ class UserModel {
       branchId: map['branch_id'],
       periodeAwal: map['periode_awal'],
       tipeAbsen: map['tipe_absen'],
-      tipeAlpha: map['tipe_alpha']
+      tipeAlpha: map['tipe_alpha'],
+      isAudit: map['is_audit'],
     );
   }
 

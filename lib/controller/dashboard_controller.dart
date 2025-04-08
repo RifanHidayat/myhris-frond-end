@@ -2576,6 +2576,7 @@ class DashboardController extends GetxController {
             tipeAbsen: element['tipe_absen'],
             tipeAlpha: element['tipe_alpha'],
             periodeAwal: element['periode_awal'],
+            isAudit: element['is_audit'],
           );
           print('ini branch id ${element['branch_id']}');
           getData.add(data);

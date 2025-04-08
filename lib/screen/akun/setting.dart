@@ -1129,7 +1129,7 @@ class _SettingState extends State<Setting> {
               Get.to(ChangeLogPage()),
           // : UtilsAlert.showDialogCheckInternet(),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 12.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 8.0),
             child: Column(
               children: [
                 Row(
@@ -1177,48 +1177,12 @@ class _SettingState extends State<Setting> {
               ],
             ),
           ),
-        ),
-        // InkWell(
-        //   onTap: () => null,
-        //   child: Padding(
-        //     padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 12.0),
-        //     child: Column(
-        //       children: [
-        //         Row(
-        //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //           children: [
-        //             Row(
-        //               children: [
-        //                 Icon(
-        //                   Iconsax.password_check,
-        //                   color: Constanst.fgSecondary,
-        //                   size: 24,
-        //                 ),
-        //                 Padding(
-        //                   padding: const EdgeInsets.only(left: 12),
-        //                   child: Text(
-        //                     "PIN Slip Gaji",
-        //                     style: GoogleFonts.inter(
-        //                         color: Constanst.fgPrimary,
-        //                         fontWeight: FontWeight.w500,
-        //                         fontSize: 14),
-        //                   ),
-        //                 )
-        //               ],
-        //             ),
-        //             Icon(Icons.arrow_forward_ios_rounded,
-        //                 size: 18, color: Constanst.fgSecondary)
-        //           ],
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
+        ),     
         const SizedBox(height: 8),
         InkWell(
           onTap: () => Get.to(SuratPeringatan()),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 12.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 8.0),
             child: Column(
               children: [
                 Divider(
@@ -1301,7 +1265,6 @@ class _SettingState extends State<Setting> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
         InkWell(
           onTap: () => Get.to(TeguranLisan()),
           child: Padding(
