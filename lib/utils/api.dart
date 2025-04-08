@@ -25,7 +25,7 @@ class Api {
   //  static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API DEV
-   static var basicUrl = "http://kantor.membersis.com:2627/";
+ // static var basicUrl = "http://kantor.membersis.com:2627/";
 //
   // API LOCAL
 
@@ -219,7 +219,7 @@ class ApiRequest {
 
 
   // API DEV
-   static var basicUrl = "http://kantor.membersis.com:2627/";
+   //static var basicUrl = "http://kantor.membersis.com:2627/";
 
   Map<String, String> headers = {
     'Authorization': basicAuth,
