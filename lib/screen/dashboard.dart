@@ -3102,6 +3102,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                             onTap: () {
                               controllerDaily.getMonitor();
+                              controllerDaily.getBranch();
                               // controllerDaily.loadAllTask('SIS202412070');
                               internetController.isConnected.value
                                   ? Get.to(DailyTaskAtasan())
@@ -3166,12 +3167,12 @@ class _DashboardState extends State<Dashboard> {
                     ),
             ],
           ),
-          controller.hideAudit.value == false
+          controller.hideAudit.value == true
               ? SizedBox()
               : const SizedBox(
                   height: 8,
                 ),
-          controller.hideAudit.value == false
+          controller.hideAudit.value == true
               ? SizedBox()
               : Container(
                   decoration: BoxDecoration(
@@ -3189,7 +3190,7 @@ class _DashboardState extends State<Dashboard> {
                         borderRadius: Constanst.borderStyle2,
                       ),
                       onTap: () {
-                        auditController.fetchAuditData();
+                        // auditController.fetchAuditData();
                         internetController.isConnected.value
                             ? Get.to(AuditScreen())
                             : UtilsAlert.showDialogCheckInternet();
