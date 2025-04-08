@@ -185,6 +185,43 @@ class Informasi extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Expanded(
+        //   child: InkWell(
+        //     onTap: () {
+        //       controller.selectedInformasiView.value = 0;
+        //       controller.informasiController.jumpToPage(0);
+        //       controller.selectedInformasiView.refresh();
+        //     },
+        //     child: Padding(
+        //       padding: const EdgeInsets.only(top: 8.0),
+        //       child: Container(
+        //         decoration: BoxDecoration(
+        //           border: Border(
+        //             bottom: BorderSide(
+        //               color: controller.selectedInformasiView.value == 0
+        //                   ? Constanst.colorPrimary
+        //                   : Constanst.color6,
+        //               width: 3.0,
+        //             ),
+        //           ),
+        //         ),
+        //         child: Padding(
+        //           padding: const EdgeInsets.only(bottom: 8),
+        //           child: Text(
+        //             "Informasi",
+        //             textAlign: TextAlign.center,
+        //             style: GoogleFonts.inter(
+        //                 color: controller.selectedInformasiView.value == 0
+        //                     ? Constanst.colorPrimary
+        //                     : Constanst.colorText2,
+        //                 fontWeight: FontWeight.w500,
+        //                 fontSize: 14),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
         Expanded(
           child: InkWell(
             onTap: () {
@@ -201,17 +238,17 @@ class Informasi extends StatelessWidget {
                       color: controller.selectedInformasiView.value == 0
                           ? Constanst.colorPrimary
                           : Constanst.color6,
-                      width: 3.0,
+                      width: 2.0,
                     ),
                   ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    "Informasi",
+                    "Ulang Tahun",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                        color: controller.selectedInformasiView.value == 0
+                        color: controller.selectedInformasiView.value ==0
                             ? Constanst.colorPrimary
                             : Constanst.colorText2,
                         fontWeight: FontWeight.w500,
@@ -235,7 +272,7 @@ class Informasi extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: controller.selectedInformasiView.value == 1
+                      color: controller.selectedInformasiView.value ==1
                           ? Constanst.colorPrimary
                           : Constanst.color6,
                       width: 2.0,
@@ -245,7 +282,7 @@ class Informasi extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    "Ulang Tahun",
+                    "Tidak Hadir",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                         color: controller.selectedInformasiView.value == 1
@@ -259,6 +296,9 @@ class Informasi extends StatelessWidget {
             ),
           ),
         ),
+        // !controller.viewInformasiSisaKontrak.value
+        //     ? SizedBox()
+        //     :
         Expanded(
           child: InkWell(
             onTap: () {
@@ -282,50 +322,10 @@ class Informasi extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    "Tidak Hadir",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                        color: controller.selectedInformasiView.value == 2
-                            ? Constanst.colorPrimary
-                            : Constanst.colorText2,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        // !controller.viewInformasiSisaKontrak.value
-        //     ? SizedBox()
-        //     :
-        Expanded(
-          child: InkWell(
-            onTap: () {
-              controller.selectedInformasiView.value = 3;
-              controller.informasiController.jumpToPage(3);
-              controller.selectedInformasiView.refresh();
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: controller.selectedInformasiView.value == 3
-                          ? Constanst.colorPrimary
-                          : Constanst.color6,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
                     "Sisa Kontrak",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                        color: controller.selectedInformasiView.value == 3
+                        color: controller.selectedInformasiView.value == 2
                             ? Constanst.colorPrimary
                             : Constanst.colorText2,
                         fontWeight: FontWeight.w500,
@@ -354,12 +354,10 @@ class Informasi extends StatelessWidget {
           return Padding(
               padding: const EdgeInsets.all(0),
               child: index == 0
-                  ? screenInformasi()
-                  : index == 1
                       ? screenUltah(context)
-                      : index == 2
+                      : index == 1
                           ? screenTidakHadir()
-                          : index == 3
+                          : index == 2
                               ? screenSisaKontrak()
                               : const SizedBox());
         });
