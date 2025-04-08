@@ -32,6 +32,7 @@ import 'package:siscom_operasional/screen/pesan/persetujuan_surat_peringatan.dar
 import 'package:siscom_operasional/screen/pesan/persetujuan_teguran_lisan.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_wfh.dart';
+import 'package:siscom_operasional/screen/teguran_lisan.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
@@ -48,6 +49,7 @@ class PesanController extends GetxController {
   var selectedView = 0.obs;
 
   var listNotifikasi = [].obs;
+  var listNotifikasiApproval = [].obs;
   var dataScreenPersetujuan = [].obs;
   var riwayatPersetujuan = [].obs;
   var allRiwayatPersetujuan = [].obs;
@@ -65,6 +67,7 @@ class PesanController extends GetxController {
   var jumlahApproveSuratPeringatan = 0.obs;
   var jumlahApproveTeguranLIsan = 0.obs;
   var jumlahNotifikasiBelumDibaca = 0.obs;
+  var jumlahNotifikasiBelumDibacaApproval = 0.obs;
   var jumlahCheckin = 0.obs;
 
   var jumlahPersetujuan = 0.obs;
@@ -105,6 +108,7 @@ class PesanController extends GetxController {
   void onReady() async {
     getTimeNow();
     loadNotifikasi();
+    loadNotifikasiApproval();
     super.onReady();
   }
 
@@ -757,7 +761,7 @@ class PesanController extends GetxController {
         tahunSelectedSearchHistory.value,
         'persetujuan');
 
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       bool exists = controllerApproval.listData
           .any((element) => element['id'].toString() == idx.toString());
 
@@ -772,20 +776,20 @@ class PesanController extends GetxController {
             tahunSelectedSearchHistory.value,
             'riwayat');
 
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 2), () {
         bool existsInHistory = controllerApproval.listData
             .any((element) => element['id'].toString() == idx.toString());
 
         if (!existsInHistory) {
           print('Data tidak ditemukan di keduanya');
-          Future.delayed(const Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 2), () {
             Get.back();
             UtilsAlert.showToast('Data sudah tidak tersedia');
             return;
           });
         } else {
           print('Data ditemukan di riwayat');
-          Future.delayed(const Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 2), () {
             Get.back();
             Get.to(detailPage());
           });
@@ -809,9 +813,11 @@ class PesanController extends GetxController {
             emId: emIdPengaju,
             title: 'Lembur',
             idxDetail: idx,
-            delegasi: delegasi),
+            delegasi: delegasi,
+            ),
         idx,
       );
+      // print('ini idx $idx, $');
     } else if (title == "Approval Cuti" || url == "Cuti") {
       loadAndNavigate(
         'Cuti',
@@ -929,7 +935,7 @@ class PesanController extends GetxController {
         idx,
       );
         }
-    else {}
+    else  {}
   }
 
   // void routeApprovalNotifFCm({
@@ -1102,6 +1108,47 @@ class PesanController extends GetxController {
   //   } else {}
   // }
 
+  void loadNotifikasiApproval() {
+    isLoading.value = true;
+    listNotifikasiApproval.clear();
+    var dataUser = AppData.informasiUser;
+    var getEmid = dataUser![0].em_id;
+    var dt = DateTime.now();
+    var tanggalSekarang =
+        Constanst.convertDate1("${dt.year}-${dt.month}-${dt.day}");
+    var getBulan = dt.month <= 9 ? "0${dt.month}" : dt.month;
+    Map<String, dynamic> body = {
+      'em_id': getEmid,
+      'bulan': getBulan,
+      'tahun': dt.year
+    };
+    var connect = Api.connectionApi("post", body, "load_notifikasi_approval");
+    connect.then((dynamic res) async {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        for (var element in valueBody['data']) {
+          var tanggalDataApi = Constanst.convertDate1("${element['tanggal']}");
+          var filterTanggal =
+              tanggalDataApi == tanggalSekarang ? 'Hari ini' : tanggalDataApi;
+          List listNotif = element['notifikasi'];
+          listNotif.sort((a, b) {
+            return b['id'].compareTo(a['id']);
+          });
+          var data = {
+            'tanggal': filterTanggal,
+            'notifikasi': listNotif,
+          };
+          listNotifikasiApproval.add(data);
+        }
+        this.listNotifikasiApproval.refresh();
+        hitungNotifikasiBelumDibacaApproval();
+        isLoading.value = false;
+      }
+    }).catchError((error) {
+      isLoading.value = false;
+    });
+  }
+
   void loadNotifikasi() {
     isLoading.value = true;
     listNotifikasi.value.clear();
@@ -1156,6 +1203,19 @@ class PesanController extends GetxController {
     this.jumlahNotifikasiBelumDibaca.refresh();
   }
 
+  void hitungNotifikasiBelumDibacaApproval() {
+    var data = [];
+    listNotifikasiApproval.value.forEach((element) {
+      element['notifikasi'].forEach((element1) {
+        if (element1['view'] == 0) {
+          data.add(element1);
+        }
+      });
+    });
+    jumlahNotifikasiBelumDibacaApproval.value = data.length;
+    this.jumlahNotifikasiBelumDibacaApproval.refresh();
+  }
+
   void aksilihatNotif(id) {
     var pisahkanData = [];
     listNotifikasi.value.forEach((element) {
@@ -1168,6 +1228,20 @@ class PesanController extends GetxController {
     });
     this.listNotifikasi.refresh();
     hitungNotifikasiBelumDibaca();
+    updateDataNotif(pisahkanData);
+  }
+  void aksilihatNotifApproval(id) {
+    var pisahkanData = [];
+    listNotifikasiApproval.value.forEach((element) {
+      element['notifikasi'].forEach((element1) {
+        if (element1['id'] == id) {
+          element1['view'] = 1;
+          pisahkanData.add(element1);
+        }
+      });
+    });
+    this.listNotifikasiApproval.refresh();
+    hitungNotifikasiBelumDibacaApproval();
     updateDataNotif(pisahkanData);
   }
 

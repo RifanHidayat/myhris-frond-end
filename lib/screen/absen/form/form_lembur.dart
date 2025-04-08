@@ -93,8 +93,16 @@ class _FormLemburState extends State<FormLembur> {
                 color: Constanst.fgPrimary,
                 size: 24,
               ),
-              onPressed: () {
-                Get.back();
+              onPressed: () async {
+                if (controller.isFormChanged.value == false) {
+                  bool? confirmExit =
+                      await _showExitConfirmationDialog(context);
+                  if (confirmExit ?? false) {
+                    Navigator.of(context).pop();
+                  }
+                } else {
+                  Navigator.of(context).pop();
+                }
               },
             )),
         body: SingleChildScrollView(
@@ -244,8 +252,12 @@ class _FormLemburState extends State<FormLembur> {
             negativeBtnText: "Tidak",
             style: 1,
             buttonStatus: 1,
-            positiveBtnPressed: () {
+            negativeBtnPressed: (){
+              controller.loadDataLembur();
               Get.back();
+              Get.back();
+            },
+            positiveBtnPressed: () {
               Get.back();
               controller.statusDraft.value = 'draft';
               controller.validasiKirimPengajuan();

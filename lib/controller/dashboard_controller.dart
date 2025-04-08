@@ -40,6 +40,7 @@ import 'package:google_maps_utils/google_maps_utils.dart' as maps;
 import 'package:siscom_operasional/model/user_model.dart';
 import 'package:siscom_operasional/screen/absen/absesi_location.dart';
 import 'package:siscom_operasional/screen/absen/camera_view.dart';
+import 'package:siscom_operasional/screen/absen/camera_view_location.dart';
 import 'package:siscom_operasional/screen/absen/form/form_lembur.dart';
 import 'package:siscom_operasional/screen/absen/form/form_pengajuan_izin.dart';
 import 'package:siscom_operasional/screen/absen/form/form_tugas_luar.dart';
@@ -137,6 +138,7 @@ class DashboardController extends GetxController {
   var isPauseCamera = true;
   var jumlahData = 0.obs;
   var departementAkses = [].obs;
+  var hideAudit = false.obs;
 
   var timeString = "".obs;
   var dateNow = "".obs;
@@ -145,6 +147,7 @@ class DashboardController extends GetxController {
   var showPengumuman = false.obs;
   var showLaporan = false.obs;
   var showMonitDaily = false.obs;
+  var showAbsen = false.obs;
   var offlineInternet = false.obs;
 
   var selectedPageView = 0.obs;
@@ -332,7 +335,7 @@ class DashboardController extends GetxController {
     //   if ((AppData.signingTime == "" || AppData.signingTime == "00:00:00") &&
     //       (AppData.signoutTime == "" || AppData.signoutTime == "00:00:00")) {
     //     absenOfflineStatus.value = false;
-    //     absenControllre.absenStatus.value = false;
+    //     controllerAbsensi.absenStatus.value = false;
     //     AppData.statusAbsen = false;
     //     // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
     //   } else if ((AppData.signingTime != "" ||
@@ -344,7 +347,7 @@ class DashboardController extends GetxController {
     //       textPendingMasuk.value = AppData.textPendingMasuk;
     //       textPendingKeluar.value = AppData.textPendingKeluar;
     //     }
-    //     absenControllre.absenStatus.value = true;
+    //     controllerAbsensi.absenStatus.value = true;
     //     AppData.statusAbsen = true;
     //     // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
     //   } else if ((AppData.signingTime != "" ||
@@ -352,7 +355,7 @@ class DashboardController extends GetxController {
     //       (AppData.signoutTime != "" || AppData.signoutTime != "00:00:00")) {
     //     absenOfflineStatus.value = AppData.statusAbsenOffline;
 
-    //     absenControllre.absenStatus.value = false;
+    //     controllerAbsensi.absenStatus.value = false;
     //     AppData.statusAbsen = false;
     //     if (absenOfflineStatus.value == true) {
     //       pendingSignoutApr.value = true;
@@ -363,13 +366,13 @@ class DashboardController extends GetxController {
     //         pendingSigninApr.value = true;
     //         textPendingMasuk.value = AppData.textPendingMasuk;
     //         textPendingKeluar.value = AppData.textPendingKeluar;
-    //         absenControllre.absenStatus.value = true;
+    //         controllerAbsensi.absenStatus.value = true;
     //         AppData.statusAbsen = true;
     //       } else if (AppData.temp == true) {
     //         pendingSigninApr.value = true;
     //         textPendingMasuk.value = AppData.textPendingMasuk;
     //         textPendingKeluar.value = AppData.textPendingKeluar;
-    //         absenControllre.absenStatus.value = true;
+    //         controllerAbsensi.absenStatus.value = true;
     //         AppData.statusAbsen = true;
     //       }
     //     }
@@ -587,9 +590,6 @@ class DashboardController extends GetxController {
           .where((element) => _isLateSignin(element.signin_time.toString(),
               tambahSatuMenit(element.jamKerja.toString())))
           .toList();
-
-      
-
       controllerAbsensi.historyAbsen.value = filteredAbsen.where((event) {
         if (seenDates.contains(event.date)) {
           return false;
@@ -606,7 +606,6 @@ class DashboardController extends GetxController {
           .where((element) => _isPulangCepat(
               element.signout_time.toString() != "00:00:00" &&
                       element.signout_time.toString().toUpperCase() != "NULL"
-                  // element.jamPulang > jamKeluar
                   ? element.signout_time.toString()
                   : element.jamPulang.toString(),
               element.jamPulang.toString()))
@@ -788,19 +787,18 @@ class DashboardController extends GetxController {
             listJamKeluar = (jamKeluar!.split(':'));
           }
 
-          return 
-          controllerAbsensi.statusAbsen == "pulang_cepat" &&
+          return controllerAbsensi.statusAbsen == "pulang_cepat" &&
                   controllerAbsensi.historyAbsen[index].signout_time ==
                       '00:00:00'
               ? Container()
-              : 
-              tampilan2(controllerAbsensi.historyAbsen[index]);
+              : tampilan2(controllerAbsensi.historyAbsen[index]);
         },
       );
     });
   }
 
   Widget tampilan2(AbsenModel index) {
+    print('ini data index ? ${controllerAbsensi.statusAbsen.value}');
     var jamMasuk = index.signin_time ?? '';
     var jamKeluar = index.signout_time ?? '';
     var jamKerja = index.jamKerja ?? '';
@@ -815,6 +813,8 @@ class DashboardController extends GetxController {
     var batasJam = index.jamKerja.toString();
     var statusView;
     print('ini jam pulang $jaamPulang');
+    print('ini jam pulang ${index.namaIzin}');
+    print('ini nama lembur ${index.namaLembur}');
     if (placeIn != "") {
       statusView =
           placeIn == "pengajuan" && placeOut == "pengajuan" ? true : false;
@@ -834,6 +834,9 @@ class DashboardController extends GetxController {
     if (index.namaHariLibur == null ||
         index.namaCuti == null ||
         index.namaSakit == null ||
+        index.namaIzin == null ||
+        index.namaTugasLuar == null ||
+        index.namaLembur == null ||
         index.offDay.toString() == '1' ||
         text == "") {
       if (index.atten_date == "" || index.atten_date == null) {
@@ -900,265 +903,260 @@ class DashboardController extends GetxController {
       print('ini bukan');
     }
 
-    return index.atten_date == "" ||
-            index.atten_date == null ||
-            index.namaHariLibur != null ||
-            index.namaCuti != null ||
-            index.namaSakit != null ||
-            index.offDay.toString() == '0' ||
-            text == "" ||
-            (controllerAbsensi.statusAbsen.value == 'pulang_cepat' &&
-                DateTime.parse("${index.date} ${jaamPulang}")
-                    .isBefore(DateTime.parse("${index.date} $jamKeluar")))
-        ? SizedBox()
-        : Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: InkWell(
-              customBorder: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12))),
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(width: 1, color: Constanst.fgBorder)),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 15,
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Container(
-                          height: index.turunan!.isNotEmpty &&
-                                  index.statusView == true
-                              ? int.parse(index.turunan!.length.toString()) *
-                                      55 +
-                                  28
-                              : 50,
-                          decoration: BoxDecoration(
-                            color: Constanst.colorNeutralBgSecondary,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(8.0),
-                              bottomLeft: Radius.circular(8.0),
-                            ),
-                          ),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(top: 5.0, bottom: 5.0),
-                            child: index.namaHariLibur == null ||
-                                    index.namaHariLibur == ""
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                          DateFormat('d').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Constanst.fgPrimary,
-                                          )),
-                                      Text(
-                                          DateFormat('EEEE', 'id').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w400,
-                                            color: Constanst.fgPrimary,
-                                          )),
-                                    ],
-                                  )
-                                : Column(
-                                    children: [
-                                      Text(
-                                          DateFormat('d').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.red,
-                                          )),
-                                      Text(
-                                          DateFormat('EEEE', 'id').format(
-                                              DateFormat('yyyy-MM-dd')
-                                                  .parse(index.date)),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.red,
-                                          )),
-                                    ],
-                                  ),
-                          ),
+    if (index.atten_date == "" ||
+        index.atten_date == null ||
+        index.namaHariLibur != null ||
+        index.namaCuti != null ||
+        (index.namaLembur != null && (index.atten_date?.length ?? 0) <= 1) ||
+        index.namaSakit != null ||
+        index.namaIzin != null &&
+            (controllerAbsensi.statusAbsen.value == 'pulang_cepat'
+                ? index.namaIzin.toLowerCase() != "izin datang terlambat"
+                : index.namaIzin.toLowerCase() != "izin pulang cepat") ||
+        index.namaTugasLuar != null ||
+        index.offDay.toString() == '0' ||
+        text == "" ||
+        (controllerAbsensi.statusAbsen.value == 'pulang_cepat' &&
+            DateTime.parse("${index.date} ${jaamPulang}")
+                .isBefore(DateTime.parse("${index.date} $jamKeluar")))) {
+      return SizedBox();
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: InkWell(
+          customBorder: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12))),
+          onTap: () {},
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(width: 1, color: Constanst.fgBorder)),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 15,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      height: index.turunan!.isNotEmpty &&
+                              index.statusView == true
+                          ? int.parse(index.turunan!.length.toString()) * 55 +
+                              28
+                          : 50,
+                      decoration: BoxDecoration(
+                        color: Constanst.colorNeutralBgSecondary,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(8.0),
+                          bottomLeft: Radius.circular(8.0),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 85,
-                      child:
-
-                          //     ada asen
-                          Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 8, left: 6, right: 6),
-                            child: TextLabell(
-                              text: text,
-                              color: Colors.black.withOpacity(0.5),
-                              size: 11.0,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12, bottom: 1),
-                            child: InkWell(
-                              onTap: () {
-                                // controllerAbsensi.historySelected(
-                                //     index.id, 'history');
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                        child: index.namaHariLibur == null ||
+                                index.namaHariLibur == ""
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 38,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Icon(
-                                                Iconsax.login_1,
-                                                color: Constanst.color5,
-                                                size: 16,
-                                              ),
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 4),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        jamMasuk,
-                                                        style:
-                                                            GoogleFonts.inter(
-                                                                color: Constanst
-                                                                    .fgPrimary,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontSize: 16),
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        regType == 0
-                                                            ? "Face Recognition"
-                                                            : "Photo",
-                                                        style: GoogleFonts.inter(
-                                                            color: Constanst
-                                                                .fgSecondary,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize: 10),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
+                                  Text(
+                                      DateFormat('d').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.fgPrimary,
+                                      )),
+                                  Text(
+                                      DateFormat('EEEE', 'id').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w400,
+                                        color: Constanst.fgPrimary,
+                                      )),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  Text(
+                                      DateFormat('d').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.red,
+                                      )),
+                                  Text(
+                                      DateFormat('EEEE', 'id').format(
+                                          DateFormat('yyyy-MM-dd')
+                                              .parse(index.date)),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.red,
+                                      )),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 85,
+                  child:
+
+                      //     ada asen
+                      Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 8, left: 6, right: 6),
+                        child: TextLabell(
+                          text: text,
+                          color: Colors.black.withOpacity(0.5),
+                          size: 11.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12, bottom: 1),
+                        child: InkWell(
+                          onTap: () {
+                            // controllerAbsensi.historySelected(
+                            //     index.id, 'history');
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 38,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            Iconsax.login_1,
+                                            color: Constanst.color5,
+                                            size: 16,
                                           ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Expanded(
-                                        flex: 38,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 4),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Icon(
-                                                Iconsax.logout_14,
-                                                color: Constanst.color4,
-                                                size: 16,
-                                              ),
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 4),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        jamKeluar,
-                                                        style:
-                                                            GoogleFonts.inter(
-                                                                color: Constanst
-                                                                    .fgPrimary,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontSize: 16),
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        regType == 0
-                                                            ? "Face Recognition"
-                                                            : "Photo",
-                                                        style: GoogleFonts.inter(
-                                                            color: Constanst
-                                                                .fgSecondary,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize: 10),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ],
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 4),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    jamMasuk,
+                                                    style: GoogleFonts.inter(
+                                                        color:
+                                                            Constanst.fgPrimary,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 16),
                                                   ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    regType == 0
+                                                        ? "Face Recognition"
+                                                        : "Photo",
+                                                    style: GoogleFonts.inter(
+                                                        color: Constanst
+                                                            .fgSecondary,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 10),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Expanded(
+                                    flex: 38,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            Iconsax.logout_14,
+                                            color: Constanst.color4,
+                                            size: 16,
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 4),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    jamKeluar,
+                                                    style: GoogleFonts.inter(
+                                                        color:
+                                                            Constanst.fgPrimary,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 16),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    regType == 0
+                                                        ? "Face Recognition"
+                                                        : "Photo",
+                                                    style: GoogleFonts.inter(
+                                                        color: Constanst
+                                                            .fgSecondary,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 10),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    )
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                )
+              ],
             ),
-          );
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> checkAbsenUser(convert, getEmid) async {
@@ -1196,7 +1194,6 @@ class DashboardController extends GetxController {
 
       //alur beda hari
     } else if (totalMinutes1 > totalMinutes2) {
-
       var waktu3 =
           TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
       int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
@@ -1233,8 +1230,7 @@ class DashboardController extends GetxController {
           "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
     }
     Map<String, dynamic> body = {
-      'atten_date': DateFormat('yyyy-MM-dd')
-          .format(DateTime.now()),
+      'atten_date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
       'em_id': getEmid,
       'database': AppData.selectedDatabase,
       'start_date': startDate,
@@ -1244,235 +1240,193 @@ class DashboardController extends GetxController {
       'pola': globalCtr.valuePolaPersetujuan.value.toString(),
     };
     print("data param ${body}");
-    if(!internetController.isConnected.value){
+    if (!internetController.isConnected.value) {
       signinTime.value = AppData.signingTime;
-        signoutTime.value = AppData.signoutTime;
-        print('haslih signin offline ${AppData.signingTime}');
-        print('haslih signout offline ${AppData.signoutTime}');
-        print('haslih signin offline ${signinTime.value}');
-        print('haslih signout offline ${signoutTime.value}');
+      signoutTime.value = AppData.signoutTime;
+      print('haslih signin offline ${AppData.signingTime}');
+      print('haslih signout offline ${AppData.signoutTime}');
+      print('haslih signin offline ${signinTime.value}');
+      print('haslih signout offline ${signoutTime.value}');
       if (absenMasukKeluarOffline.value != null) {
-          if (absenMasukKeluarOffline.value['signing_time'] != "") {
-            signinTime.value =
-                absenMasukKeluarOffline.value['signing_time'].toString();
-            textPendingMasuk.value = true;
-            signoutTime.value =
-                AppData.signoutTime != "" && AppData.signoutTime != "00:00:00"
-                    ? AppData.signoutTime
-                    : "_ _:_ _:_ _";
-          } else if (absenMasukKeluarOffline.value['signout_time'] != "") {
-            signinTime.value =
-                AppData.signingTime != "" && AppData.signingTime != "00:00:00"
-                    ? AppData.signingTime
-                    : "_ _:_ _:_ _";
-            signoutTime.value =
-                absenMasukKeluarOffline.value['signout_time'].toString();
-            textPendingKeluar.value = true;
-          } else if (absenMasukKeluarOffline.value['signing_time'] != "" &&
-              absenMasukKeluarOffline.value['signout_time'] != "") {
-            signinTime.value =
-                absenMasukKeluarOffline.value['signing_time'].toString();
-            signoutTime.value =
-                absenMasukKeluarOffline.value['signout_time'].toString();
-            textPendingMasuk.value = true;
-            textPendingKeluar.value = true;
-          }
-        } else {
+        if (absenMasukKeluarOffline.value['signing_time'] != "") {
+          signinTime.value =
+              absenMasukKeluarOffline.value['signing_time'].toString();
+          textPendingMasuk.value = true;
+          signoutTime.value =
+              AppData.signoutTime != "" && AppData.signoutTime != "00:00:00"
+                  ? AppData.signoutTime
+                  : "_ _:_ _:_ _";
+        } else if (absenMasukKeluarOffline.value['signout_time'] != "") {
           signinTime.value =
               AppData.signingTime != "" && AppData.signingTime != "00:00:00"
                   ? AppData.signingTime
                   : "_ _:_ _:_ _";
           signoutTime.value =
-              AppData.signoutTime != "" && AppData.signoutTime != "00:00:00"
-                  ? AppData.signoutTime
-                  : "_ _:_ _:_ _";
+              absenMasukKeluarOffline.value['signout_time'].toString();
+          textPendingKeluar.value = true;
+        } else if (absenMasukKeluarOffline.value['signing_time'] != "" &&
+            absenMasukKeluarOffline.value['signout_time'] != "") {
+          signinTime.value =
+              absenMasukKeluarOffline.value['signing_time'].toString();
+          signoutTime.value =
+              absenMasukKeluarOffline.value['signout_time'].toString();
+          textPendingMasuk.value = true;
+          textPendingKeluar.value = true;
         }
+      } else {
+        signinTime.value =
+            AppData.signingTime != "" && AppData.signingTime != "00:00:00"
+                ? AppData.signingTime
+                : "_ _:_ _:_ _";
+        signoutTime.value =
+            AppData.signoutTime != "" && AppData.signoutTime != "00:00:00"
+                ? AppData.signoutTime
+                : "_ _:_ _:_ _";
+      }
 
-        if ((AppData.signingTime == "" || AppData.signingTime == "00:00:00") &&
-            (AppData.signoutTime == "" || AppData.signoutTime == "00:00:00")) {
-          absenOfflineStatus.value = false;
-          absenControllre.absenStatus.value = false;
-          AppData.statusAbsen = false;
-          // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
-        } else if ((AppData.signingTime != "" ||
-                AppData.signingTime != "00:00:00") &&
-            (AppData.signoutTime == "" || AppData.signoutTime == "00:00:00")) {
-          absenOfflineStatus.value = AppData.statusAbsenOffline;
-          if (absenOfflineStatus.value == true) {
-            pendingSigninApr.value = true;
-            textPendingMasuk.value = true;
-          }
-          absenControllre.absenStatus.value = true;
-          AppData.statusAbsen = true;
-          // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
-        } else if ((AppData.signingTime != "" ||
-                AppData.signingTime != "00:00:00") &&
-            (AppData.signoutTime != "" || AppData.signoutTime != "00:00:00")) {
-          absenOfflineStatusOut.value = AppData.statusAbsenOffline;
+      if ((AppData.signingTime == "" || AppData.signingTime == "00:00:00") &&
+          (AppData.signoutTime == "" || AppData.signoutTime == "00:00:00")) {
+        absenOfflineStatus.value = false;
+        controllerAbsensi.absenStatus.value = false;
+        AppData.statusAbsen = false;
+        // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
+      } else if ((AppData.signingTime != "" ||
+              AppData.signingTime != "00:00:00") &&
+          (AppData.signoutTime == "" || AppData.signoutTime == "00:00:00")) {
+        absenOfflineStatus.value = AppData.statusAbsenOffline;
+        if (absenOfflineStatus.value == true) {
+          pendingSigninApr.value = true;
+          textPendingMasuk.value = true;
+        }
+        controllerAbsensi.absenStatus.value = true;
+        AppData.statusAbsen = true;
+        // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
+      } else if ((AppData.signingTime != "" ||
+              AppData.signingTime != "00:00:00") &&
+          (AppData.signoutTime != "" || AppData.signoutTime != "00:00:00")) {
+        absenOfflineStatusOut.value = AppData.statusAbsenOffline;
 
-          absenControllre.absenStatus.value = false;
-      //     AppData.statusAbsen = false;
-      //     if (absenOfflineStatus.value == true) {
-      //       pendingSignoutApr.value = true;
-      //       textPendingKeluar.value = true;
-      //       pendingSigninApr.value = false;
-      //       textPendingMasuk.value = false;
-      //       if (absenMasukKeluarOffline.value['signing_time'] != "") {
-      //         pendingSigninApr.value = true;
-      //         textPendingMasuk.value = true;
-      //         absenControllre.absenStatus.value = true;
-      //         AppData.statusAbsen = true;
-      //       } else if (AppData.temp == true) {
-      //         pendingSigninApr.value = true;
-      //         textPendingMasuk.value = false;
-      //         absenControllre.absenStatus.value = true;
-      //         AppData.statusAbsen = true;
-      //       }
-      //     }
-      //     // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
-      //   }
-      //   isLoading.value = false;
-      // });
-            }
+        controllerAbsensi.absenStatus.value = false;
+        //     AppData.statusAbsen = false;
+        //     if (absenOfflineStatus.value == true) {
+        //       pendingSignoutApr.value = true;
+        //       textPendingKeluar.value = true;
+        //       pendingSigninApr.value = false;
+        //       textPendingMasuk.value = false;
+        //       if (absenMasukKeluarOffline.value['signing_time'] != "") {
+        //         pendingSigninApr.value = true;
+        //         textPendingMasuk.value = true;
+        //         controllerAbsensi.absenStatus.value = true;
+        //         AppData.statusAbsen = true;
+        //       } else if (AppData.temp == true) {
+        //         pendingSigninApr.value = true;
+        //         textPendingMasuk.value = false;
+        //         controllerAbsensi.absenStatus.value = true;
+        //         AppData.statusAbsen = true;
+        //       }
+        //     }
+        //     // AppData.dateLastAbsen = absenMasukKeluarOffline['atten_date'];
+        //   }
+        //   isLoading.value = false;
+        // });
+      }
+    } else {
+      try {
+        var response =
+            await Api.connectionApi("post", body, "view_last_absen_user2");
 
-    }else{
-          var connect = Api.connectionApi("post", body, "view_last_absen_user2");
-    Future.delayed(const Duration(milliseconds: 500), () {
-      connect.then((dynamic res) async {
-        if (res.statusCode == 200) {
-          var valueBody = jsonDecode(res.body);
-          print("cek data absen ini mah  new ${valueBody['offiline']}");
-          var data = valueBody['data'];
-          List wfh = valueBody['wfh'];
-          List offiline = valueBody['offiline'];
-          // print("cek data absen ini mah  new ${offiline[0]['signout_time']}");
-
-          status.value = data.toString();
-          // print("hasil status.value ${status.value}");
-          if (wfh.isEmpty) {
-            if (data.isEmpty) {
-              AppData.statusAbsen = false;
-              signoutTime.value = '00:00:00';
-              signinTime.value = '00:00:00';
-              breakinTime.value = '00:00:00';
-              breakoutTime.value = '00:00:00';
-              controllerAbsensi.absenStatus.value = false;
-              dashboardStatusAbsen.value = false;
-            } else {
-              wfhlokasi.value =
-                  valueBody['data'][0]['place_in'].toString() == "WFH"
-                      ? true
-                      : false;
-
-              AppData.statusAbsen =
-                  data[0]['signout_time'] == "00:00:00" ? true : false;
-              dashboardStatusAbsen.value =
-                  data[0]['signout_time'] == "00:00:00" ? true : false;
-
-              signoutTime.value = data[0]['signout_time'].toString();
-              signinTime.value = data[0]['signin_time'].toString();
-              breakinTime.value = data[0]['breakin_time'].toString() != "null"
-                  ? data[0]['breakin_time'].toString()
-                  : "00:00:00";
-              breakoutTime.value = data[0]['breakout_time'].toString() != "null"
-                  ? data[0]['breakout_time'].toString()
-                  : "00:00:00";
-              trx.value = data[0]['trx'].toString() ?? "";
-              print("hasil signinTime wfh ${signinTime.value}");
-              // print("hasil signinTime ${status.value}");
-            }
-          }
-           else {
-            wfhstatus.value = wfh.isEmpty ? false : true;
-            controllerAbsensi.absenStatus.value = wfh.isEmpty ? false : true;
-            approveStatus.value = valueBody['wfh'][0]['status'].toString();
-            // if (data.isEmpty) {
-            signinTime.value = wfh[0]['signing_time'].toString();
-            controllerAbsensi.nomorAjuan.value =
-                wfh[0]['nomor_ajuan'].toString();
-            // status.value = wfh[0]['status'].toString();
-
-            // status.value = "ad";
-            // controllerAbsensi.absenStatus.value = true;
-            print("hasil signinTime ini yak${signinTime.value}");
-            print("hasil signinTime ${status.value}");
-          }
-
-          if (offiline.isEmpty) {
-            if (data.isEmpty) {
-              AppData.statusAbsen = false;
-              signoutTime.value = '00:00:00';
-              signinTime.value = '00:00:00';
-              breakinTime.value = '00:00:00';
-              breakoutTime.value = '00:00:00';
-              controllerAbsensi.absenStatus.value = false;
-              dashboardStatusAbsen.value = false;
-            } else {
-
-              AppData.statusAbsen =
-                  data[0]['signout_time'] == "00:00:00" ? true : false;
-              dashboardStatusAbsen.value =
-                  data[0]['signout_time'] == "00:00:00" ? true : false;
-
-              // signoutTime.value = data[0]['signout_time'].toString();
-              // signinTime.value = data[0]['signin_time'];
-            pendingSigninApr.value = false;
-            pendingSignoutApr.value = false;
-            absenOfflineStatus.value = false;
-            absenOfflineStatusOut.value = false;
-
-              breakinTime.value = data[0]['breakin_time'].toString() != "null"
-                  ? data[0]['breakin_time'].toString()
-                  : "00:00:00";
-              breakoutTime.value = data[0]['breakout_time'].toString() != "null"
-                  ? data[0]['breakout_time'].toString()
-                  : "00:00:00";
-              trx.value = data[0]['trx'].toString() ?? "";
-              print("hasil signinTime offoline ${signinTime.value}");
-              print("hasil signinTime ${signoutTime.value}");
-            }
-          }
-           else {
-            controllerAbsensi.absenStatus.value = offiline.isEmpty ? false : true;
-            approveStatus.value = valueBody['offiline'][0]['status'].toString();
-            // if (data.isEmpty) {
-            textPendingMasuk.value = offiline[0]['signing_time'] == '00:00:00' ? true : false;
-            textPendingKeluar.value = offiline[0]['signout_time'] == '00:00:00' ? true : false;
-            pendingSigninApr.value = offiline[0]['signing_time'] == '00:00:00' ? false : true;
-            pendingSignoutApr.value = offiline[0]['signout_time'] == '00:00:00' ? false : true;
-            absenOfflineStatus.value = offiline[0]['signing_time'] == '00:00:00' ? false : true;
-            absenOfflineStatusOut.value = offiline[0]['signout_time'] == '00:00:00' ? false : true;
-
-            signinTime.value = offiline[0]['signing_time'] == '00:00:00' ? data[0]['signin_time'] : offiline[0]['signing_time'];
-            signoutTime.value = offiline[0]['signout_time'] == '00:00:00' ? data[0]['signout_time']: offiline[0]['signout_time'];
-            controllerAbsensi.nomorAjuan.value =
-                offiline[0]['nomor_ajuan'].toString();
-            // status.value = wfh[0]['status'].toString();
-
-            // status.value = "ad";
-            // controllerAbsensi.absenStatus.value = true;
-            print("hasil signinTime ini yak${signinTime.value}");
-            print("hasil signinTime ${status.value}");
-          }
-
-          // AppData.textPendingMasuk = textPendingMasuk.value;
-          // AppData.textPendingKeluar = textPendingKeluar.value;
-
-          AppData.signingTime = signinTime.value;
-          AppData.signoutTime = signoutTime.value;
-          AppData.statusAbsenOffline = absenOfflineStatus.value;
-
-          print("hasil signinTime ${signinTime.value}");
-          print("hasil signoutTime ${signoutTime.value}");
-          print("hasil signinTime ${AppData.signingTime}");
-          print("hasil signinTime ${AppData.signoutTime}");
-        } else {
+        if (response.statusCode != 200) {
           isLoading.value = false;
+          return;
         }
-      });
-    });
-  
+
+        var valueBody = jsonDecode(response.body);
+        print("Cek data absen: ${valueBody}");
+
+        var data = valueBody['data'] ?? [];
+        List wfh = valueBody['wfh'] ?? [];
+        List offline = valueBody['offiline'] ?? [];
+
+        status.value = data.toString();
+
+        if (data.isEmpty) {
+          _resetAbsenStatus();
+        } else {
+          _updateAbsenStatus(data[0]);
+        }
+
+        if (wfh.isNotEmpty) {
+          _updateWFHStatus(wfh[0]);
+        }
+
+        if (offline.isNotEmpty) {
+          _updateOfflineStatus(offline[0], data.isNotEmpty ? data[0] : null);
+        }
+
+        print("Hasil signinTime: ${signinTime.value}");
+        print("Hasil signoutTime: ${signoutTime.value}");
+      } catch (e) {
+        print("Error fetching absen: $e");
+        isLoading.value = false;
+      }
     }
+  }
+
+  void _resetAbsenStatus() {
+    AppData.statusAbsen = false;
+    signoutTime.value = '00:00:00';
+    signinTime.value = '00:00:00';
+    breakinTime.value = '00:00:00';
+    breakoutTime.value = '00:00:00';
+    wfhstatus.value = false;
+    controllerAbsensi.absenStatus.value = false;
+    dashboardStatusAbsen.value = false;
+  }
+
+  void _updateAbsenStatus(Map<String, dynamic> data) {
+    wfhlokasi.value = data['place_in'] == "WFH";
+    AppData.statusAbsen = data['signout_time'] == "00:00:00";
+    dashboardStatusAbsen.value = data['signout_time'] == "00:00:00";
+    signoutTime.value = data['signout_time'] ?? '00:00:00';
+    signinTime.value = data['signin_time'] ?? '00:00:00';
+    breakinTime.value = data['breakin_time'] ?? '00:00:00';
+    breakoutTime.value = data['breakout_time'] ?? '00:00:00';
+    trx.value = data['trx'] ?? "";
+  }
+
+  void _updateWFHStatus(Map<String, dynamic> wfhData) {
+    wfhstatus.value = true;
+    controllerAbsensi.absenStatus.value = true;
+    approveStatus.value = wfhData['status'] ?? "";
+    signinTime.value = wfhData['signing_time'] ?? "00:00:00";
+    controllerAbsensi.nomorAjuan.value = wfhData['nomor_ajuan'] ?? "";
+  }
+
+  void _updateOfflineStatus(
+      Map<String, dynamic> offlineData, Map<String, dynamic>? data) {
+    controllerAbsensi.absenStatus.value = true;
+    approveStatus.value = offlineData['status'] ?? "";
+
+    textPendingMasuk.value = offlineData['signing_time'] == '00:00:00';
+    textPendingKeluar.value = offlineData['signout_time'] == '00:00:00';
+
+    pendingSigninApr.value = !textPendingMasuk.value;
+    pendingSignoutApr.value = !textPendingKeluar.value;
+
+    absenOfflineStatus.value = !textPendingMasuk.value;
+    absenOfflineStatusOut.value = !textPendingKeluar.value;
+
+    signinTime.value =
+        (offlineData['signing_time'] == '00:00:00' && data != null)
+            ? data['signin_time']
+            : offlineData['signing_time'];
+
+    signoutTime.value =
+        (offlineData['signout_time'] == '00:00:00' && data != null)
+            ? data['signout_time']
+            : offlineData['signout_time'];
+
+    controllerAbsensi.nomorAjuan.value = offlineData['nomor_ajuan'] ?? "";
   }
 
   void widgetButtomSheetOfflineAbsen(
@@ -1676,7 +1630,7 @@ class DashboardController extends GetxController {
                             authController.signinTime.value = signinTime.value;
                             authController.signoutTime.value =
                                 signoutTime.value;
-                            // absenControllre.absenStatus.value =
+                            // controllerAbsensi.absenStatus.value =
                             //     controller.dashboardStatusAbsen.value;
                           });
                           tabbController.checkuserinfo();
@@ -2657,30 +2611,29 @@ class DashboardController extends GetxController {
       'em_id': getEmid,
       'date': DateFormat('yyyy-MM-dd').format(DateTime.now())
     };
-    if(!internetController.isConnected.value){
+    if (!internetController.isConnected.value) {
       timeIn.value = AppData.informasiUser![0].timeIn;
-        timeOut.value = AppData.informasiUser![0].timeOut;
-    }else{
+      timeOut.value = AppData.informasiUser![0].timeOut;
+    } else {
       var connect = Api.connectionApi("post", body, "work-schedule");
-    connect.then((dynamic res) {
-      var valueBody = jsonDecode(res.body);
-      print("data error wrok ${valueBody}");
-      print("data body ${body}");
+      connect.then((dynamic res) {
+        var valueBody = jsonDecode(res.body);
+        print("data error wrok ${valueBody}");
+        print("data body ${body}");
 
-      if (valueBody['status'] == false) {
-        print("data work time ${valueBody}");
-        timeIn.value = AppData.informasiUser![0].timeIn;
-        timeOut.value = AppData.informasiUser![0].timeOut;
-      } else {
-        print("data work time ${valueBody['data']['time_in']}");
-        timeIn.value = valueBody['data']['time_in'];
-        timeOut.value = valueBody['data']['time_out'];
-      }
-      //   Api().validateAuth(res.statusCode );
-    });
-  
+        if (valueBody['status'] == false) {
+          print("data work time ${valueBody}");
+          timeIn.value = AppData.informasiUser![0].timeIn;
+          timeOut.value = AppData.informasiUser![0].timeOut;
+        } else {
+          print("data work time ${valueBody['data']['time_in']}");
+          timeIn.value = valueBody['data']['time_in'];
+          timeOut.value = valueBody['data']['time_out'];
+        }
+        //   Api().validateAuth(res.statusCode );
+      });
     }
-    }
+  }
 
   Future<void> getMenuDashboard() async {
     finalMenu.clear();
@@ -2767,6 +2720,14 @@ class DashboardController extends GetxController {
 
         if (response.statusCode == 200) {
           // menuShowInMain.clear();
+          controllerAbsensi.showButtonlaporan.value = false;
+          controllerIzin.showButtonlaporan.value = false;
+          controllerLembur.showButtonlaporan.value = false;
+
+          controllerTugasLuar.showButtonlaporan.value = false;
+          controllerKlaim.showButtonlaporan.value = false;
+          controllerCuti.showButtonlaporan.value = false;
+
           print('luh gak 200');
           var valueBody = jsonDecode(response.body);
           var temporary = valueBody['data'];
@@ -2806,9 +2767,11 @@ class DashboardController extends GetxController {
 
   void _updateMenuStatus(String menuName) {
     switch (menuName.trim()) {
-      case "Absensi":
-        absenControllre.showButtonlaporan.value = true;
+      case 'Pengajuan Absensi':
         sortcardPengajuan.add({"id": 1, "nama_pengajuan": "Pengajuan Absensi"});
+        break;
+      case "Absensi":
+        controllerAbsensi.showButtonlaporan.value = true;
         break;
       case "Izin":
         controllerIzin.showButtonlaporan.value = true;
@@ -2847,7 +2810,7 @@ class DashboardController extends GetxController {
       // menuShowInMain.clear();
 
       // Reset semua button laporan
-      absenControllre.showButtonlaporan.value = false;
+      controllerAbsensi.showButtonlaporan.value = false;
       controllerIzin.showButtonlaporan.value = false;
       controllerLembur.showButtonlaporan.value = false;
       controllerTugasLuar.showButtonlaporan.value = false;
@@ -2879,12 +2842,6 @@ class DashboardController extends GetxController {
         "menu_dashboard_utama",
         params: "&em_id=${AppData.informasiUser![0].em_id}",
       );
-
-      // if (connect == false) {
-      //   // UtilsAlert.koneksiBuruk();
-      //   return;
-      // }
-
       if (connect.statusCode == 200) {
         var valueBody = jsonDecode(connect.body);
         var temporary = valueBody['data'];
@@ -2913,8 +2870,10 @@ class DashboardController extends GetxController {
             menu['url'].toString().toLowerCase().trim() == "ulangtahun");
         showLaporan.value = menusUtama.any(
             (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
-        showMonitDaily.value = menusUtama.any(
-            (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
+        showMonitDaily.value = menusUtama.any((menu) =>
+            menu['url'].toString().toLowerCase().trim() == "dailytask");
+        showAbsen.value = menusUtama.any(
+            (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
       }
     } catch (error) {
       print("Terjadi kesalahan: $error");
@@ -2931,7 +2890,9 @@ class DashboardController extends GetxController {
       showLaporan.value = menusUtama.any(
           (menu) => menu['url'].toString().toLowerCase().trim() == "laporan");
       showMonitDaily.value = menusUtama.any(
-            (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
+          (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
+      showAbsen.value = menusUtama.any(
+          (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
     }
   }
 
@@ -3223,8 +3184,7 @@ class DashboardController extends GetxController {
       ));
     } else if (url == "DailyTask") {
       Get.to(DailyTask());
-    } 
-    else if (url == "RiwayatCuti") {
+    } else if (url == "RiwayatCuti") {
       Get.to(RiwayatCuti(), arguments: arguments);
       // } else if (url == "Izin") {
       //   Get.to(Izin(), arguments: arguments);
@@ -3477,10 +3437,10 @@ class DashboardController extends GetxController {
                                   controllerAbsensi.statusDeteksi2.value ==
                                       false) {
                                 // if (authController.isConnected.value &&
-                                //     !absenControllre.coordinate.value) {
+                                //     !controllerAbsensi.coordinate.value) {
                                 controllerAbsensi.kirimDataAbsensi(
                                     typewfh: typewfh);
-                                // } else if (absenControllre.coordinate.value ==
+                                // } else if (controllerAbsensi.coordinate.value ==
                                 //     true) {
                                 //   UtilsAlert
                                 //       .showCheckOfflineAbsensiKesalahanServer(

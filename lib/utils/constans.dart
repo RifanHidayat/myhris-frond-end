@@ -276,6 +276,12 @@ class Constanst {
     return bulanIndoLengkap(outputDate.format(convert));
   }
 
+  static String convertGetDay(String date) {
+    DateTime convert = DateTime.parse(date);
+    var outputDate = DateFormat('EEEE');
+    return hariIndo(outputDate.format(convert));
+  }
+
   static String hariIndo(String hari) {
     if (hari == "Monday") {
       hari = "Senin";

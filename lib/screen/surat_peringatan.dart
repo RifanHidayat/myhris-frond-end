@@ -235,7 +235,7 @@ class SuratPeringatanDetail extends StatelessWidget {
                       SizedBox(
                         height: 8,
                       ),
-                      controller.listAlasan.isEmpty
+                      controller.listAlasan.isEmpty || controller.listAlasan.every((e) => e['name'].toString().isEmpty)
                           ? SizedBox()
                           : Column(
                             mainAxisAlignment: MainAxisAlignment.start,

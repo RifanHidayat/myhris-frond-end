@@ -2071,6 +2071,7 @@ class AbsenController extends GetxController {
             AppData.statusAbsen = false;
             AppData.dateLastAbsen = tanggalUserFoto.value;
           }
+          print('Ini time string ${timeString.value}');
           Map<String, dynamic> body = typewfh == "wfh"
               ? {
                   'em_id': getEmpId,
@@ -2080,7 +2081,7 @@ class AbsenController extends GetxController {
                   'lokasi': alamatUserFoto.value,
                   'latLang': latLangAbsen,
 
-                  // 'waktu': timeString.value,
+                  'waktu': timeString.value,
                   // // 'gambar': validasiGambar,
                   // 'reg_type': regType.value,
                   // 'gambar': base64fotoUser.value,

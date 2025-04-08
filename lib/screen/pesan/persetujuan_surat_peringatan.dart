@@ -310,7 +310,8 @@ class _PersetujuanSuratPeringatanState extends State<PersetujuanSuratPeringatan>
                   customBorder: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
-                  onTap: () {
+                  onTap: () async {
+                    await controller.searchTeguranLisan(emIdPengaju);
                     Get.to(DetailPersetujuanSuratPeringatan(
                       emId: emIdPengaju,
                       title: typeAjuan,

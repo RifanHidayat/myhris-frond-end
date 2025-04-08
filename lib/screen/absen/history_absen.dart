@@ -118,16 +118,21 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
           },
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: Column(
-              children: [
-                Obx(
-                  () => Expanded(
-                    child: SizedBox(
-                      height: double.maxFinite,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TabBar(
+            child: Obx(
+              () => SizedBox(
+                height: double.maxFinite,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    dashboardController.showAbsen.value == false
+                        ? Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text("Absensi",
+                                style: GoogleFonts.inter(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w500)),
+                          )
+                        : TabBar(
                             indicatorColor: Constanst.colorPrimary,
                             labelColor: Constanst.colorPrimary,
                             unselectedLabelColor: Constanst.fgSecondary,
@@ -147,17 +152,43 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                       fontWeight: FontWeight.w500)),
                             ],
                           ),
-                          Divider(
-                            thickness: 1,
-                            height: 0,
-                            color: Constanst.fgBorder,
-                          ),
-                          Expanded(
-                              child: SizedBox(
-                            height: double.maxFinite,
-                            child: TabBarView(
-                                physics: const BouncingScrollPhysics(),
+                    Divider(
+                      thickness: 1,
+                      height: 0,
+                      color: Constanst.fgBorder,
+                    ),
+                    Expanded(
+                        child: SizedBox(
+                      height: double.maxFinite,
+                      child: dashboardController.showAbsen.value == false
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 16, right: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  const SizedBox(height: 12),
+                                  filterData(),
+                                  const SizedBox(height: 8),
+                                  UtilsAlert.infoContainer(
+                                      "${AppData.informasiUser![0].beginPayroll} ${controller.beginPayroll.value} sd ${AppData.informasiUser![0].endPayroll} ${controller.endPayroll.value} ${controller.tahunSelectedSearchHistory.value}"),
+                                  const SizedBox(height: 12),
+                                  Flexible(
+                                      child: RefreshIndicator(
+                                    onRefresh: refreshData,
+                                    child: controller.historyAbsen.value.isEmpty
+                                        ? Center(
+                                            child:
+                                                Text(controller.loading.value),
+                                          )
+                                        : listAbsen(),
+                                  ))
+                                ],
+                              ),
+                            )
+                          : TabBarView(
+                              physics: const BouncingScrollPhysics(),
+                              children: [
                                   Padding(
                                     padding: const EdgeInsets.only(
                                         left: 16, right: 16),
@@ -171,192 +202,6 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                         UtilsAlert.infoContainer(
                                             "${AppData.informasiUser![0].beginPayroll} ${controller.beginPayroll.value} sd ${controller.lastDate.value} ${controller.endPayroll.value} ${controller.tahunSelectedSearchHistory.value}"),
                                         const SizedBox(height: 12),
-                                        // Row(
-                                        //   children: [
-                                        //     Expanded(
-                                        //       flex: 9,
-                                        //       child: Container(
-                                        //         decoration: BoxDecoration(
-                                        //           color: Constanst.infoLight1,
-                                        //           border: Border.all(
-                                        //             color: Constanst
-                                        //                 .colorStateInfoBorder,
-                                        //           ),
-                                        //           borderRadius:
-                                        //               const BorderRadius.all(
-                                        //             Radius.circular(8.0),
-                                        //           ),
-                                        //         ),
-                                        //         child: Padding(
-                                        //           padding:
-                                        //               const EdgeInsets.all(
-                                        //                   8.0),
-                                        //           child: Column(
-                                        //             crossAxisAlignment:
-                                        //                 CrossAxisAlignment
-                                        //                     .start,
-                                        //             children: [
-                                        //               Text(
-                                        //                 "15",
-                                        //                 style: GoogleFonts.inter(
-                                        //                     fontWeight:
-                                        //                         FontWeight
-                                        //                             .w500,
-                                        //                     fontSize: 16,
-                                        //                     color: Constanst
-                                        //                         .fgPrimary),
-                                        //               ),
-                                        //               const SizedBox(
-                                        //                   height: 4),
-                                        //               Text(
-                                        //                 "Masuk Kerja",
-                                        //                 style: GoogleFonts.inter(
-                                        //                     fontWeight:
-                                        //                         FontWeight
-                                        //                             .w400,
-                                        //                     fontSize: 12,
-                                        //                     color: Constanst
-                                        //                         .fgSecondary),
-                                        //               ),
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //     const SizedBox(width: 8),
-                                        //     Expanded(
-                                        //       flex: 9,
-                                        //       child: Container(
-                                        //         decoration: BoxDecoration(
-                                        //           color: Constanst.infoLight1,
-                                        //           border: Border.all(
-                                        //             color: Constanst
-                                        //                 .colorStateInfoBorder,
-                                        //           ),
-                                        //           borderRadius:
-                                        //               const BorderRadius.all(
-                                        //             Radius.circular(8.0),
-                                        //           ),
-                                        //         ),
-                                        //         child: Padding(
-                                        //           padding:
-                                        //               const EdgeInsets.all(
-                                        //                   8.0),
-                                        //           child: Column(
-                                        //             crossAxisAlignment:
-                                        //                 CrossAxisAlignment
-                                        //                     .start,
-                                        //             children: [
-                                        //               Text(
-                                        //                 "0",
-                                        //                 style: GoogleFonts.inter(
-                                        //                     fontWeight:
-                                        //                         FontWeight
-                                        //                             .w500,
-                                        //                     fontSize: 16,
-                                        //                     color: Constanst
-                                        //                         .fgPrimary),
-                                        //               ),
-                                        //               const SizedBox(
-                                        //                   height: 4),
-                                        //               Text(
-                                        //                 "Terlambat",
-                                        //                 style: GoogleFonts.inter(
-                                        //                     fontWeight:
-                                        //                         FontWeight
-                                        //                             .w400,
-                                        //                     fontSize: 12,
-                                        //                     color: Constanst
-                                        //                         .fgSecondary),
-                                        //               ),
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //     const SizedBox(width: 8),
-                                        //     Expanded(
-                                        //       flex: 10,
-                                        //       child: Container(
-                                        //         decoration: BoxDecoration(
-                                        //           color: Constanst.infoLight1,
-                                        //           border: Border.all(
-                                        //             color: Constanst
-                                        //                 .colorStateInfoBorder,
-                                        //           ),
-                                        //           borderRadius:
-                                        //               const BorderRadius.all(
-                                        //             Radius.circular(8.0),
-                                        //           ),
-                                        //         ),
-                                        //         child: Padding(
-                                        //           padding:
-                                        //               const EdgeInsets.all(
-                                        //                   8.0),
-                                        //           child: Column(
-                                        //             crossAxisAlignment:
-                                        //                 CrossAxisAlignment
-                                        //                     .start,
-                                        //             children: [
-                                        //               Text(
-                                        //                 "5",
-                                        //                 style: GoogleFonts.inter(
-                                        //                     fontWeight:
-                                        //                         FontWeight
-                                        //                             .w500,
-                                        //                     fontSize: 16,
-                                        //                     color: Constanst
-                                        //                         .fgPrimary),
-                                        //               ),
-                                        //               const SizedBox(
-                                        //                   height: 4),
-                                        //               Text(
-                                        //                 "Tidak Absen Keluar",
-                                        //                 style: GoogleFonts.inter(
-                                        //                     fontWeight:
-                                        //                         FontWeight
-                                        //                             .w400,
-                                        //                     fontSize: 12,
-                                        //                     color: Constanst
-                                        //                         .fgSecondary),
-                                        //               ),
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //   ],
-                                        // ),
-                                        // const SizedBox(height: 16),
-                                        // controller.bulanDanTahunNow.value == ""
-                                        //     ? const SizedBox()
-                                        //     : pickDate(),
-                                        // const SizedBox(height: 16),
-                                        // Row(
-                                        //   mainAxisAlignment:
-                                        //       MainAxisAlignment.start,
-                                        //   crossAxisAlignment:
-                                        //       CrossAxisAlignment.start,
-                                        //   children: [
-                                        //     Expanded(
-                                        //       flex: 85,
-                                        //       child: Padding(
-                                        //         padding: const EdgeInsets.only(
-                                        //             top: 8),
-                                        //         child: Text(
-                                        //           "Riwayat Absensi",
-                                        //           textAlign: TextAliginitn.left,
-                                        //           style: GoogleFonts.inter(
-                                        //               fontWeight:
-                                        //                   FontWeight.bold,
-                                        //               fontSize:
-                                        //                   Constanst.sizeTitle),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //   ],
-                                        // ),
-                                        // SizedBox(height: 8),
                                         Flexible(
                                             child: RefreshIndicator(
                                           onRefresh: refreshData,
@@ -402,73 +247,18 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                     ),
                                   )
                                 ]),
-                          ))
-                        ],
-                      ),
-                    ),
-                  ),
+                    ))
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        // floatingActionButton: Obx(
-        //   () => controller.showButtonlaporan.value == false
-        //       ? SizedBox()
-        //       : SpeedDial(
-        //           icon: Iconsax.more,
-        //           activeIcon: Icons.close,
-        //           backgroundColor: Constanst.colorPrimary,
-        //           spacing: 3,
-        //           childPadding: const EdgeInsets.all(5),
-        //           spaceBetweenChildren: 4,
-        //           elevation: 8.0,
-        //           animationCurve: Curves.elasticInOut,
-        //           animationDuration: const Duration(milliseconds: 200),
-        //           children: [
-        //             SpeedDialChild(
-        //                 child: Icon(Iconsax.document_text),
-        //                 backgroundColor: Color(0xff2F80ED),
-        //                 foregroundColor: Colors.white,
-        //                 label: 'Pengajuan Absen',
-        //                 onTap: () {
-        //                   Get.to(pengajuanAbsen());
-        //                 }),
-        //             SpeedDialChild(
-        //                 child: Icon(Iconsax.document_text),
-        //                 backgroundColor: Color(0xff2F80ED),
-        //                 foregroundColor: Colors.white,
-        //                 label: 'Laporan Absensi',
-        //                 onTap: () {
-        //                   Get.to(LaporanAbsen(
-        //                     dataForm: "",
-        //                   ));
-        //                 }),
-        //             SpeedDialChild(
-        //                 child: Icon(Iconsax.minus_cirlce),
-        //                 backgroundColor: Color(0xffFF463D),
-        //                 foregroundColor: Colors.white,
-        //                 label: 'Absen Terlambat',
-        //                 onTap: () {
-        //                   Get.to(LaporanAbsenTelat(
-        //                     dataForm: "",
-        //                   ));
-        //                 }),
-        //             SpeedDialChild(
-        //                 child: Icon(Iconsax.watch),
-        //                 backgroundColor: Color(0xffF2AA0D),
-        //                 foregroundColor: Colors.white,
-        //                 label: 'Belum Absen',
-        //                 onTap: () {
-        //                   Get.to(LaporanBelumAbsen(
-        //                     dataForm: "",
-        //                   ));
-        //                 }),
-        //           ],
-        //         ),
-        // )
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: 
+        dashboardController.showAbsen.value == false
+        ? SizedBox()
+        :
+        FloatingActionButton(
           backgroundColor: Constanst.colorPrimary,
           onPressed: () {
             Get.to(const pengajuanAbsen());
@@ -1670,7 +1460,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
     //alur normal
     if (totalMinutes1 < totalMinutes2) {
 // Menggabungkan tanggal hari ini dengan waktu dari string
-print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
+      print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
       // startTime = DateTime.parse(
       //     '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
       // endTime = DateTime.parse(
@@ -2292,8 +2082,7 @@ print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
                                                               ),
                                                             ],
                                                           ))
-                                                      : index.offDay.toString() ==
-                                                              '0'
+                                                      : index.namaIzin != null
                                                           ? Padding(
                                                               padding:
                                                                   const EdgeInsets.only(
@@ -2310,9 +2099,9 @@ print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
                                                                   const SizedBox(
                                                                     width: 10,
                                                                   ),
-                                                                  const TextLabell(
-                                                                    text:
-                                                                        "Hari Libur Kerja",
+                                                                  TextLabell(
+                                                                    text: index
+                                                                        .namaIzin,
                                                                     weight:
                                                                         FontWeight
                                                                             .w400,
@@ -2320,16 +2109,13 @@ print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
                                                                   ),
                                                                 ],
                                                               ))
-                                                          : (index.jamKerja.toString() !=
-                                                                          "null" ||
-                                                                      index.jamKerja.toString() !=
-                                                                          "") &&
-                                                                  DateTime.parse(
-                                                                          waktuMasuk)
-                                                                      .isAfter(
-                                                                          DateTime.parse(batasWaktu).add(const Duration(minutes: 1)))
+                                                          : index.offDay.toString() ==
+                                                                  '0'
                                                               ? Padding(
-                                                                  padding: const EdgeInsets.only(top: 12),
+                                                                  padding:
+                                                                      const EdgeInsets.only(
+                                                                          top:
+                                                                              12),
                                                                   child: Row(
                                                                     children: [
                                                                       Icon(
@@ -2346,7 +2132,7 @@ print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
                                                                       ),
                                                                       const TextLabell(
                                                                         text:
-                                                                            "Terlambat",
+                                                                            "Hari Libur Kerja",
                                                                         weight:
                                                                             FontWeight.w400,
                                                                         size:
@@ -2354,7 +2140,38 @@ print('${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
                                                                       ),
                                                                     ],
                                                                   ))
-                                                              : SizedBox()
+                                                              : (index.jamKerja.toString() !=
+                                                                              "null" ||
+                                                                          index.jamKerja.toString() !=
+                                                                              "") &&
+                                                                      DateTime.parse(waktuMasuk)
+                                                                          .isAfter(DateTime.parse(batasWaktu).add(const Duration(minutes: 1)))
+                                                                  ? Padding(
+                                                                      padding: const EdgeInsets.only(top: 12),
+                                                                      child: Row(
+                                                                        children: [
+                                                                          Icon(
+                                                                            Iconsax.info_circle,
+                                                                            size:
+                                                                                15,
+                                                                            color:
+                                                                                Constanst.infoLight,
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            width:
+                                                                                10,
+                                                                          ),
+                                                                          const TextLabell(
+                                                                            text:
+                                                                                "Terlambat",
+                                                                            weight:
+                                                                                FontWeight.w400,
+                                                                            size:
+                                                                                11.0,
+                                                                          ),
+                                                                        ],
+                                                                      ))
+                                                                  : SizedBox()
                               : const SizedBox(),
                           Padding(
                             padding: const EdgeInsets.only(top: 12, bottom: 1),
