@@ -3167,12 +3167,12 @@ class _DashboardState extends State<Dashboard> {
                     ),
             ],
           ),
-          controller.hideAudit.value == true
+          AppData.informasiUser![0].isAudit == 0
               ? SizedBox()
               : const SizedBox(
                   height: 8,
                 ),
-          controller.hideAudit.value == true
+          AppData.informasiUser![0].isAudit == 0
               ? SizedBox()
               : Container(
                   decoration: BoxDecoration(

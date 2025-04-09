@@ -363,22 +363,30 @@ class _AuditScreenState extends State<AuditScreen> {
   PopupMenuButton<String> statusPengajuan() {
     return PopupMenuButton<String>(
       onSelected: (value) {
-        controller.filterStatus.value = value == 'Semua' ? '' : value;
+        controller.filterStatus.value = value == 'Semua Status' ? '' : value;
         controller.tempFilterStatus.value = value;
         controller.fetchAuditData();
       },
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: "Semua",
-          child: Text("Semua"),
+          value: "Semua Status",
+          child: Text("Semua Status"),
         ),
         PopupMenuItem(
-          value: "Ongoing",
-          child: Text("Ongoing"),
+          value: "Pending",
+          child: Text("Pending"),
         ),
         PopupMenuItem(
-          value: "Finished",
-          child: Text("Finish"),
+          value: "Approve",
+          child: Text("Approve"),
+        ),
+        PopupMenuItem(
+          value: "Approve2",
+          child: Text("Approve2"),
+        ),
+        PopupMenuItem(
+          value: "Rejected",
+          child: Text("Rejected"),
         ),
       ],
       child: Container(
@@ -416,22 +424,50 @@ class _AuditScreenState extends State<AuditScreen> {
   PopupMenuButton<String> tipeForm() {
     return PopupMenuButton<String>(
       onSelected: (value) {
-        controller.filterTipeForm.value = value == 'Semua' ? '' : value;
+        controller.filterTipeForm.value = value == 'Semua Tipe Form' ? '' : value;
         controller.tempFilterTipeForm.value = value;
         controller.fetchAuditData();
       },
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: "Semua",
-          child: Text("Semua"),
+          value: "Semua Tipe Form",
+          child: Text("Semua Tipe Form"),
         ),
         PopupMenuItem(
-          value: "Fullday",
-          child: Text("Fullday"),
+          value: "Izin",
+          child: Text("Izin"),
         ),
         PopupMenuItem(
-          value: "Halfday",
-          child: Text("Halfday"),
+          value: "Sakit",
+          child: Text("Sakit"),
+        ),
+        PopupMenuItem(
+          value: "Tugas Luar",
+          child: Text("Tugas Luar"),
+        ),
+        PopupMenuItem(
+          value: "Dinas Luar",
+          child: Text("Dinas Luar"),
+        ),
+        PopupMenuItem(
+          value: "Cuti",
+          child: Text("Cuti"),
+        ),
+        PopupMenuItem(
+          value: "Pengajuan Absen",
+          child: Text("Pengajuan Absen"),
+        ),
+        PopupMenuItem(
+          value: "Absen Offline",
+          child: Text("Absen Offline"),
+        ),
+        PopupMenuItem(
+          value: "WFH",
+          child: Text("WFH"),
+        ),
+        PopupMenuItem(
+          value: "Lembur",
+          child: Text("Lembur"),
         ),
       ],
       child: Container(
@@ -469,18 +505,22 @@ class _AuditScreenState extends State<AuditScreen> {
   PopupMenuButton<String> statusAudit() {
     return PopupMenuButton<String>(
       onSelected: (value) {
-        controller.filterStatusAudit.value = value == "Semua" ? '' : value;
+        controller.filterStatusAudit.value = value == "Semua Status Audit" ? '' : value;
         controller.tempfilterStatusAudit.value = value;
         controller.fetchAuditData();
       },
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: "Semua",
-          child: Text("Semua"),
+          value: "Semua Status Audit",
+          child: Text("Semua Status Audit"),
         ),
         PopupMenuItem(
           value: "Reject",
           child: Text("Reject"),
+        ),
+        PopupMenuItem(
+          value: "Approve",
+          child: Text("Approve"),
         ),
       ],
       child: Container(
