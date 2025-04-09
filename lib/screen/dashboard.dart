@@ -42,7 +42,9 @@ import 'package:siscom_operasional/screen/akun/personal_info.dart';
 import 'package:siscom_operasional/screen/audit/audit_screen.dart';
 import 'package:siscom_operasional/screen/chatting/history.dart';
 import 'package:siscom_operasional/screen/daily_task/daily_task.dart';
+
 import 'package:siscom_operasional/screen/daily_task/daily_task_atasan.dart';
+
 import 'package:siscom_operasional/screen/detail_informasi.dart';
 import 'package:siscom_operasional/screen/informasi.dart';
 import 'package:siscom_operasional/screen/monitoring.dart';
@@ -856,35 +858,6 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 Row(
                   children: [
-                    //  void _checkversion() async {
-                    //     try {
-                    //       final newVersion = NewVersionPlus(
-                    //         androidId: 'com.siscom.siscomhris',
-                    //       );
-
-                    //       final status = await newVersion.getVersionStatus();
-
-                    //       if (status != null) {
-                    //         if (status.localVersion != status.storeVersion) {
-                    //           if (context.mounted) {
-                    //             newVersion.showUpdateDialog(
-                    //                 context: context,
-                    //                 versionStatus: status,
-                    //                 dialogTitle: "Update SISCOM HRIS",
-                    //                 dialogText:
-                    //                     "Update versi SISCOM HRIS dari versi ${status.localVersion} ke versi ${status.storeVersion}",
-                    //                 dismissAction: () {
-                    //                   Get.back();
-                    //                 },
-                    //                 updateButtonText: "Update Sekarang",
-                    //                 dismissButtonText: "Skip");
-                    //             print("status yesy ${status.localVersion}");
-                    //           }
-                    //         }
-                    //       } else {}
-                    //     } catch (e) {}
-                    //   }
-
                     Text(
                       "VERSI APLIKASI SAAT INI : ${controller.statuz.value}",
                       style: GoogleFonts.inter(
@@ -896,6 +869,7 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
                 // _isVisible
+
                 // ?
                 Text(
                   AppData.informasiUser![0].branchName,
@@ -907,12 +881,14 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 const SizedBox(height: 8),
                 // : Container(),
+
                 Text(
                   "${AppData.informasiUser![0].full_name ?? ""}",
                   style: GoogleFonts.inter(
                       color: Constanst.fgPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w500),
+
                   overflow: TextOverflow.ellipsis, // Untuk menghindari overflow
                 ),
                 const SizedBox(height: 4),
@@ -922,6 +898,7 @@ class _DashboardState extends State<Dashboard> {
                       color: Constanst.fgPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w400),
+
                   overflow: TextOverflow.ellipsis, // Untuk menghindari overflow
                 ),
               ],
