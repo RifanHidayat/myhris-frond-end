@@ -226,7 +226,7 @@ class ApiRequest {
 
 
   // API DEV
-]
+
   //  static var basicUrl = "http://kantor.membersis.com:2627/";
 
 
