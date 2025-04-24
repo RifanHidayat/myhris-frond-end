@@ -21,7 +21,7 @@ class RiwayatIzin extends StatefulWidget {
 
 class _RiwayatIzinState extends State<RiwayatIzin> {
   var controller = Get.put(IzinController());
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
   final dashboardController = Get.put(DashboardController());
   var idx = 0;
 

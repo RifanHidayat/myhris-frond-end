@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:get/get.dart';
@@ -41,6 +43,21 @@ class _AuditScreenState extends State<AuditScreen> {
         titleSpacing: 0,
         centerTitle: true,
         title: const Text("Audit"),
+        actions: [
+              IconButton(
+                onPressed: () {
+                  controller.fetchAuditData(allData: true);
+                  UtilsAlert.showLoadingIndicator(context);
+                  // controller.generateAndOpenPdf();
+                },
+                icon: Icon(
+                  Iconsax.document_text,
+                  color: Constanst.fgPrimary,
+                  size: 24,
+                ),
+                padding: EdgeInsets.only(right: 16.0),
+              )
+            ]
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,8 +121,39 @@ class _AuditScreenState extends State<AuditScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(8))),
                   onTap: () {
                     // controller.getDetailAudit(audit['id'], tipeForm);
-                    controller.searchSuratPeringatan(em_id);
-                    controller.searchTeguranLisan(em_id);
+                    controller.idTrx.value = audit['id'].toString();
+                    controller.logAudit();
+
+                    print('ini audit yang nerima surat ${audit['approve1']}');
+                    final approve1 = audit['approve1'];
+                    final approve2 = audit['approve2'];
+                    final users = audit['users'];
+
+                    controller.availableUsers.value = [];
+
+                    if (approve1 != null) {
+                      final data =
+                          approve1 is String ? json.decode(approve1) : approve1;
+                      controller.availableUsers
+                          .add(Map<String, dynamic>.from(data));
+                    }
+
+                    if (approve2 != null) {
+                      final data =
+                          approve2 is String ? json.decode(approve2) : approve2;
+                      controller.availableUsers
+                          .add(Map<String, dynamic>.from(data));
+                    }
+
+                    if (users != null) {
+                      final data = users is String ? json.decode(users) : users;
+                      controller.availableUsers
+                          .add(Map<String, dynamic>.from(data));
+                    }
+
+                    print('availableUsers: ${controller.availableUsers}');
+                    print(
+                        'type of first item: ${controller.availableUsers.isNotEmpty ? controller.availableUsers.first.runtimeType : 'empty'}');
                     controller.showDetailRiwayat(audit);
                     print(audit);
                   },
@@ -424,7 +472,8 @@ class _AuditScreenState extends State<AuditScreen> {
   PopupMenuButton<String> tipeForm() {
     return PopupMenuButton<String>(
       onSelected: (value) {
-        controller.filterTipeForm.value = value == 'Semua Tipe Form' ? '' : value;
+        controller.filterTipeForm.value =
+            value == 'Semua Tipe Form' ? '' : value;
         controller.tempFilterTipeForm.value = value;
         controller.fetchAuditData();
       },
@@ -505,7 +554,8 @@ class _AuditScreenState extends State<AuditScreen> {
   PopupMenuButton<String> statusAudit() {
     return PopupMenuButton<String>(
       onSelected: (value) {
-        controller.filterStatusAudit.value = value == "Semua Status Audit" ? '' : value;
+        controller.filterStatusAudit.value =
+            value == "Semua Status Audit" ? '' : value;
         controller.tempfilterStatusAudit.value = value;
         controller.fetchAuditData();
       },
@@ -513,6 +563,10 @@ class _AuditScreenState extends State<AuditScreen> {
         PopupMenuItem(
           value: "Semua Status Audit",
           child: Text("Semua Status Audit"),
+        ),
+        PopupMenuItem(
+          value: "Draft",
+          child: Text("Draft"),
         ),
         PopupMenuItem(
           value: "Reject",
@@ -719,7 +773,7 @@ class _AuditScreenState extends State<AuditScreen> {
           // if (controller.allTask.isEmpty) {
           //   // Get.snackbar("Error", "Data tidak tersedia.");
           // } else {
-          
+
           showBottomStatus(Get.context!);
           // Get.snackbar("${controller.monitoringList.length}", "ddd");
           const CircularProgressIndicator();

@@ -78,7 +78,7 @@ class LaporanLemburController extends GetxController {
   //   isSearching.value = !isSearching.value;
   // }
 
-  GlobalController globalCt = Get.put(GlobalController());
+  GlobalController globalCt = Get.find<GlobalController>();
 
   @override
   void onReady() async {

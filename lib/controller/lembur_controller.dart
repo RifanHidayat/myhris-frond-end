@@ -105,7 +105,7 @@ class LemburController extends GetxController {
     isFormChanged.value = false;
   }
 
-  GlobalController globalCt = Get.put(GlobalController());
+  GlobalController globalCt = Get.find<GlobalController>();
   @override
   void onReady() async {
     print("on ready");
@@ -610,7 +610,7 @@ class LemburController extends GetxController {
           catatan.value.text == "" ||
           selectedDropdownDelegasi.value == "" ||
           selectedDropdownEmploy.isEmpty ||
-          (listTask.isEmpty && dinilai.value == 'N')) {
+          listTask.isEmpty) {
         print('ini kepangil');
         UtilsAlert.showToast("Lengkapi form *");
       } else if (isTaskEmpty) {

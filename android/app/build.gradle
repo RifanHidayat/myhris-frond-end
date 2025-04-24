@@ -36,12 +36,12 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 
 android {
-     lint {
-          baseline = file("lint-baseline.xml")
-      }
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
     
     compileSdkVersion 34
-     lintOptions {
+    lintOptions {
         disable 'InvalidPackage'
     }
     ndkVersion flutter.ndkVersion
@@ -83,12 +83,12 @@ android {
 //    }
 
     signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
+        // release {
+        //     keyAlias keystoreProperties['keyAlias']
+        //     keyPassword keystoreProperties['keyPassword']
+        //     storeFile file(keystoreProperties['storeFile'])
+        //     storePassword keystoreProperties['storePassword']
+        // }
     }
     buildTypes {
               

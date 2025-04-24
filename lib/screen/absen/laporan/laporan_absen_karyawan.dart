@@ -22,7 +22,7 @@ class LaporanAbsenKaryawan extends StatefulWidget {
 
 class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
   var controller = Get.put(LaporanAbsenKaryawanController());
-  var controllerAbsen = Get.put(AbsenController());
+  var controllerAbsen = Get.find<AbsenController>();
 
   @override
   void initState() {

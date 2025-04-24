@@ -87,7 +87,7 @@ class BerhasilAbsensi extends StatefulWidget {
 }
 
 class _BerhasilAbsensiState extends State<BerhasilAbsensi> {
-  var controller = Get.put(AbsenController());
+  var controller = Get.find<AbsenController>();
   var controllerBerhasil = Get.put(BerhasilController());
   var authController = Get.put(AuthController());
   var controllerTracking = Get.put(TrackingController());
@@ -260,7 +260,7 @@ class _BerhasilAbsensiState extends State<BerhasilAbsensi> {
 
   @override
   void dispose() {
-    UtilsAlert.showLoadingIndicator(context);
+    // UtilsAlert.showLoadingIndicator(context);
     super.dispose();
     Get.back();
   }
@@ -498,7 +498,7 @@ class _BerhasilAbsensiState extends State<BerhasilAbsensi> {
 // }
 
 // class _BerhasilAbsensiState extends State<BerhasilAbsensi> {
-//   var controller = Get.put(AbsenController());
+//   var controller = Get.find<AbsenController>();
 //   var controllerBerhasil = Get.put(BerhasilController());
 //   Timer? time;
 //   Location location = new Location();

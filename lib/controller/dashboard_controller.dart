@@ -72,6 +72,7 @@ import 'package:siscom_operasional/screen/klaim/form_klaim.dart';
 import 'package:siscom_operasional/screen/klaim/riwayat_klaim.dart';
 import 'package:siscom_operasional/screen/peraturan/detail_peraturan.dart';
 import 'package:siscom_operasional/screen/peraturan/detail_peraturan_dasboard.dart';
+import 'package:siscom_operasional/screen/pinjaman/pinjaman.dart';
 import 'package:siscom_operasional/screen/pph21/pphh21.dart';
 import 'package:siscom_operasional/screen/slip_gaji/slip_gaji.dart';
 import 'package:siscom_operasional/screen/surat_peringatan.dart';
@@ -111,17 +112,18 @@ class DashboardController extends GetxController {
   var searchController = TextEditingController();
   var bpjsController = Get.put(BpjsController());
 
-  var controllerAbsensi = Get.put(AbsenController());
+  var controllerAbsensi = Get.find<AbsenController>();
+
   var controllerIzin = Get.put(IzinController());
   var controllerLembur = Get.put(LemburController());
   var controllerCuti = Get.put(CutiController());
   var controllerTugasLuar = Get.put(TugasLuarController());
   var controllerKlaim = Get.put(KlaimController());
   final authController = Get.put(AuthController());
-  final internetController = Get.put(InternetController());
+  final internetController = Get.find<InternetController>(tag: 'AuthController');
 
   var menu = <MenuDashboardModel>[].obs;
-  var globalCtr = Get.put(GlobalController());
+  var globalCtr = Get.find<GlobalController>();
   var dashboardStatusAbsen = false.obs;
 
   var user = [].obs;
@@ -131,6 +133,8 @@ class DashboardController extends GetxController {
   var finalMenu = [].obs;
   var informasiDashboard = [].obs;
   var employeeUltah = [].obs;
+  var employeeApresiasi = [].obs;
+  var isShowAllApresiasi = false.obs;
   var employeeTidakHadir = [].obs;
   var menuShowInMain = [].obs;
   var menuShowInMainNew = [].obs;
@@ -144,6 +148,7 @@ class DashboardController extends GetxController {
   var dateNow = "".obs;
   var showUlangTahun = false.obs;
   var showPkwt = false.obs;
+  var showApresiasi = false.obs;
   var showPengumuman = false.obs;
   var showLaporan = false.obs;
   var showMonitDaily = false.obs;
@@ -256,6 +261,7 @@ class DashboardController extends GetxController {
     loadMenuShowInMain();
     loadMenuShowInMainUtama();
     getInformasiDashboard();
+    getApresiasi();
     getEmployeeBelumAbsen();
     timeString.value = formatDateTime(startDate);
     dateNow.value = dateNoww(startDate);
@@ -1391,6 +1397,12 @@ class DashboardController extends GetxController {
     signinTime.value = data['signin_time'] ?? '00:00:00';
     breakinTime.value = data['breakin_time'] ?? '00:00:00';
     breakoutTime.value = data['breakout_time'] ?? '00:00:00';
+    textPendingMasuk.value = false;
+    textPendingMasuk.value = false;
+    pendingSigninApr.value = false;
+    pendingSignoutApr.value = false;
+    absenOfflineStatus.value = false;
+    absenOfflineStatusOut.value = false;
     trx.value = data['trx'] ?? "";
   }
 
@@ -1751,7 +1763,7 @@ class DashboardController extends GetxController {
           stringTanggal,
           typeNotifFcm,
           pesan,
-          'Approval WFH');
+          'Pengajuan WFH');
 
       if (item['token_notif'] != null) {
         globalCtr.kirimNotifikasiFcm(
@@ -2875,6 +2887,8 @@ class DashboardController extends GetxController {
             menu['url'].toString().toLowerCase().trim() == "dailytask");
         showAbsen.value = menusUtama.any(
             (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
+        showApresiasi.value = menusUtama.any(
+          (menu) => menu['url'].toString().toLowerCase().trim() == 'apresiasi');
       }
     } catch (error) {
       print("Terjadi kesalahan: $error");
@@ -2894,6 +2908,8 @@ class DashboardController extends GetxController {
           (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
       showAbsen.value = menusUtama.any(
           (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
+      showApresiasi.value = menusUtama.any(
+          (menu) => menu['url'].toString().toLowerCase().trim() == "apresiasi");
     }
   }
 
@@ -2949,6 +2965,20 @@ class DashboardController extends GetxController {
           this.employeeUltah.refresh();
         }
       });
+    });
+  }
+
+  Future<void> getApresiasi() async {
+    employeeApresiasi.clear();
+    var connect = Api.connectionApi("get", {}, "apresiasi");
+
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        employeeApresiasi.value = valueBody['data'];
+        print("data employee Apresiasi ${employeeApresiasi}");
+        this.employeeApresiasi.refresh();
+      }
     });
   }
 
@@ -3195,6 +3225,8 @@ class DashboardController extends GetxController {
       Get.to(Klaim(), arguments: arguments);
     } else if (url == "Kasbon") {
       Get.to(Kasbon(), arguments: arguments);
+    } else if (url == "PinjamanAlat") {
+      Get.to(Pinjaman(), arguments: arguments);
     } else if (url == "FormKlaim") {
       Get.to(FormKlaim(
         dataForm: [[], false],
@@ -3428,10 +3460,11 @@ class DashboardController extends GetxController {
                         ),
                         TextButtonWidget(
                           title: "Lanjutkan",
-                          onTap: () async {
+                          onTap: ()  {
                             if (type == "checkTracking") {
                               print('kesini');
                               Get.back();
+                              
                               // await controllerAbsensi.deteksiFakeGps(context);
                               if (controllerAbsensi.statusDeteksi.value ==
                                       false &&
@@ -3439,6 +3472,7 @@ class DashboardController extends GetxController {
                                       false) {
                                 // if (authController.isConnected.value &&
                                 //     !controllerAbsensi.coordinate.value) {
+                                print('ini placecordinate ${controllerAbsensi.placeCoordinate}');
                                 controllerAbsensi.kirimDataAbsensi(
                                     typewfh: typewfh);
                                 // } else if (controllerAbsensi.coordinate.value ==
@@ -3496,8 +3530,8 @@ class DashboardController extends GetxController {
                             // }
                             else {
                               Navigator.pop(context);
-                              await Permission.camera.request();
-                              await Permission.location.request();
+                              Permission.camera.request();
+                              Permission.location.request();
                             }
                           },
                           colorButton: Constanst.colorButton1,

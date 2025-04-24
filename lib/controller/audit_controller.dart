@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:open_file_plus/open_file_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
@@ -13,6 +17,9 @@ import 'package:siscom_operasional/utils/custom_dialog.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class AuditController extends GetxController {
   var auditList = [].obs;
@@ -23,6 +30,7 @@ class AuditController extends GetxController {
   var tahunSelectedSearchHistory = ''.obs;
   var bulanSelectedSearchHistory = ''.obs;
   var bulanDanTahunNow = ''.obs;
+  var idTrx = ''.obs;
   var date = DateTime.now().obs;
   var tempNamaStatus1 = ''.obs;
   var emId = ''.obs;
@@ -30,8 +38,8 @@ class AuditController extends GetxController {
   var tempFilterStatus = 'Semua Status'.obs;
   var filterTipeForm = ''.obs;
   var tempFilterTipeForm = 'Semua Tipe Form'.obs;
-  var filterStatusAudit = ''.obs;
-  var tempfilterStatusAudit = 'Semua Status Audit'.obs;
+  var filterStatusAudit = 'Draft'.obs;
+  var tempfilterStatusAudit = 'Draft'.obs;
   var offset = 0.obs;
   var isLoadingMore = false.obs;
   var alasanReject = TextEditingController().obs;
@@ -40,9 +48,22 @@ class AuditController extends GetxController {
     'PT. SHAN INFORMASI SISTEM',
     'PT. REFORMASI ANUGERAH JAVA JAYA',
   ].obs;
-  var listStatusPengajuan = <Map<String, String>>[].obs;
+  var statusCondition = ''.obs;
+  var listStatusPengajuan = <Map<String, String>>[
+    {'name': "None", 'value': "none"},
+    {'name': "Teguran Lisan", 'value': "teguran_lisan"},
+    {'name': "Surat Peringatan", 'value': "surat_peringatan"}
+  ].obs;
   var konsekuemsiList = [].obs;
-  var statusPemgajuanIzin = ''.obs;
+  var statusPemgajuanIzin = 'none'.obs;
+
+  var availableUsers = [].obs;
+
+  var selectedUsersName = <String>[].obs;
+  var selectedUsersEm_id = <String>[].obs;
+  var selectedUsersData = <Map<String, dynamic>>[].obs;
+
+  var statusLog = [].obs;
 
   void updateListStatus() {
     print('ini di update gak sih');
@@ -52,6 +73,7 @@ class AuditController extends GetxController {
     listStatusPengajuan.value = searchSp.isNotEmpty || searchTl.isNotEmpty
         ? [
             {'name': "None", 'value': "none"},
+            {'name': "Teguran Lisan", 'value': "teguran_lisan"},
             {'name': "Surat Peringatan", 'value': "surat_peringatan"}
           ]
         : [
@@ -144,7 +166,7 @@ class AuditController extends GetxController {
     });
   }
 
-  void fetchAuditData({bool isLoadMore = false}) {
+  void fetchAuditData({bool isLoadMore = false, bool allData = false}) {
     if (!isLoadMore) {
       // listEmployee.clear();
       auditList.clear();
@@ -160,6 +182,7 @@ class AuditController extends GetxController {
       'status': filterStatus.value,
       'status_audit': filterStatusAudit.value,
       'tipe_form': filterTipeForm.value,
+      'all_data': allData,
       'branch_id': getBranchIdByName(selectedBranch.value)
     };
     var connect = Api.connectionApi("post", body, "audit");
@@ -171,7 +194,31 @@ class AuditController extends GetxController {
           offset.value += 5;
         }
         print('ini audit list: $auditList');
+        if (allData == true) {
+          Get.back();
+          generateAndOpenPdf();
+        }
         isLoadingMore.value = false;
+      } else {
+        UtilsAlert.showToast(res.message);
+      }
+    });
+  }
+
+  void logAudit() {
+    Map<String, dynamic> body = {
+      'tahun': tahunSelectedSearchHistory.value,
+      'bulan': bulanSelectedSearchHistory.value,
+      'id_trx': idTrx.value
+    };
+    var connect = Api.connectionApi("post", body, "audit/log");
+    connect.then((dynamic res) {
+      statusLog.clear();
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        if (valueBody['data'] != null && valueBody['data'].isNotEmpty) {
+          statusLog.add(valueBody['data']);
+        }
       } else {
         UtilsAlert.showToast(res.message);
       }
@@ -208,13 +255,10 @@ class AuditController extends GetxController {
   void showDetailRiwayat(detailData) {
     var nomorAjuan = detailData['nomor'];
     var tanggalMasukAjuan = detailData['atten_date'];
-    var namaTypeAjuan = detailData['tipe_form'];
     var categoryAjuan = detailData['tipe_pengajuan'];
     var namaPengaju = detailData['full_name'];
     var jabatanPengaju = detailData['jabatan'];
-    var inputTime = detailData['input_time'];
     var alasan = detailData['keterangan'];
-    var durasi = detailData['leave_duration'];
     var typeAjuan = detailData['status'];
     var leave_files = detailData['leave_files'];
     showModalBottomSheet(
@@ -460,8 +504,8 @@ class AuditController extends GetxController {
                                 ],
                               )
                             : typeAjuan == "Approve" ||
-                                    typeAjuan == "Approve 1" ||
-                                    typeAjuan == "Approve 2"
+                                    typeAjuan == "Approve1" ||
+                                    typeAjuan == "Approve2"
                                 ? Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -503,32 +547,219 @@ class AuditController extends GetxController {
                                       ),
                                     ],
                                   ),
+                        Obx(() {
+                          return statusLog.isEmpty
+                              ? const SizedBox()
+                              : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    Divider(
+                                      height: 0,
+                                      thickness: 1,
+                                      color: Constanst.border,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      "Riwayat Audit",
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        color: Constanst.fgSecondary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: statusLog[0].length,
+                                        itemBuilder: (context, index) {
+                                          var log = statusLog[0][index];
+                                          print('ini log $log');
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 12.0),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Icon(
+                                                  log['status'] == 'Rejected'
+                                                      ? Iconsax.close_circle
+                                                      : log['status']
+                                                              .toString()
+                                                              .contains(
+                                                                  "Approve")
+                                                          ? Iconsax.tick_circle
+                                                          : Iconsax.timer,
+                                                  color: log['status'] ==
+                                                          'Rejected'
+                                                      ? Constanst.color4
+                                                      : log['status']
+                                                              .toString()
+                                                              .contains(
+                                                                  "Approve")
+                                                          ? Colors.green
+                                                          : Constanst.color3,
+                                                  size: 20,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "${log['status']} oleh ${log['full_name']}",
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: Constanst
+                                                              .fgPrimary,
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        Constanst.convertDateAndClock(log['created_on'])
+                                                        ,
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Constanst
+                                                              .fgSecondary,
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }),
+                                  ],
+                                );
+                        }),
+                        //   statusLog.isEmpty
+                        //       ? const SizedBox()
+                        //       : const SizedBox(height: 12),
+                        //   statusLog.isEmpty
+                        //       ? const SizedBox()
+                        //       : Divider(
+                        //           height: 0,
+                        //           thickness: 1,
+                        //           color: Constanst.border,
+                        //         ),
+                        //   statusLog.isEmpty
+                        //       ? const SizedBox()
+                        //       : const SizedBox(height: 12),
+                        //   statusLog.isEmpty
+                        //       ? const SizedBox()
+                        //       : Text(
+                        //           "Riwayat Audit",
+                        //           style: GoogleFonts.inter(
+                        //             fontWeight: FontWeight.w400,
+                        //             fontSize: 14,
+                        //             color: Constanst.fgSecondary,
+                        //           ),
+                        //         ),
+                        //   statusLog.isEmpty
+                        //       ? const SizedBox()
+                        //       : const SizedBox(height: 12),
+                        //   statusLog.isEmpty
+                        //       ? const SizedBox()
+                        //       : ListView.builder(
+                        //           itemCount: statusLog.length,
+                        //           itemBuilder: (context, index) {
+                        //             var log = statusLog[index];
+                        //             return Padding(
+                        //               padding:
+                        //                   const EdgeInsets.only(bottom: 12.0),
+                        //               child: Row(
+                        //                 crossAxisAlignment:
+                        //                     CrossAxisAlignment.start,
+                        //                 children: [
+                        //                   Icon(
+                        //                     log['status'] == 'Rejected'
+                        //                         ? Iconsax.close_circle
+                        //                         : log['status']
+                        //                                 .toString()
+                        //                                 .contains("Approve")
+                        //                             ? Iconsax.tick_circle
+                        //                             : Iconsax.timer,
+                        //                     color: log['status'] == 'Rejected'
+                        //                         ? Constanst.color4
+                        //                         : log['status']
+                        //                                 .toString()
+                        //                                 .contains("Approve")
+                        //                             ? Colors.green
+                        //                             : Constanst.color3,
+                        //                     size: 20,
+                        //                   ),
+                        //                   const SizedBox(width: 8),
+                        //                   Expanded(
+                        //                     child: Column(
+                        //                       crossAxisAlignment:
+                        //                           CrossAxisAlignment.start,
+                        //                       children: [
+                        //                         Text(
+                        //                           "${log['status']} oleh ${log['by']}",
+                        //                           style: GoogleFonts.inter(
+                        //                             fontWeight: FontWeight.w500,
+                        //                             color: Constanst.fgPrimary,
+                        //                             fontSize: 14,
+                        //                           ),
+                        //                         ),
+                        //                         const SizedBox(height: 4),
+                        //                         Text(
+                        //                           log['date'],
+                        //                           style: GoogleFonts.inter(
+                        //                             fontWeight: FontWeight.w400,
+                        //                             color: Constanst.fgSecondary,
+                        //                             fontSize: 12,
+                        //                           ),
+                        //                         ),
+                        //                       ],
+                        //                     ),
+                        //                   ),
+                        //                 ],
+                        //               ),
+                        //             );
+                        //           }),
                       ],
                     ),
                   ),
                 ),
-                typeAjuan == 'Approve2' ||
-                        detailData['status_audit'] == 'Rejected'
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
-                        child: Container(
-                          height: 40,
-                          width: double.infinity,
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Constanst
-                                  .border, // Set the desired border color
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Get.back();
-                              detailData['status_audit'] == 'Rejected'
-                                  ? showGeneralDialog(
+                typeAjuan == 'Approve2' && detailData['status_audit'] == ''
+                    ? Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom: 16.0, top: 16.0),
+                              child: Container(
+                                height: 40,
+                                width: double.infinity,
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Constanst
+                                        .border, // Set the desired border color
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    statusCondition.value = 'Approve';
+                                    Get.back();
+                                    showGeneralDialog(
                                       barrierDismissible: false,
                                       context: Get.context!,
                                       barrierColor:
@@ -547,14 +778,13 @@ class AuditController extends GetxController {
                                             // our custom dialog
                                             title: "Peringatan",
                                             content:
-                                                "Apakah Anda yakin ingin membatalkan penolakan? "
-                                                "Surat Peringatan atau Teguran Lisan yang sudah diterbitkan "
-                                                "akan ditarik kembali.",
-                                            positiveBtnText: "Batalkan",
+                                                "Apakah Anda yakin ingin Meng-Approve Pengajuan ini? ",
+                                            positiveBtnText: "Approve",
                                             negativeBtnText: "Kembali",
                                             style: 1,
                                             buttonStatus: 1,
                                             positiveBtnPressed: () {
+                                              Get.back();
                                               approvAudit(detailData);
                                             },
                                           ),
@@ -565,34 +795,215 @@ class AuditController extends GetxController {
                                           Animation secondaryAnimation) {
                                         return null!;
                                       },
-                                    )
-                                  : showBottomApproval(detailData);
-                            },
-                            style: ElevatedButton.styleFrom(
-                                foregroundColor: Constanst.color4,
-                                backgroundColor: Constanst.colorWhite,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Constanst.color4,
+                                      backgroundColor: Constanst.colorWhite,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      elevation: 0,
+                                      // padding: EdgeInsets.zero,
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 0, 0, 0)),
+                                  child: Text(
+                                    'Approve',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.color5,
+                                        fontSize: 14),
+                                  ),
                                 ),
-                                elevation: 0,
-                                // padding: EdgeInsets.zero,
-                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                            child: Text(
-                              detailData['status_audit'] == 'Rejected'
-                                  ? 'Approve'
-                                  : 'Reject',
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  color:
-                                      detailData['status_audit'] == 'Rejected'
-                                          ? Constanst.color5
-                                          : Constanst.color4,
-                                  fontSize: 14),
+                              ),
                             ),
                           ),
-                        ),
+                          SizedBox(width: 8.0),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom: 16.0, top: 16.0),
+                              child: Container(
+                                height: 40,
+                                width: double.infinity,
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Constanst
+                                        .border, // Set the desired border color
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    statusCondition.value = 'Reject';
+                                    Get.back();
+                                    statusPemgajuanIzin.value = 'none';
+                                      selectedUsersEm_id.clear();
+                                      selectedUsersName.clear();
+                                      selectedUsersData.clear();
+                                      konsekuemsiList.clear();
+                                      searchSuratPeringatan('');
+                                      searchTeguranLisan('');
+                                    showBottomApproval(detailData);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Constanst.color4,
+                                      backgroundColor: Constanst.colorWhite,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      elevation: 0,
+                                      // padding: EdgeInsets.zero,
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 0, 0, 0)),
+                                  child: Text(
+                                    'Reject',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w500,
+                                        color: Constanst.color4,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       )
-                    : SizedBox()
+                    : detailData['status_audit'] == 'Rejected'
+                        ? Padding(
+                            padding:
+                                const EdgeInsets.only(bottom: 16.0, top: 16.0),
+                            child: Container(
+                              height: 40,
+                              width: double.infinity,
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Constanst
+                                      .border, // Set the desired border color
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  statusCondition.value = 'Approve';
+                                  Get.back();
+                                  showGeneralDialog(
+                                    barrierDismissible: false,
+                                    context: Get.context!,
+                                    barrierColor:
+                                        Colors.black54, // space around dialog
+                                    transitionDuration:
+                                        Duration(milliseconds: 200),
+                                    transitionBuilder:
+                                        (context, a1, a2, child) {
+                                      return ScaleTransition(
+                                        scale: CurvedAnimation(
+                                            parent: a1,
+                                            curve: Curves.elasticOut,
+                                            reverseCurve: Curves.easeOutCubic),
+                                        child: CustomDialog(
+                                          // our custom dialog
+                                          title: "Peringatan",
+                                          content:
+                                              "Apakah Anda yakin ingin membatalkan penolakan? "
+                                              "Surat Peringatan atau Teguran Lisan yang sudah diterbitkan "
+                                              "akan ditarik kembali.",
+                                          positiveBtnText: "Batalkan",
+                                          negativeBtnText: "Kembali",
+                                          style: 1,
+                                          buttonStatus: 1,
+                                          positiveBtnPressed: () {
+                                            approvAudit(detailData);
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    pageBuilder: (BuildContext context,
+                                        Animation animation,
+                                        Animation secondaryAnimation) {
+                                      return null!;
+                                    },
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    foregroundColor: Constanst.color4,
+                                    backgroundColor: Constanst.colorWhite,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    elevation: 0,
+                                    // padding: EdgeInsets.zero,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 0)),
+                                child: Text(
+                                  'Approve',
+                                  style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w500,
+                                      color: Constanst.color5,
+                                      fontSize: 14),
+                                ),
+                              ),
+                            ),
+                          )
+                        : detailData['status_audit'] == 'Approve'
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    bottom: 16.0, top: 16.0),
+                                child: Container(
+                                  height: 40,
+                                  width: double.infinity,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Constanst
+                                          .border, // Set the desired border color
+                                      width: 1.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      statusCondition.value = 'Reject';
+                                      Get.back();
+                                      statusPemgajuanIzin.value = 'none';
+                                      selectedUsersEm_id.clear();
+                                      selectedUsersName.clear();
+                                      selectedUsersData.clear();
+                                      konsekuemsiList.clear();
+                                      searchSuratPeringatan('');
+                                      searchTeguranLisan('');
+                                      showBottomApproval(detailData);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        foregroundColor: Constanst.color4,
+                                        backgroundColor: Constanst.colorWhite,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        elevation: 0,
+                                        // padding: EdgeInsets.zero,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 0, 0, 0)),
+                                    child: Text(
+                                      'Reject',
+                                      style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          color: Constanst.color4,
+                                          fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SizedBox()
               ],
             ),
           ),
@@ -602,6 +1013,11 @@ class AuditController extends GetxController {
   }
 
   void showBottomApproval(detailData) {
+    for (var user in availableUsers) {
+      final fullName =
+          (user['full_name'] != null) ? user['full_name'].toString() : 'N/A';
+      print('Full name: $fullName');
+    }
     showModalBottomSheet(
       context: Get.context!,
       isScrollControlled: true,
@@ -660,72 +1076,80 @@ class AuditController extends GetxController {
                           ),
                           Obx(() {
                             var sp = searchSp;
-                            return searchSp.isNotEmpty
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                      color: Constanst.infoLight1,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Iconsax.info_circle5,
-                                          color: Constanst.colorPrimary,
-                                          size: 26,
+                            return statusPemgajuanIzin.value == 'none'
+                                ? SizedBox()
+                                : searchSp.isNotEmpty
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                          color: Constanst.infoLight1,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            sp[0]['status'] == 'Approve'
-                                                ? "Karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}"
-                                                : 'Karyawan ${sp[0]['nama']} mempunyai surat peringatan dengan nomor ${sp[0]['nomor']}, status: ${sp[0]['status']}',
-                                            textAlign: TextAlign.left,
-                                            style: GoogleFonts.inter(
-                                                fontWeight: FontWeight.w400,
-                                                color: Constanst.fgSecondary,
-                                                fontSize: 14),
-                                          ),
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Iconsax.info_circle5,
+                                              color: Constanst.colorPrimary,
+                                              size: 26,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Text(
+                                                sp[0]['status'] == 'Approve'
+                                                    ? "Karyawan ${sp[0]['nama']} mempunyai surat peringatan yang sedang aktif dengan nomor ${sp[0]['nomor']} berakhir pada tanggal ${sp[0]['exp']}"
+                                                    : 'Karyawan ${sp[0]['nama']} mempunyai surat peringatan dengan nomor ${sp[0]['nomor']}, status: ${sp[0]['status']}',
+                                                textAlign: TextAlign.left,
+                                                style: GoogleFonts.inter(
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        Constanst.fgSecondary,
+                                                    fontSize: 14),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                : SizedBox();
+                                      )
+                                    : SizedBox();
                           }),
                           SizedBox(height: 12),
                           Obx(() {
                             var tl = searchTl;
-                            return searchTl.isNotEmpty
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                      color: Constanst.infoLight1,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Iconsax.info_circle5,
-                                          color: Constanst.colorPrimary,
-                                          size: 26,
+                            return statusPemgajuanIzin.value == 'none'
+                                ? SizedBox()
+                                : searchTl.isNotEmpty
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                          color: Constanst.infoLight1,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            tl[0]['status'] == 'Approve'
-                                                ? "Karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}"
-                                                : 'Karyawan ${tl[0]['nama']} mempunyai teguran lisan dengan nomor ${tl[0]['nomor']}, status: ${tl[0]['status']}',
-                                            textAlign: TextAlign.left,
-                                            style: GoogleFonts.inter(
-                                                fontWeight: FontWeight.w400,
-                                                color: Constanst.fgSecondary,
-                                                fontSize: 14),
-                                          ),
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Iconsax.info_circle5,
+                                              color: Constanst.colorPrimary,
+                                              size: 26,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Text(
+                                                tl[0]['status'] == 'Approve'
+                                                    ? "Karyawan ${tl[0]['nama']} mempunyai teguran lisan yang sedang aktif dengan nomor ${tl[0]['nomor']} berakhir pada tanggal ${tl[0]['exp']}"
+                                                    : 'Karyawan ${tl[0]['nama']} mempunyai teguran lisan dengan nomor ${tl[0]['nomor']}, status: ${tl[0]['status']}',
+                                                textAlign: TextAlign.left,
+                                                style: GoogleFonts.inter(
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        Constanst.fgSecondary,
+                                                    fontSize: 14),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                : SizedBox();
+                                      )
+                                    : SizedBox();
                           }),
                           const SizedBox(height: 12),
                           Obx(() {
@@ -819,6 +1243,89 @@ class AuditController extends GetxController {
                                 ? SizedBox()
                                 : Column(
                                     children: [
+                                      Text(
+                                        'Berikan Surat Peringatan Kepada : ',
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            fontSize: 11),
+                                      ),
+                                      // Buatlah tampilkan untuk memilih user yang akan di berikan surat bisa multiple dan jumlah total ada 3
+                                      Obx(() {
+                                        if (availableUsers.isEmpty) {
+                                          return CircularProgressIndicator(); // atau SizedBox.shrink();
+                                        }
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            DropdownSearch<
+                                                Map<String,
+                                                    dynamic>>.multiSelection(
+                                              items: availableUsers
+                                                  .cast<Map<String, dynamic>>()
+                                                  .where((user) =>
+                                                      !selectedUsersData.any(
+                                                          (sel) =>
+                                                              sel['em_id'] ==
+                                                              user['em_id']))
+                                                  .toList(),
+                                              selectedItems:
+                                                  selectedUsersData.toList(),
+                                              itemAsString: (item) =>
+                                                  item?['full_name'] ?? '',
+                                              compareFn: (item, selectedItem) =>
+                                                  item['em_id'] ==
+                                                  selectedItem['em_id'],
+                                              popupProps:
+                                                  PopupPropsMultiSelection
+                                                      .dialog(
+                                                showSelectedItems: true,
+                                              ),
+                                              dropdownDecoratorProps:
+                                                  DropDownDecoratorProps(
+                                                baseStyle: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 11),
+                                                dropdownSearchDecoration:
+                                                    InputDecoration(
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText:
+                                                            "Pilih Pengguna",
+                                                        labelStyle: TextStyle(
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                            fontSize: 11)),
+                                              ),
+                                              onChanged:
+                                                  (List<Map<String, dynamic>>
+                                                      selected) {
+                                                selectedUsersData.value =
+                                                    selected;
+                                                selectedUsersName.value =
+                                                    selected
+                                                        .map((e) =>
+                                                            e['full_name']
+                                                                ?.toString() ??
+                                                            '')
+                                                        .toList();
+                                                selectedUsersEm_id.value =
+                                                    selected
+                                                        .map((e) =>
+                                                            e['em_id']
+                                                                ?.toString() ??
+                                                            '')
+                                                        .toList();
+                                                searchSuratPeringatan(
+                                                    selectedUsersEm_id);
+                                                searchTeguranLisan(
+                                                    selectedUsersEm_id);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                      SizedBox(height: 4.0),
                                       Container(
                                         decoration: BoxDecoration(
                                             color: Colors.white,
@@ -1007,6 +1514,8 @@ class AuditController extends GetxController {
                                 child: TextButtonWidget(
                                   title: "Menyetujui",
                                   onTap: () {
+                                    print(
+                                        'ini selected user $selectedUsersData');
                                     bool data = konsekuemsiList.any(
                                         (konsekuensi) =>
                                             konsekuensi['konsekuensi']
@@ -1057,21 +1566,51 @@ class AuditController extends GetxController {
 
   void approvAudit(detailData) {
     Map<String, dynamic> body = {
+      'em_id_surat': selectedUsersEm_id,
+      'full_name_surat': selectedUsersName,
       'konsekuensi': statusPemgajuanIzin.value,
       'list_konsekuensi': konsekuemsiList,
-      'status': detailData['status_audit'] == 'Rejected' ? '' : 'Rejected',
+      'alasan': alasanReject.value.text,
+      'status': detailData['status_audit'] == 'Approve' ||
+              statusCondition.value == 'Reject'
+          ? 'Rejected'
+          : '',
       'tipe_form': detailData['tipe_pengajuan'],
-      'full_name': detailData['full_name']
+      'full_name': AppData.informasiUser![0].full_name
     };
     var connect =
         Api.connectionApi("post", body, "audit/${detailData['id']}/approval");
     connect.then((dynamic res) {
       var valueBody = jsonDecode(res.body);
       if (res.statusCode == 200) {
-        Get.back();
-        Get.back();
-        statusPemgajuanIzin.value = '';
+        // Get.back();
+        statusPemgajuanIzin.value = 'none';
+        selectedUsersEm_id.clear();
+        selectedUsersName.clear();
+        selectedUsersData.clear();
+        alasanReject.value.clear();
         konsekuemsiList.clear();
+        if (detailData['status_audit'] == 'Rejected') {
+          Get.back();
+          tempfilterStatusAudit.value = 'Approve';
+          filterStatusAudit.value = 'Approve';
+          fetchAuditData(isLoadMore: false);
+        } else if (detailData['status_audit'] == 'Approve') {
+          tempfilterStatusAudit.value = 'Reject';
+          filterStatusAudit.value = 'Reject';
+          fetchAuditData(isLoadMore: false);
+        } else {
+          if (statusCondition.value == 'Approve') {
+            tempfilterStatusAudit.value = 'Approve';
+            filterStatusAudit.value = 'Approve';
+            fetchAuditData(isLoadMore: false);
+          } else {
+            tempfilterStatusAudit.value = 'Reject';
+            filterStatusAudit.value = 'Reject';
+            fetchAuditData(isLoadMore: false);
+          }
+        }
+        statusPemgajuanIzin.value = 'none';
         UtilsAlert.showToast(valueBody['message']);
       } else {
         UtilsAlert.showToast(valueBody['message']);
@@ -1102,5 +1641,239 @@ class AuditController extends GetxController {
   // Example method to remove an audit entry
   void loadMoreData() {
     fetchAuditData(isLoadMore: true);
+  }
+
+  Future<void> generateAndOpenPdf() async {
+    final pdf = pw.Document();
+    final pdfColor = Colors.red;
+    final int colorInt = pdfColor.value;
+    final imageData = await rootBundle.load('assets/icon.png');
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return [
+            // Header
+            pw.Center(
+              child: pw.Column(
+                children: [
+                  pw.SizedBox(height: 30),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    children: [
+                      pw.SizedBox(
+                        width: 70,
+                        child: pw.Image(
+                          pw.MemoryImage(imageData.buffer.asUint8List()),
+                          width: 70,
+                        ),
+                      ),
+                      pw.SizedBox(width: 25),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'PT . SHAN INFORMASI SISTEM',
+                            style: pw.TextStyle(
+                              fontSize: 24,
+                              color: PdfColor.fromInt(colorInt),
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                          pw.SizedBox(height: 8),
+                          pw.Text(
+                            'BEST SOLUTION FOR BUSINESS CONTROL',
+                            style: pw.TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 12),
+                  pw.Divider(thickness: 1),
+                ],
+              ),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // Title
+            pw.Center(
+              child: pw.Text(
+                'AUDIT REPORT',
+                style:
+                    pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+              ),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            _buildInfoRow("Filter Cabang", selectedBranch.value),
+            _buildInfoRow("Filter Karyawan", tempNamaStatus1.value),
+            _buildInfoRow("Filter Tipe Form", tempFilterTipeForm.value),
+            _buildInfoRow("Filter Status Pengajuan", tempFilterStatus.value),
+            _buildInfoRow("Filter Status Audit", tempfilterStatusAudit.value),
+            _buildInfoRow("FIlter Periode",
+                Constanst.convertDateBulanDanTahun(bulanDanTahunNow.value)),
+
+            pw.SizedBox(height: 20),
+
+            // Tabel Task
+            _buildTaskTable(auditList.cast<Map<String, dynamic>>()),
+          ];
+        },
+      ),
+    );
+
+    // Simpan PDF
+    final outputDir = await getTemporaryDirectory();
+    final filePath = '${outputDir.path}/audit_report.pdf';
+    final file = File(filePath);
+    await file.writeAsBytes(await pdf.save());
+
+    // Buka PDF
+    final result = await OpenFile.open(filePath);
+    if (result.type != ResultType.done) {
+      // Get.snackbar('Error', 'Failed to open PDF', snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  pw.Widget _buildInfoRow(String title, String value) {
+    return pw.Container(
+      padding: pw.EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Expanded(
+            flex: 24,
+            child: pw.Text(title,
+                style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold, fontSize: 10.0)),
+          ),
+          pw.Text(":"),
+          pw.SizedBox(width: 4),
+          pw.Expanded(
+            flex: 68,
+            child: pw.Text(value,
+                style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.normal, fontSize: 10.0)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildTaskTable(List<Map<String, dynamic>> auditList) {
+    final headers = [
+      "No",
+      "Kode",
+      "Nama Pengajuan",
+      "Tipe",
+      "Tgl Form",
+      "Durasi Form",
+      "Approve 1",
+      "Approve 2",
+      "Status Audit",
+      "Konsesuensi",
+      "Penerima Konsekuensi",
+      "Pelanggaran Yang Dilakukan"
+    ];
+
+    final Map<String, int> tanggalRowSpan = {};
+    final List<List> data = auditList.map((item) {
+      String parseApprover(String? approverJson) {
+        if (approverJson == null || approverJson.isEmpty) return '';
+        try {
+          final decoded = json.decode(approverJson);
+          return decoded['full_name'] ?? '';
+        } catch (e) {
+          return '';
+        }
+      }
+
+      return [
+        (auditList.indexOf(item) + 1).toString(),
+        item['nomor'] ?? '',
+        item['full_name'] ?? '',
+        item['tipe_pengajuan'] ?? '',
+        item['atten_date'] ?? '',
+        item['durasi_form'] ?? '',
+        parseApprover(item['approve1']),
+        parseApprover(item['approve2']),
+        item['status_audit'] ?? '',
+        item['konsekuensi'] ?? '',
+        item['penerima_konsekuensi'] ?? '',
+        item['pelanggaran'] ?? '',
+      ];
+    }).toList();
+
+    return pw.Table(
+      border: pw.TableBorder.all(width: 1),
+      columnWidths: {
+        0: pw.FixedColumnWidth(50), // No
+        1: pw.FixedColumnWidth(95), // Kode
+        2: pw.FixedColumnWidth(80), // Nama Pengaju
+        3: pw.FixedColumnWidth(80), // Tipe
+        4: pw.FixedColumnWidth(80), // Tgl Form
+        5: pw.FixedColumnWidth(80), // Durasi Form
+        6: pw.FixedColumnWidth(80), // Approve 1
+        7: pw.FixedColumnWidth(80), // Approve 2
+        8: pw.FixedColumnWidth(80), // Status Audit
+        9: pw.FixedColumnWidth(80), // Konsekuensi
+        10: pw.FixedColumnWidth(80), // Penerima Konsekuensi
+        11: pw.FixedColumnWidth(80), // Pelanggaran yang dilakukan
+      },
+      children: [
+        // Header Tabel
+        pw.TableRow(
+          decoration: pw.BoxDecoration(color: PdfColors.grey300),
+          children: headers.map((header) {
+            return pw.Padding(
+              padding: pw.EdgeInsets.all(8),
+              child: pw.Text(
+                header,
+                style:
+                    pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 4.0),
+                textAlign: pw.TextAlign.center,
+              ),
+            );
+          }).toList(),
+        ),
+
+        ..._buildMergedTableRows(data, tanggalRowSpan),
+      ],
+    );
+  }
+
+  List<pw.TableRow> _buildMergedTableRows(
+      List<List<dynamic>> data, Map<String, int> tanggalRowSpan) {
+    List<pw.TableRow> rows = [];
+
+    for (var row in data) {
+      // String currentDate = row[1];
+
+      rows.add(
+        pw.TableRow(
+          verticalAlignment: pw.TableCellVerticalAlignment.middle,
+          children: [
+            for (int i = 0; i < row.length; i++)
+              pw.Padding(
+                padding: pw.EdgeInsets.all(6),
+                child: pw.Text(
+                  row[i],
+                  textAlign:
+                      (i == 3) ? pw.TextAlign.justify : pw.TextAlign.center,
+                  style: pw.TextStyle(fontSize: 4.0),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    return rows;
   }
 }

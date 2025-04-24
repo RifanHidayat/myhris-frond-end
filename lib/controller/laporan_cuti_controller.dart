@@ -82,7 +82,7 @@ class LaporanCutiController extends GetxController {
   // void toggleSearch() {
   //   isSearching.value = !isSearching.value;
   // }
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
 
   @override
   void onReady() async {

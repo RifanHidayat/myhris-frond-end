@@ -34,8 +34,8 @@ class _AktifitasState extends State<Aktifitas> {
   @override
   initState(){
     super.initState();
-    // controller.getInformasiAktivitas();
-    // controller.loadAktifitas();
+    controller.getInformasiAktivitas();
+    controller.loadAktifitas();
   }
 
   Widget build(BuildContext context) {

@@ -26,7 +26,7 @@ class Lembur extends StatefulWidget {
 
 class _LemburState extends State<Lembur> {
   final controller = Get.put(LemburController());
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
   final dashboardController = Get.put(DashboardController());
   var idx = 0;
 

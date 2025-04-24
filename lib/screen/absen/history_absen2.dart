@@ -29,7 +29,7 @@
 // }
 
 // class _HistoryAbsenState extends State<HistoryAbsen> {
-//   var controller = Get.put(AbsenController());
+//   var controller = Get.find<AbsenController>();
 
 //   @override
 //   void initState() {

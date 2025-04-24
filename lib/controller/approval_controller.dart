@@ -40,7 +40,7 @@ class ApprovalController extends GetxController {
   var statusCari = false.obs;
   var listStatusPengajuan = <Map<String, String>>[].obs;
 
-  var statusPemgajuanIzin = ''.obs;
+  var statusPemgajuanIzin = 'none'.obs;
   var listStatusPengajuanSP = [
             {'name': "None", 'value': "none"},
             {'name': "Potong Cuti", 'value': "potong_cuti"},
@@ -75,7 +75,7 @@ class ApprovalController extends GetxController {
 
   var statusHitungCuti = false.obs;
 
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
 
   var saldo = 0.obs;
   var limitTransaksi = 0.obs;
@@ -1307,6 +1307,7 @@ class ApprovalController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
+        print(valueBody);
         fullNameDelegasi.value = valueBody['data'][0]['full_name'];
         this.fullNameDelegasi.refresh();
       }
@@ -2523,6 +2524,10 @@ class ApprovalController extends GetxController {
         ? ", Alasan pengajuan di tolak = ${alasanReject.value.text}"
         : "";
 
+    var listKonsekuensi = '';
+    print(konsekuemsiList);
+    listKonsekuensi =
+        konsekuemsiList.map((item) => item['konsekuensi']).join(',');
     var body = {
       'id': id.toString(),
       'em_id': ajuanEmid.toString(),
@@ -2555,6 +2560,8 @@ class ApprovalController extends GetxController {
       "endTime": endTime.value,
       "startDate": startDate.value,
       "endDate": endDate.value,
+      'konsekuensi': listKonsekuensi,
+      'tipe_surat': statusPemgajuanIzin.value,
     };
     print("body approve new 2 ${body}");
 

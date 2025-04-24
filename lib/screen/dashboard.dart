@@ -76,7 +76,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   final controller = Get.put(DashboardController());
-  final controllerAbsensi = Get.put(AbsenController());
+  final controllerAbsensi = Get.find<AbsenController>();
   final controllerTracking = Get.put(TrackingController());
   final controllerPeraturan = Get.put(PeraturanPerusahaanController());
   final settingController = Get.put(SettingController());
@@ -88,13 +88,14 @@ class _DashboardState extends State<Dashboard> {
   // var controllerTugasLuar = Get.put(TugasLuarController());
   // var controllerKlaim = Get.put(KlaimController());
 
-  final controllerPesan = Get.put(PesanController());
-  var controllerGlobal = Get.put(GlobalController());
+  final controllerPesan = Get.find<PesanController>();
+  var controllerGlobal = Get.find<GlobalController>();
   var controllerBpj = Get.put(BpjsController());
   final tabbController = Get.put(TabbController());
   final authController = Get.put(AuthController());
   final chatController = Get.put(ChatController());
-  final internetController = Get.put(InternetController());
+  final internetController =
+      Get.find<InternetController>(tag: 'AuthController');
   final auditController = Get.put(AuditController());
 
   var intervalTracking = "";
@@ -561,92 +562,108 @@ class _DashboardState extends State<Dashboard> {
                                       ? const SizedBox()
                                       : sliderBanner(),
                                   const SizedBox(height: 10),
-
-                                  // controller.showPengumuman.value == false
-                                  //     ? const SizedBox()
-                                  //     : controller
-                                  //             .informasiDashboard.value.isEmpty
-                                  //         ? const SizedBox()
-                                  //         : Column(
-                                  //             children: [
-                                  //               Container(
-                                  //                 width: double.infinity,
-                                  //                 height: 6,
-                                  //                 color: Constanst
-                                  //                     .colorNeutralBgSecondary,
-                                  //               ),
-                                  //               Padding(
-                                  //                 padding:
-                                  //                     const EdgeInsets.only(
-                                  //                         left: 16.0,
-                                  //                         top: 16.0,
-                                  //                         right: 8.0),
-                                  //                 child: Row(
-                                  //                   crossAxisAlignment:
-                                  //                       CrossAxisAlignment
-                                  //                           .start,
-                                  //                   mainAxisAlignment:
-                                  //                       MainAxisAlignment
-                                  //                           .spaceBetween,
-                                  //                   children: [
-                                  //                     Text(
-                                  //                       "Informasi",
-                                  //                       style:
-                                  //                           GoogleFonts.inter(
-                                  //                               color: Constanst
-                                  //                                   .fgPrimary,
-                                  //                               fontSize: 18,
-                                  //                               fontWeight:
-                                  //                                   FontWeight
-                                  //                                       .w500),
-                                  //                     ),
-                                  //                     Material(
-                                  //                       color: Constanst
-                                  //                           .colorWhite,
-                                  //                       child: InkWell(
-                                  //                         customBorder:
-                                  //                             RoundedRectangleBorder(
-                                  //                           borderRadius:
-                                  //                               Constanst
-                                  //                                   .borderStyle5,
-                                  //                         ),
-                                  //                         onTap: () =>
-                                  //                             Get.to(Informasi(
-                                  //                           index: 0,
-                                  //                         )),
-                                  //                         child: Padding(
-                                  //                           padding:
-                                  //                               const EdgeInsets
-                                  //                                   .fromLTRB(
-                                  //                                   8.0,
-                                  //                                   3.0,
-                                  //                                   8.0,
-                                  //                                   3.0),
-                                  //                           child: Text(
-                                  //                             "Lihat semua",
-                                  //                             style: GoogleFonts.inter(
-                                  //                                 fontSize: 14,
-                                  //                                 fontWeight:
-                                  //                                     FontWeight
-                                  //                                         .w500,
-                                  //                                 color: Constanst
-                                  //                                     .infoLight),
-                                  //                           ),
-                                  //                         ),
-                                  //                       ),
-                                  //                     ),
-                                  //                   ],
-                                  //                 ),
-                                  //               ),
-                                  //             ],
-                                  //           ),
-
-                                  // controller.showPengumuman.value == false
-                                  //     ? const SizedBox()
-                                  //     : controller
-                                  //             .informasiDashboard.value.isEmpty
-                                  //         ? const SizedBox()
-                                  //         : listInformasi(),
+                                  controller.showApresiasi.value == false
+                                      ? const SizedBox()
+                                      : controller.employeeApresiasi.isEmpty
+                                          ? const SizedBox()
+                                          : Column(
+                                              children: [
+                                                Container(
+                                                  width: double.infinity,
+                                                  height: 6,
+                                                  color: Constanst
+                                                      .colorNeutralBgSecondary,
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 16.0,
+                                                          top: 16.0,
+                                                          right: 8.0),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Apresiasi Karyawan",
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                                color: Constanst
+                                                                    .fgPrimary,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                      ),
+                                                      Material(
+                                                        color: Constanst
+                                                            .colorWhite,
+                                                        child: InkWell(
+                                                          customBorder:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                Constanst
+                                                                    .borderStyle5,
+                                                          ),
+                                                          onTap: () {
+                                                            if (controller
+                                                                    .isShowAllApresiasi
+                                                                    .value ==
+                                                                true) {
+                                                              controller
+                                                                  .isShowAllApresiasi
+                                                                  .value = false;
+                                                            } else {
+                                                              controller
+                                                                  .isShowAllApresiasi
+                                                                  .value = true;
+                                                            }
+                                                          },
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .fromLTRB(
+                                                                    8.0,
+                                                                    3.0,
+                                                                    8.0,
+                                                                    3.0),
+                                                            child: Text(
+                                                              controller.isShowAllApresiasi
+                                                                          .value ==
+                                                                      true
+                                                                  ? "Sembunyikan"
+                                                                  : "Lihat semua",
+                                                              style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: Constanst
+                                                                      .infoLight),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                  controller.showApresiasi.value == false
+                                      ? const SizedBox()
+                                      : controller.employeeApresiasi.isEmpty
+                                          ? const SizedBox()
+                                          : const SizedBox(height: 8),
+                                  controller.showApresiasi.value == false
+                                      ? const SizedBox()
+                                      : controller.employeeApresiasi.isEmpty
+                                          ? const SizedBox()
+                                          : listEmployeeApresiasi(),
+                                  const SizedBox(height: 16),
 
                                   controller.showPkwt.value == false
                                       ? const SizedBox()
@@ -3892,6 +3909,170 @@ class _DashboardState extends State<Dashboard> {
                 ),
               );
             }));
+  }
+
+  Widget listEmployeeApresiasi() {
+    final screenWidth = MediaQuery.of(context).size.width; // Ambil lebar layar
+    const crossAxisCount = 2; // Jumlah kolom
+    const crossAxisSpacing = 12.0; // Spasi antar kolom
+    final itemWidth =
+        (screenWidth - (crossAxisSpacing * (crossAxisCount - 1))) /
+            crossAxisCount; // Lebar item
+    final itemHeight =
+        itemWidth * 1.4; // Misalnya tinggi 20% lebih besar dari lebar
+    final childAspectRatio = itemWidth / itemHeight;
+
+    return GridView.builder(
+      itemCount: controller.isShowAllApresiasi.value
+          ? controller.employeeApresiasi.length
+          : (controller.employeeApresiasi.length > 2
+              ? 2
+              : controller.employeeApresiasi.length),
+      shrinkWrap: true,
+      physics: const BouncingScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.0,
+        mainAxisSpacing: 16.0,
+        childAspectRatio: childAspectRatio,
+      ),
+      itemBuilder: (context, index) {
+        var apresiasi = controller.employeeApresiasi[index];
+        var fullname = apresiasi['full_name'] ?? '-';
+        var image = apresiasi['em_image'] ?? '';
+        var message = apresiasi['perihal_apresiasi'] ?? '-';
+        var nomorHp = apresiasi['em_mobile'] ?? '';
+        var tipeApresiasi = apresiasi['type'] ?? '';
+
+        // print('ini tipe apresiasi $tipeApresiasi');
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Constanst.colorNeutralBgTertiary,
+                width: 1.0,
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        'assets/bg_employee.png',
+                        width: double.infinity,
+                        // fit: BoxFit.cover,
+                      ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(90),
+                            child: CachedNetworkImage(
+                              imageUrl: "${Api.UrlfotoProfile}$image",
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) => Center(
+                                child: CircularProgressIndicator(
+                                  value: downloadProgress.progress,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  SvgPicture.asset(
+                                'assets/avatar_default.svg',
+                                width: 95,
+                                height: 110,
+                                fit: BoxFit.cover,
+                              ),
+                              fit: BoxFit.cover,
+                              width: 95,
+                              height: 110,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        left: 0,
+                        bottom: -4,
+                        child: Image.asset(
+                            tipeApresiasi == 'disiplin'
+                                ? 'assets/disiplin.png'
+                                : tipeApresiasi == 'most_valuable'
+                                    ? 'assets/most_valuable.png'
+                                    : 'assets/top_performer.png',
+                            height: 50,
+                            width: 50),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    fullname,
+                    style: GoogleFonts.inter(
+                      color: Constanst.fgPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    message,
+                    style: GoogleFonts.inter(
+                      color: Constanst.fgSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Material(
+                  color: Constanst.infoLight1,
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  child: InkWell(
+                    customBorder: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    onTap: () {
+                      var message =
+                          "Selamat Yah Atas Pencapaiannya $fullname, ";
+                      var nomorUltah = nomorHp;
+                      controllerGlobal.kirimUcapanWa(message, nomorUltah);
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                          child: Text(
+                            "Beri ucapan 🎉",
+                            style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: Constanst.infoLight,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget listReminderPkwt() {

@@ -126,6 +126,16 @@ class Constanst {
     );
   }
 
+  static String convertDateAndClock(String dateString) {
+    try {
+      final dateTime = DateTime.parse(dateString);
+      final formatter = DateFormat('yyyy-MM-dd HH:mm');
+      return formatter.format(dateTime);
+    } catch (e) {
+      return '-';
+    }
+  }
+
   static String convertDate(String date) {
     DateTime convert = DateTime.parse(date);
     var hari = DateFormat('EEEE');
@@ -140,7 +150,7 @@ class Constanst {
   static String convertDate1(String date) {
     var inputFormat = DateFormat('yyyy-MM-dd');
     var inputDate = inputFormat.parse(date);
-    var outputFormat = DateFormat('dd-MM-yyyy');
+    var outputFormat = DateFormat('dd-MM-yyyy', 'id_ID');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }

@@ -24,7 +24,7 @@ class Pesan extends StatefulWidget {
 }
 
 class _PesanState extends State<Pesan> {
-  final controller = Get.put(PesanController());
+  final controller = Get.find<PesanController>();
   final authController = Get.put(AuthController());
 
   Future<void> refreshData() async {

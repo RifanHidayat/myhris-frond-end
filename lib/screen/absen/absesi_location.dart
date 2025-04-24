@@ -14,7 +14,7 @@ class AbsensiLocation extends StatefulWidget {
 }
 
 class _AbsensiLocationState extends State<AbsensiLocation> {
-  final controllerAbsensi = Get.put(AbsenController());
+  final controllerAbsensi = Get.find<AbsenController>();
   // final FaceDetector _faceDetector = FaceDetector(
   //   options: FaceDetectorOptions(
   //     enableContours: true,

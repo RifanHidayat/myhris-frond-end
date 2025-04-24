@@ -35,7 +35,7 @@ class _AbsenIstirahatMasukKeluarState extends State<AbsenIstirahatMasukKeluar> {
   double _panelHeightOpen = 0;
   double _panelHeightClosed = 250.0;
   final panelController = PanelController();
-  final controller = Get.put(AbsenController());
+  final controller = Get.find<AbsenController>();
   final controllerDashboard = Get.put(DashboardController());
   FocusNode myfocus = FocusNode();
 
@@ -758,6 +758,7 @@ class _AbsenIstirahatMasukKeluarState extends State<AbsenIstirahatMasukKeluar> {
                                                           8.0),
                                                   side: const BorderSide(color: Colors.white)))),
                                       onPressed: () async {
+                                        controller.getPosisition();
                                         final packageInfo =
                                             await PackageInfo.fromPlatform();
                                             

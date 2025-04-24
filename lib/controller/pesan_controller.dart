@@ -42,7 +42,7 @@ import 'package:url_launcher/url_launcher.dart';
 class PesanController extends GetxController {
   PageController menuController = PageController(initialPage: 0);
   RefreshController refreshController = RefreshController(initialRefresh: true);
-  var controllerApproval = Get.put(ApprovalController());
+  var controllerApproval = Get.find<ApprovalController>();
 
   var cari = TextEditingController().obs;
 
@@ -819,6 +819,8 @@ class PesanController extends GetxController {
       );
       // print('ini idx $idx, $');
     } else if (title == "Approval Cuti" || url == "Cuti") {
+      controllerApproval.searchSuratPeringatan(emIdPengaju);
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Cuti',
         () => DetailPersetujuanCuti(
@@ -833,6 +835,8 @@ class PesanController extends GetxController {
         url == "Izin" ||
         url == "sakit" ||
         url == "TidakHadir") {
+      controllerApproval.searchSuratPeringatan(emIdPengaju);
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Tidak Hadir',
         () => DetailPersetujuanIzin(
@@ -883,6 +887,8 @@ class PesanController extends GetxController {
         idx,
       );
     } else if (title == "Approval Absensi" || url == "Absensi") {
+      controllerApproval.searchSuratPeringatan(emIdPengaju);
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Absensi',
         () => DetailPersetujuanAbsensi(
@@ -914,6 +920,7 @@ class PesanController extends GetxController {
       );
     } else if (title == "Approval Surat Peringatan" ||
         url == 'Surat Peringatan') {
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Surat Peringatan',
         () => DetailPersetujuanSuratPeringatan(
