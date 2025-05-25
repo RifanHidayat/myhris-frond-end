@@ -32,19 +32,6 @@ class PinjamanController extends GetxController {
           pinjamanList.value = cekData;
           tempData.value = cekData;
           filter();
-
-          // if (statusSelected.value == "Semua Status") {
-          //   var cekData = valueBody['data'];
-          //   pinjamanList.value = cekData;
-          //   tempData.value == cekData;
-          // } else {
-          //   var cekData = valueBody['data'];
-          //   pinjamanList.value = cekData;
-          //   tempData.value == cekData;
-          //   pinjamanList.value = tempData.value
-          //       .where((i) => i['status'] == statusSelected.value)
-          //       .toList();
-          // }
         }
       } else {
         pinjamanList.value = [];
@@ -88,20 +75,6 @@ class PinjamanController extends GetxController {
       return false;
     }
 
-    // var connect = Api.connectionApi("get", {}, "pinjaman/detail/$id");
-    // connect.then(
-    //   (dynamic res) {
-    //     var valueBody = jsonDecode(res.body);
-    //     if (res.statusCode == 200) {
-    //       if (valueBody['status'] == false) {
-    //         print("datanya gada");
-    //       } else {
-    //         detailData.value = List.from(valueBody['data']['detail']);
-    //         print("waduh : ${detailData.value}");
-    //       }
-    //     }
-    //   },
-    // );
   }
 
   Future<bool> simpanData(tanggal, keterangan) async {

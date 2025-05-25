@@ -15,7 +15,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:web_socket_channel/io.dart';
 
 class InfoKaryawan extends StatelessWidget {
-  final controller = Get.put(SettingController());
+  final controller = Get.find<SettingController>();
 
   @override
   Widget build(BuildContext context) {

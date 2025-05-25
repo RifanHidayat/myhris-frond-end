@@ -273,20 +273,20 @@ class TrackingController extends GetxController {
     isMaximizeDetail.value = !isMaximizeDetail.value;
   }
 
-  @override
-  void onReady() async {
-    print("Masulk ke controller absen");
-    DashboardController().updateInformasiUser();
-    getTimeNow();
-    getLoadsysData();
-    loadHistoryAbsenUser();
-    getDepartemen(1, "");
-    filterLokasiKoordinate.value = "Lokasi";
-    selectedViewFilterAbsen.value = 0;
-    pilihTanggalTelatAbsen.value = DateTime.now();
-    super.onReady();
-    userShift();
-  }
+  // @override
+  // void onReady() async {
+  //   print("Masulk ke controller absen");
+  //   DashboardController().updateInformasiUser();
+  //   getTimeNow();
+  //   getLoadsysData();
+  //   // loadHistoryAbsenUser();
+  //   getDepartemen(1, "");
+  //   filterLokasiKoordinate.value = "Lokasi";
+  //   selectedViewFilterAbsen.value = 0;
+  //   pilihTanggalTelatAbsen.value = DateTime.now();
+  //   super.onReady();
+  //   userShift();
+  // }
 
   void getLoadsysData() {
     var connect = Api.connectionApi("get", "", "sysdata");
@@ -1531,15 +1531,14 @@ class TrackingController extends GetxController {
       // 'alamat': address.toString(),
       // 'database': AppData.selectedDatabase,
     };
-    print('parameter updateStatus ${body}');
 
     try {
       var response =
           await ApiRequest(url: "employee-tracking-update", body: body).post();
-      print('parameter ${response}');
+
       var resp = jsonDecode(response.body);
 
-      print('parameter updateStatus ${resp}');
+
 
       if (response.statusCode == 200) {
       } else {}

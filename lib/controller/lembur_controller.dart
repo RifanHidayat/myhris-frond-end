@@ -216,7 +216,6 @@ class LemburController extends GetxController {
               element['em_id'] != AppData.informasiUser![0].em_id) {
             var fullName = element['full_name'] ?? "";
             infoEmployeeAll.value.add(element);
-            print(fullName);
           }
         }
         if (idpengajuanLembur.value == "") {
@@ -290,7 +289,6 @@ class LemburController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         var overtimeData = valueBody['data'][0]['overtime_id'];
-        print("overtime data ${overtimeData}");
         loadDataTypeOvertime(overtimeData);
       }
     });
@@ -302,11 +300,9 @@ class LemburController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        print('ini load data tipe overtime ${valueBody}');
 
         var data = valueBody['data'];
         List overtimeUser = overtimeData.split(',');
-        print(overtimeUser);
         List tampung = [];
         for (var element in data) {
           for (var element1 in overtimeUser) {
@@ -456,7 +452,6 @@ class LemburController extends GetxController {
         if (res.statusCode == 200) {
           var valueBody = jsonDecode(res.body);
           var data = valueBody['data'];
-          print("data delegasi ${data}");
           for (var element in data) {
             if (element['status'] == 'ACTIVE') {
               var fullName = element['full_name'] ?? "";
@@ -609,13 +604,16 @@ class LemburController extends GetxController {
           sampaiJam.value.text == "" ||
           catatan.value.text == "" ||
           selectedDropdownDelegasi.value == "" ||
-          selectedDropdownEmploy.isEmpty ||
-          listTask.isEmpty) {
+          selectedDropdownEmploy.isEmpty
+          ) {
         print('ini kepangil');
         UtilsAlert.showToast("Lengkapi form *");
       } else if (isTaskEmpty) {
         UtilsAlert.showToast("Wajib isi keterangan task");
-      } else {
+      } else if (listTask.isEmpty) {
+        UtilsAlert.showToast("Isi Task terlebih dahulu");
+      } 
+      else {
         if (statusForm.value == false) {
           print('ini kepangil');
           UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");

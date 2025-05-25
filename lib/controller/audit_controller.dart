@@ -99,18 +99,18 @@ class AuditController extends GetxController {
 
   ScrollController scrollController = ScrollController();
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchAuditData();
-    scrollController.addListener(() {
-      if (scrollController.position.pixels >=
-              scrollController.position.maxScrollExtent &&
-          !isLoadingMore.value) {
-        loadMoreData();
-      }
-    });
-  }
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   fetchAuditData();
+  //   scrollController.addListener(() {
+  //     if (scrollController.position.pixels >=
+  //             scrollController.position.maxScrollExtent &&
+  //         !isLoadingMore.value) {
+  //       loadMoreData();
+  //     }
+  //   });
+  // }
 
   Future<void> searchSuratPeringatan(em_id) async {
     searchSp.value.clear();

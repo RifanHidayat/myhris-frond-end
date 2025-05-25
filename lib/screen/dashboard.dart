@@ -91,7 +91,7 @@ class _DashboardState extends State<Dashboard> {
   final controllerPesan = Get.find<PesanController>();
   var controllerGlobal = Get.find<GlobalController>();
   var controllerBpj = Get.put(BpjsController());
-  final tabbController = Get.put(TabbController());
+  final tabbController = Get.find<TabbController>();
   final authController = Get.put(AuthController());
   final chatController = Get.put(ChatController());
   final internetController =
@@ -106,28 +106,26 @@ class _DashboardState extends State<Dashboard> {
     controller.refreshPagesStatus.value = true;
     var emId = AppData.informasiUser![0].em_id.toString();
     // setState(() {
-    Future.wait([
-      absenControllre.getPosisition(),
-      absenControllre.getPlaceCoordinate(),
-      controller.checkperaturanPerusahaan(emId),
-      controller.showDialogHistoryTerlambat(),
-      controllerBpj.employeDetaiBpjs(),
-      controllerAbsensi.employeDetail(),
-      controllerAbsensi.userShift(),
-      controller.initData(),
-      Future.delayed(const Duration(milliseconds: 500), () {
-        absenControllre.absenStatus.value = AppData.statusAbsen;
-        authController.signinTime.value = controller.signinTime.value;
-        authController.signoutTime.value = controller.signoutTime.value;
-        // absenControllre.absenStatus.value =
-        //     controller.dashboardStatusAbsen.value;
-      }),
-      tabbController.checkuserinfo(),
-    ]);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.wait([
+        absenControllre.getPosisition(),
+        absenControllre.getPlaceCoordinate(),
+        controller.checkperaturanPerusahaan(emId),
+        controllerBpj.employeDetaiBpjs(),
+        controllerAbsensi.employeDetail(),
+        controllerAbsensi.userShift(),
+        controller.initData(),
+        Future.delayed(const Duration(seconds: 5), () {
+          absenControllre.absenStatus.value = AppData.statusAbsen;
+          authController.signinTime.value = controller.signinTime.value;
+          authController.signoutTime.value = controller.signoutTime.value;
+        }),
+        tabbController.checkuserinfo(),
+      ]);
 
-    controllerPesan.getTimeNow();
+      controllerPesan.getTimeNow();
+    });
     await Future.delayed(const Duration(seconds: 2));
-    controller.onInit();
     controller.isLoading.value = false;
 
     // });
@@ -164,309 +162,6 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Constanst.coloBackgroundScreen,
-      // floatingActionButton:
-      // _isVisible == true
-      //     ? Container()
-      //     :
-      //     Container(
-      //         decoration: BoxDecoration(
-      //           // color: Colors.white,
-      //           borderRadius: BorderRadius.circular(100),
-      //           boxShadow: [
-      //             BoxShadow(
-      //               color: const Color.fromARGB(255, 155, 155, 155)
-      //                   .withOpacity(0.5),
-      //               spreadRadius: 1.0,
-      //               blurRadius: 3,
-      //               offset: const Offset(0, 0),
-      //             ),
-      //           ],
-      //         ),
-      //         child: FloatingActionButton.extended(
-      //             // shape: RoundedRectangleBorder(
-      //             //   borderRadius: BorderRadius.circular(10),
-      //             // ),
-      //             extendedPadding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-      //             // splashColor: Colors.black,
-      //             elevation: 0,
-      //             onPressed: !controllerAbsensi.absenStatus.value
-      //                 ? () {
-      //                     if (controllerAbsensi.absenStatus.value == true) {
-      //                       if (controller.wfhstatus.value == true) {
-      //                         UtilsAlert.showToast(
-      //                             "Menunggu status wfh anda di approve");
-      //                         return;
-      //                       }
-
-      //                       UtilsAlert.showToast(
-      //                           "Anda harus absen keluar terlebih dahulu");
-      //                     } else {
-      //                       var dataUser = AppData.informasiUser;
-      //                       var faceRecog = dataUser![0].face_recog;
-      //                       print(
-      //                           "facee recog ${GetStorage().read('face_recog')}");
-      //                       if (GetStorage().read('face_recog') == true) {
-      //                         print("masuk sini");
-      //                         var statusCamera = Permission.camera.status;
-      //                         statusCamera.then((value) {
-      //                           var statusLokasi = Permission.location.status;
-      //                           statusLokasi.then((value2) async {
-      //                             if (value != PermissionStatus.granted ||
-      //                                 value2 != PermissionStatus.granted) {
-      //                               UtilsAlert.showToast(
-      //                                   "Anda harus aktifkan kamera dan lokasi anda");
-      //                               controller.widgetButtomSheetAktifCamera(
-      //                                   type: 'loadfirst');
-      //                             } else {
-      //                               print("masuk absen user");
-      //                               // if (controller.absenOfflineStatus.value ==
-      //                               //     true) {
-      //                               //   UtilsAlert.showToast(
-      //                               //       "Menunggu status absensi anda di approve");
-      //                               //   return;
-      //                               // }
-      //                               // Get.offAll(AbsenMasukKeluar(
-      //                               //   status: "Absen Masuk",
-      //                               //   type: 1,
-      //                               // ));
-      //                               //  controllerAbsensi.absenSelfie();
-
-      //                               var validasiAbsenMasukUser =
-      //                                   controller.validasiAbsenMasukUser();
-      //                               if (!validasiAbsenMasukUser) {
-      //                                 print("masuk sini");
-      //                               } else {
-      //                                 // if (!authController.isConnected.value) {
-      //                                 //   if (controller
-      //                                 //           .absenOfflineStatus.value ==
-      //                                 //       true) {
-      //                                 //     UtilsAlert.showToast(
-      //                                 //         "Menunggu status absensi anda di approve");
-      //                                 //     return;
-      //                                 //   } else {
-      //                                 //     controllerAbsensi.titleAbsen.value =
-      //                                 //         "Absen masuk";
-      //                                 //     controllerAbsensi.typeAbsen.value =
-      //                                 //         1;
-      //                                 //     controller
-      //                                 //         .widgetButtomSheetOfflineAbsen(
-      //                                 //             title: "Absen masuk",
-      //                                 //             status: "masuk");
-      //                                 //   }
-      //                                 // } else {
-      //                                 controllerAbsensi.titleAbsen.value =
-      //                                     "Absen masuk";
-
-      //                                 controllerAbsensi.typeAbsen.value = 1;
-
-      //                                 //begin image picker
-      //                                 // final getFoto = await ImagePicker()
-      //                                 //     .pickImage(
-      //                                 //         source: ImageSource.camera,
-      //                                 //         preferredCameraDevice:
-      //                                 //             CameraDevice.front,
-      //                                 //         imageQuality: 100,
-      //                                 //         maxHeight: 350,
-      //                                 //         maxWidth: 350);
-      //                                 // if (getFoto == null) {
-      //                                 //   UtilsAlert.showToast(
-      //                                 //       "Gagal mengambil gambar");
-      //                                 // } else {
-      //                                 //   // controllerAbsensi.facedDetection(
-      //                                 //   //     status: "registration",
-      //                                 //   //     absenStatus: "Absen Masuk",
-      //                                 //   //     img: getFoto.path,
-      //                                 //   //     type: "1");
-      //                                 //   Get.to(LoadingAbsen(
-      //                                 //     file: getFoto.path,
-      //                                 //     status: "detection",
-      //                                 //     statusAbsen: 'masuk',
-      //                                 //   ));
-      //                                 //   // Get.to(FaceidRegistration(
-      //                                 //   //   status: "registration",
-      //                                 //   // ));
-      //                                 // }
-      //                                 //end image picker
-
-      //                                 //begin face recognition
-      //                                 // Get.to(FaceDetectorView(
-      //                                 //   status: "masuk",
-      //                                 // ));
-      //                                 //end begin face recogniton
-
-      //                                 if (controllerAbsensi.regType.value ==
-      //                                     1) {
-      //                                   Get.to(AbsensiLocation(
-      //                                     status: "masuk",
-      //                                   ));
-      //                                 } else {
-      //                                   Get.to(FaceDetectorView(
-      //                                     status: "masuk",
-      //                                   ));
-      //                                 }
-
-      //                                 // // controllerAbsensi.getPlaceCoordinate();
-      //                                 // ;
-      //                                 // controllerAbsensi.facedDetection(
-      //                                 //     status: "detection",
-      //                                 //     absenStatus: "masuk",
-      //                                 //     type: "1");
-
-      //                                 // var kalkulasiRadius =
-      //                                 //     controller.radiusNotOpen();
-      //                                 // Get.to(faceDetectionPage(
-      //                                 //   status: "masuk",
-      //                                 // ));
-      //                                 // kalkulasiRadius.then((value) {
-      //                                 //   print(value);
-      //                                 //   // if (value) {
-      //                                 //   //   controllerAbsensi.titleAbsen.value =
-      //                                 //   //       "Absen Masuk";
-      //                                 //   //   controllerAbsensi.typeAbsen.value = 1;
-      //                                 //   //   Get.offAll(faceDetectionPage());
-      //                                 //   //   // controllerAbsensi.absenSelfie();
-      //                                 //   // }
-      //                                 // });
-      //                                 // }
-      //                               }
-      //                             }
-      //                           });
-      //                         });
-      //                       } else {
-      //                         controllerAbsensi
-      //                             .widgetButtomSheetFaceRegistrattion();
-      //                       }
-      //                     }
-      //                   }
-      //                 : () async {
-      //                     if (!controllerAbsensi.absenStatus.value) {
-      //                       UtilsAlert.showToast("Absen Masuk terlebih dahulu");
-      //                     } else {
-      //                       // if (!authController.isConnected.value) {
-      //                       //   // if (controller.absenOfflineStatusDua.value ==
-      //                       //   //     true) {
-      //                       //   //   UtilsAlert.showToast(
-      //                       //   //       "Menunggu status absensi anda di approve");
-      //                       //   //   return;
-      //                       //   // } else {
-      //                       //   controllerAbsensi.getPlaceCoordinate();
-      //                       //   controllerAbsensi.titleAbsen.value =
-      //                       //       "Absen Keluar";
-      //                       //   controllerAbsensi.typeAbsen.value = 2;
-      //                       //   controller.widgetButtomSheetOfflineAbsen(
-      //                       //       title: "Absen Keluar", status: "keluar");
-      //                       //   // }
-      //                       // } else {
-      //                       // if (controller.absenOfflineStatus.value ==
-      //                       //     true) {
-      //                       //   UtilsAlert.showToast(
-      //                       //       "Menunggu status absensi anda di approve");
-      //                       //   return;
-      //                       // }
-      //                       var dataUser = AppData.informasiUser;
-      //                       var faceRecog = dataUser![0].face_recog;
-
-      //                       if (GetStorage().read('face_recog') == true) {
-      //                         controllerAbsensi.getPlaceCoordinate();
-      //                         controllerAbsensi.titleAbsen.value =
-      //                             "Absen Keluar";
-      //                         controllerAbsensi.typeAbsen.value = 2;
-
-      //                         //begin image picker
-      //                         // final getFoto = await ImagePicker()
-      //                         //     .pickImage(
-      //                         //         source: ImageSource.camera,
-      //                         //         preferredCameraDevice:
-      //                         //             CameraDevice.front,
-      //                         //         imageQuality: 100,
-      //                         //         maxHeight: 350,
-      //                         //         maxWidth: 350);
-      //                         // if (getFoto == null) {
-      //                         //   UtilsAlert.showToast(
-      //                         //       "Gagal mengambil gambar");
-      //                         // } else {
-      //                         //   // controllerAbsensi.facedDetection(
-      //                         //   //     status: "registration",
-      //                         //   //     absenStatus: "Absen Masuk",
-      //                         //   //     img: getFoto.path,
-      //                         //   //     type: "1");
-      //                         //   Get.to(LoadingAbsen(
-      //                         //     file: getFoto.path,
-      //                         //     status: "detection",
-      //                         //     statusAbsen: 'keluar',
-      //                         //   ));
-      //                         //   // Get.to(FaceidRegistration(
-      //                         //   //   status: "registration",
-      //                         //   // ));
-      //                         // }
-      //                         //end image picker
-
-      //                         if (controllerAbsensi.regType.value == 1) {
-      //                           Get.to(AbsensiLocation(
-      //                             status: "keluar",
-      //                           ));
-      //                         } else {
-      //                           Get.to(FaceDetectorView(
-      //                             status: "keluar",
-      //                           ));
-      //                         }
-
-      //                         // controllerAbsensi.facedDetection(
-      //                         //     status: "detection",
-      //                         //     type: "2",
-      //                         // //     absenStatus: "keluar");
-      //                         // Get.to(faceDetectionPage(
-      //                         //   status: "keluar",
-      //                         // ));
-      //                         // Get.offAll(AbsenMasukKeluar(
-      //                         //   status: "Absen Keluar",
-      //                         //   type: 2,
-      //                         // ));
-      //                         // controllerAbsensi.absenSelfie();
-      //                         // var validasiAbsenMasukUser =
-      //                         //     controller.validasiAbsenMasukUser();
-      //                         // print(validasiAbsenMasukUser);
-      //                         // if (validasiAbsenMasukUser == false) {
-
-      //                         // } else {
-      //                         //   var kalkulasiRadius =
-      //                         //       controller.radiusNotOpen();
-      //                         //   kalkulasiRadius.then((value) {
-      //                         //     if (value) {
-      //                         //       controllerAbsensi.titleAbsen.value =
-      //                         //           "Absen Keluar";
-      //                         //       controllerAbsensi.typeAbsen.value = 2;
-      //                         //       Get.offAll(AbsenMasukKeluar());
-      //                         //       controllerAbsensi.absenSelfie();
-      //                         //     }
-      //                         //   });
-      //                         // }
-      //                       } else {
-      //                         controllerAbsensi
-      //                             .widgetButtomSheetFaceRegistrattion();
-      //                       }
-      //                       // }
-      //                     }
-      //                   },
-      //             label: Text(
-      //               !controllerAbsensi.absenStatus.value ? "Masuk" : "Keluar",
-      //               style: GoogleFonts.inter(
-      //                   color: Constanst.fgPrimary,
-      //                   fontSize: 16,
-      //                   fontWeight: FontWeight.w500),
-      //             ),
-      //             icon: Icon(
-      //               !controllerAbsensi.absenStatus.value
-      //                   ? Iconsax.login5
-      //                   : Iconsax.logout_15,
-      //               size: 32,
-      //               color: !controllerAbsensi.absenStatus.value
-      //                   ? Constanst.color5
-      //                   : Constanst.color4,
-      //             ),
-      //             backgroundColor: Constanst.colorWhite),
-      //       ),
-
       body: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
           return true;
@@ -915,7 +610,7 @@ class _DashboardState extends State<Dashboard> {
                 // _isVisible
                 // ?
                 Text(
-                  AppData.informasiUser![0].branchName,
+                  '${AppData.informasiUser![0].branchName ?? ''}',
                   style: GoogleFonts.inter(
                       color: Constanst.fgSecondary,
                       fontSize: 12,
@@ -4002,7 +3697,7 @@ class _DashboardState extends State<Dashboard> {
                         child: Image.asset(
                             tipeApresiasi == 'disiplin'
                                 ? 'assets/disiplin.png'
-                                : tipeApresiasi == 'most_valuable'
+                                : tipeApresiasi == 'kinerja'
                                     ? 'assets/most_valuable.png'
                                     : 'assets/top_performer.png',
                             height: 50,
@@ -4168,72 +3863,27 @@ class _DashboardState extends State<Dashboard> {
   void getSession() async {
     final prefs = await SharedPreferences.getInstance();
     var d = prefs.getString('interval_tracking');
-
-    setState(() {
-      intervalTracking = "${d}";
-    });
   }
 
   @override
   void initState() {
     super.initState();
-    var emId = AppData.informasiUser![0].em_id.toString();
-    controller.checkperaturanPerusahaan(emId);
-    // controller.updateInformasiUser();
-    //controller.initData();
-    // absenControllre.getTimeNow();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('init state dasbord ke panggil?');
+      _setIsloading();
 
-    // controller.checkAbsenUser(DateFormat('yyyy-MM-dd').format(DateTime.now()),
-    //     AppData.informasiUser![0].em_id);
-    // controllerBpj.employeDetaiBpjs();
+      var emId = AppData.informasiUser![0].em_id.toString();
+      controller.checkperaturanPerusahaan(emId);
 
-    // controller.initData();
-    _setIsloading();
-    //  refreshData();
+      _scrollController.addListener(_scrollListener);
+      if (controllerTracking.bagikanlokasi.value == "aktif") {
+        controllerTracking.absenSelfie();
+      }
 
-    // Api().checkLogin();
-    // Add a listener to the scroll controller
-    _scrollController.addListener(_scrollListener);
-    // controller.loadMenuShowInMain();
-    // tabbController.checkuserinfo();
-    if (controllerTracking.bagikanlokasi.value == "aktif") {
-      controllerTracking.absenSelfie();
-    }
-
-    // chatController.getCount();
-
-    // channel.sink.add(jsonEncode({
-    //   'type': 'count',
-    //   'database': AppData.selectedDatabase,
-    //   'em_id': AppData.informasiUser![0].em_id
-    // }));
-
-    // channel.stream.listen((message) {
-    //   print('ambil data websoket');
-    //   final decodedMessage = jsonDecode(message);
-
-    //   if (decodedMessage['type'] == 'count') {
-    //     // print('total chat ${decodedMessage['data'][0]['total']}');
-    //     chatController.jumlahChat.value = decodedMessage['data'][0]['total'];
-    //   }
-
-    //   if (decodedMessage['type'] == 'fetchHistory') {
-    //     print('total chat ${decodedMessage['data']}');
-    //     // print('total chat ${decodedMessage['data'][0]['total']}');
-    //     // chatController.jumlahChat.value = decodedMessage['data'][0]['total'];
-    //   }
-    // });
-    controller.versionCheck();
-    _checkversion();
-    // absenControllre.getPosisition();
-    // absenControllre.getPlaceCoordinate();
-    print("intervallll ${AppData.informasiUser![0].interval.toString()}");
-    // _setTime();
-    // } else {
-    //   final service = FlutterBackgroundService();
-    //   service.invoke("stopService");
-    //   controller.initData();
-    // }
+      controller.versionCheck();
+      _checkversion();
+      // controller.showDialogHistoryTerlambat();
+    });
   }
 
   void _setTime() async {
@@ -4247,46 +3897,32 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _setIsloading() async {
-    controller.isLoading.value = true;
-    controller.refreshPagesStatus.value = true;
-    // if (AppData.firsLogin == true) {
-    //   absenControllre.getTimeNow();
-    //   controllerBpj.employeDetaiBpjs();
-    //   controller.initData();
-    //   absenControllre.getPosisition();
-    //   absenControllre.getPlaceCoordinate();rcq
-    //   await Future.delayed(const Duration(seconds: 4));
-    // } else {
-    //   await Future.wait([
-    //     absenControllre.getTimeNow(),
-    //     controllerBpj.employeDetaiBpjs(),
-    //     controller.initData(),
-    //     absenControllre.getPosisition(),
-    //     absenControllre.getPlaceCoordinate(),
-    //   ]);
-    // }
-    absenControllre.getTimeNow();
-    controllerBpj.employeDetaiBpjs();
-    controllerAbsensi.employeDetail();
-    controllerAbsensi.userShift();
-    absenControllre.getPosisition();
-    absenControllre.getPlaceCoordinate();
-    controllerPesan.getTimeNow();
-    var emId = AppData.informasiUser![0].em_id.toString();
-    await controller.checkperaturanPerusahaan(emId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.isLoading.value = true;
+      controller.refreshPagesStatus.value = true;
 
-    controller.initData();
+      controller.initData();
+      absenControllre.getTimeNow();
+      controllerBpj.employeDetaiBpjs();
+      controllerAbsensi.employeDetail();
+      controllerAbsensi.userShift();
+      absenControllre.getPosisition();
+      absenControllre.getPlaceCoordinate();
+      controllerPesan.getTimeNow();
 
-    await Future.delayed(const Duration(seconds: 3));
+      // Future.delayed(const Duration(milliseconds: 300));
 
-    controller.isLoading.value = false;
+      controller.isLoading.value = false;
+    });
+      // controller.showDialogHistoryTerlambat();
+
     // AppData.firsLogin = false;
   }
 
   void _checkversion() async {
     try {
       final newVersion = NewVersionPlus(
-        androidId: 'com.siscom.siscomhrisnew',
+        androidId: 'com.siscom.myhris',
       );
 
       final status = await newVersion.getVersionStatus();
@@ -4297,9 +3933,9 @@ class _DashboardState extends State<Dashboard> {
             newVersion.showUpdateDialog(
                 context: context,
                 versionStatus: status,
-                dialogTitle: "Update SISCOM HRIS",
+                dialogTitle: "Update MY HRIS",
                 dialogText:
-                    "Update versi SISCOM HRIS dari versi ${status.localVersion} ke versi ${status.storeVersion}",
+                    "Update versi MY HRIS dari versi ${status.localVersion} ke versi ${status.storeVersion}",
                 dismissAction: () {
                   Get.back();
                 },

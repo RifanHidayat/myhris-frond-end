@@ -22,14 +22,14 @@ class AuditScreen extends StatefulWidget {
 }
 
 class _AuditScreenState extends State<AuditScreen> {
-  final controller = Get.put(AuditController());
+  final controller = Get.find<AuditController>();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     controller.getTimeNow();
-    controller.fetchAuditData();
+    controller.fetchAuditData(isLoadMore: false);
     controller.getFilterEmployee();
   }
 

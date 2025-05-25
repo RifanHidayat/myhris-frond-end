@@ -27,7 +27,7 @@ class Aktifitas extends StatefulWidget {
 class _AktifitasState extends State<Aktifitas> {
   final controller = Get.put(AktifitasController());
 
-  final stcontroller = Get.put(SettingController());
+  final stcontroller = Get.find<SettingController>();
 
   final authController = Get.put(AuthController());
 

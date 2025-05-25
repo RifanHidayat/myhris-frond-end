@@ -400,7 +400,6 @@ class KasbonController extends GetxController {
         if (res.statusCode == 200) {
           var valueBody = jsonDecode(res.body);
           var data = valueBody['data'];
-          print("data delegasi ${data}");
           for (var element in data) {
             if (element['status'] == 'ACTIVE') {
               var fullName = element['full_name'] ?? "";

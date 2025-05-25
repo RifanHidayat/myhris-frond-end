@@ -17,7 +17,7 @@ import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class FaceRecognition extends StatelessWidget {
-  final controller = Get.put(SettingController());
+  final controller = Get.find<SettingController>();
 
   final list = [
     {

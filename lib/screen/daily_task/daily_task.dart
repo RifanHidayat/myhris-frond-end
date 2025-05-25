@@ -32,9 +32,13 @@ class _DailyTaskState extends State<DailyTask> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    controller.getTimeNow();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      controller.getTimeNow();
+    
     controller.atasanStatus.value = '';
     controller.loadAllTask(AppData.informasiUser![0].em_id);
+    });
+    
   }
 
   @override

@@ -25,7 +25,6 @@ class _InitScreenState extends State<InitScreen> {
   final controller = Get.put(TabbController());
   final controllerTracking = Get.put(TrackingController());
   final controllerPesan = Get.find<PesanController>();
-
   // int _currentIndex = 0;
 
   late final List<Widget> _buildScreens = [

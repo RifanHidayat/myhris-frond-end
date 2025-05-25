@@ -256,6 +256,29 @@ class Constanst {
     }
   }
 
+  static String convertDate8(String date) {
+    var inputFormat = DateFormat('yyyy-MM-dd');
+    var inputDate = inputFormat.parse(date);
+    var outputFormat = DateFormat('dd MMM yyyy', 'id');
+    var outputDate = outputFormat.format(inputDate);
+    return outputDate;
+  }
+
+  static String convertDate9(String date) {
+    var inputDate = DateTime.parse(date);
+    var outputFormat = DateFormat('yyyy-MM-dd', 'id_ID');
+    var outputDate = outputFormat.format(inputDate);
+    return outputDate;
+  }
+
+  static String convertTime(String time) {
+    var inputFormat = DateFormat('HH:mm:ss');
+    var inputTime = inputFormat.parse(time);
+    var outputFormat = DateFormat('HH:mm');
+    var outputTime = outputFormat.format(inputTime);
+    return outputTime;
+  }
+
   static String convertDateBulanDanTahun(String date) {
     var inputFormat = DateFormat('MM-yyyy');
     var inputDate = inputFormat.parse(date);
