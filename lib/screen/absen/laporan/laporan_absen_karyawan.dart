@@ -365,65 +365,66 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
     int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
     int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
 
-    //alur normal
-//     if (totalMinutes1 < totalMinutes2) {
-// // Menggabungkan tanggal hari ini dengan waktu dari string
-//       startTime = DateTime.parse(
-//           '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
-//       endTime = DateTime.parse(
-//           '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
 
-//       //alur beda hari
-//     } else if (totalMinutes1 > totalMinutes2) {
-//       var waktu3 =
-//           TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
-//       int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
+    if (totalMinutes1 < totalMinutes2) {
+// Menggabungkan tanggal hari ini dengan waktu dari string
+      startTime = DateTime.parse(
+          '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
+      endTime = DateTime.parse(
+          '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
 
-//       if (totalMinutes2 > totalMinutes3) {
-//         print("masuk sini view las user");
-//         var today;
-//         if (index.atten_date!.isNotEmpty) {
-//           today = DateTime.parse(index.atten_date!);
-//         }
-//         var yesterday = today.add(const Duration(days: 1));
-//         startDate = DateFormat('yyyy-MM-dd').format(yesterday);
-//         endDate = DateFormat('yyyy-MM-dd').format(today);
-//         startTime = DateTime.parse(
-//             '$startDate ${AppData.informasiUser![0].startTime}:00');
-//         endTime =
-//             DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
-//         print('ini  bener gakl lu${startTime.isAfter(today)}');
-//       } else {
-//         var today;
-//         print('masa lu kosong sih ${index.atten_date}');
-//         if (index.atten_date!.isNotEmpty) {
-//           today = DateTime.parse(index.atten_date!);
-//         } else {
-//           today = DateTime.now();
-//         }
-//         var yesterday = today.add(const Duration(days: 1));
+      //alur beda hari
+    } else if (totalMinutes1 > totalMinutes2) {
+      var waktu3 =
+          TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
+      int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
 
-//         startDate = DateFormat('yyyy-MM-dd').format(today);
-//         endDate = DateFormat('yyyy-MM-dd').format(yesterday);
+      if (totalMinutes2 > totalMinutes3) {
+        print("masuk sini view las user");
+        var today;
+        if (index.atten_date!.isNotEmpty) {
+          today = DateTime.parse(index.atten_date!);
+        }
+        var yesterday = today.add(const Duration(days: 1));
+        startDate = DateFormat('yyyy-MM-dd').format(yesterday);
+        endDate = DateFormat('yyyy-MM-dd').format(today);
+        startTime = DateTime.parse(
+            '$startDate ${AppData.informasiUser![0].startTime}:00');
+        endTime =
+            DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
+        print('ini  bener gakl lu${startTime.isAfter(today)}');
+      } else {
+        var today;
+        print('masa lu kosong sih ${index.atten_date}');
+        if (index.atten_date!.isNotEmpty) {
+          today = DateTime.parse(index.atten_date!);
+        } else {
+          today = DateTime.now();
+        }
+        var yesterday = today.add(const Duration(days: 1));
 
-//         startTime = DateTime.parse(
-//             '$startDate ${AppData.informasiUser![0].startTime}:00'); // Waktu kemarin
-//         endTime =
-//             DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
-//         print(
-//             'ini  bener gakl lu${startTime.isBefore(today)}'); // Waktu hari ini
-//         print('ini  bener gakl lu${startTime}'); // Waktu hari ini
-//         print('ini  bener gakl lu${endTime}'); // Waktu hari ini
-//       }
-//     } else {
-//       startTime = AppData.informasiUser![0].startTime;
-//       endTime = AppData.informasiUser![0].endTime;
+        startDate = DateFormat('yyyy-MM-dd').format(today);
+        endDate = DateFormat('yyyy-MM-dd').format(yesterday);
 
-//       startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-//       endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-//       print(
-//           "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
-//     }
+        startTime = DateTime.parse(
+            '$startDate ${AppData.informasiUser![0].startTime}:00'); // Waktu kemarin
+        endTime =
+            DateTime.parse('$endDate ${AppData.informasiUser![0].endTime}:00');
+        print(
+            'ini  bener gakl lu${startTime.isBefore(today)}'); // Waktu hari ini
+        print('ini  bener gakl lu${startTime}'); // Waktu hari ini
+        print('ini  bener gakl lu${endTime}'); // Waktu hari ini
+      }
+    } else {
+      startTime = AppData.informasiUser![0].startTime;
+      endTime = AppData.informasiUser![0].endTime;
+
+      startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      print(
+          "Waktu 1 sama dengan waktu 2 new ${totalMinutes1}  ${totalMinutes2}");
+    }
+
     var tipeAbsen = AppData.informasiUser![0].tipeAbsen;
     var tipeAlpha = AppData.informasiUser![0].tipeAlpha;
     var list = tipeAlpha.toString().split(',').map(int.parse).toList();
