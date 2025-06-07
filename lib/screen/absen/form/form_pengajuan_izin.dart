@@ -357,7 +357,8 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                     if (controller.jumlahIzin.value >= 0) {
                       print("jumlah izin ${controller.jumlahIzin.value}");
                       if (controller.percentIzin.value >= 1) {
-                        controller.messageApi.value = "Pemakaian izin telah melewati batas maksimal";
+                        controller.messageApi.value =
+                            "Pemakaian izin telah melewati batas maksimal";
                         UtilsAlert.showToast(
                             "Pemakaian izin telah melewati batas maksimal");
                       } else {
@@ -369,8 +370,9 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                             print('ini total ${totalTerpakai}');
                             print(
                                 'ini total ${controller.tanggalSelected.value.length}');
-                                controller.messageApi.value = "Pemakaian izin telah melewati batas maksimal";
-                        
+                            controller.messageApi.value =
+                                "Pemakaian izin telah melewati batas maksimal";
+
                             UtilsAlert.showToast(
                                 "Pemakaian izin telah melewati batas maksimal");
                           } else {
@@ -394,8 +396,9 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
                           controller.tanggalSelected.value.length;
                       if (totalTerpakai > controller.limitIzin.value) {
                         print("jumlah izin ${controller.limitIzin.value}");
-                        controller.messageApi.value = "Pemakaian izin telah melewati batas maksimal";
-                        
+                        controller.messageApi.value =
+                            "Pemakaian izin telah melewati batas maksimal";
+
                         UtilsAlert.showToast(
                             "Pemakaian izin telah melewati batas maksimal");
                       } else {

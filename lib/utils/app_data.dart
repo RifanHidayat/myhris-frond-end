@@ -253,7 +253,6 @@ class AppData {
   }
 
   static List<SettingAppModel>? get infoSettingApp {
-    print("info setting ${LocalStorage.getFromDisk('infoSettingApp')}");
 
     if (LocalStorage.getFromDisk('infoSettingApp') != null) {
       List<String> listData = LocalStorage.getFromDisk('infoSettingApp');

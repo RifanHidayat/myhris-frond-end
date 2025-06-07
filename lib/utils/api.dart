@@ -21,7 +21,9 @@ class Api {
   // API PROD
 
 
+
   static var basicUrl = "http://mobilehris.siscom.id:3009/";
+]
 
 
   //  static var basicUrl = "http://mobilehris.siscom.id:3009/";
@@ -34,9 +36,8 @@ class Api {
 //
   // API LOCAL
 
-  // static var basicUrl = "http://192.168.20.238:2627/";
-
   static var urlImage = 'https://imagehris.siscom.id:4431';
+  // static var urlImage = 'https://myhrisdev.siscom.id/imagehris';
 
   static var token = '9d590c04119a4433971a1dd622266d38';
   static var luxand = 'https://api.luxand.cloud/photo/similarity';
@@ -58,7 +59,7 @@ class Api {
   static var urlGambarDariFinance =
       urlImage + "/${AppData.selectedDatabase}/gambar_banner/";
   static var urlFilePermintaanKandidat =
-      urlImage + "/${AppData.selectedDatabase}/file_permintaan_kandida t/";
+      urlImage + "/${AppData.selectedDatabase}/file_permintaan_kandidat/";
   static var urlFileKandidat =
       urlImage + "/${AppData.selectedDatabase}/file_kandidat/";
 
@@ -217,12 +218,9 @@ class ApiRequest {
 
   // API PROD
 
+
   static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
-
-  // API LOCAL
-
-  // static var basicUrl = "http://192.168.20.238:2627/";
 
 
   // API DEV
@@ -311,11 +309,6 @@ class ApiRequest {
   }
 
   Future<http.Response> delete() async {
-    // print("Hostname ${AppData.hostInformation![0].hostname}");
-    // print("Hostname ${AppData.hostInformation![0].port}");
-    // print("Hostname ${AppData.hostInformation![0].dbname}");
-    // print("periode ${AppData.periode}");
-    // print("Kode cabang ${AppData.kodeCabang}");
     if (temParams != null) {
       headers.addAll(temParams);
     }
@@ -326,7 +319,7 @@ class ApiRequest {
           ? ""
           : AppData.informasiUser![0].branchId.toString(),
     });
-    print(basicUrl + url);
+    print('ini url delete ${basicUrl + url}');
     return await http
         .delete(Uri.parse(basicUrl + url).replace(queryParameters: params),
             body: jsonEncode(body), headers: headers)

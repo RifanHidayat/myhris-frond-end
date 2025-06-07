@@ -27,14 +27,18 @@ class DailyTask extends StatefulWidget {
 
 class _DailyTaskState extends State<DailyTask> {
   final DailyTaskController controller = Get.put(DailyTaskController());
-  final AbsenController controllerAbsensi = Get.put(AbsenController());
+  final AbsenController controllerAbsensi = Get.find<AbsenController>();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    controller.getTimeNow();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      controller.getTimeNow();
+    
     controller.atasanStatus.value = '';
     controller.loadAllTask(AppData.informasiUser![0].em_id);
+    });
+    
   }
 
   @override

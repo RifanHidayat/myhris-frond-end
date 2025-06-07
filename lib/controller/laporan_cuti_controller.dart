@@ -16,6 +16,7 @@ import 'package:siscom_operasional/screen/absen/laporan/laporan_dinas_luar.dart'
 import 'package:siscom_operasional/screen/absen/laporan/laporan_izin.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_klaim.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_lembur.dart';
+import 'package:siscom_operasional/screen/absen/laporan/laporan_shift.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_tugas_luar.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
@@ -82,7 +83,7 @@ class LaporanCutiController extends GetxController {
   // void toggleSearch() {
   //   isSearching.value = !isSearching.value;
   // }
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
 
   @override
   void onReady() async {
@@ -513,9 +514,8 @@ class LaporanCutiController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         var data = valueBody['data'];
-        for (var ya in data){
-
-        print('ini tampil laporan  ${ya['leave_status']}');
+        for (var ya in data) {
+          print('ini tampil laporan  ${ya['leave_status']}');
         }
         listDetailLaporanEmployee.value = data;
         alllistDetailLaporanEmployee.value = data;
@@ -945,7 +945,6 @@ class LaporanCutiController extends GetxController {
   }
 
   void filterStatusPengajuan(name) {
-    
     List listFilterLokasi = [];
     print('ini name: $name');
     // for (var element in allNameLaporanTidakhadirCopy.value) {
@@ -2250,6 +2249,78 @@ class LaporanCutiController extends GetxController {
                                     color: Constanst.onPrimary),
                                 borderRadius: BorderRadius.circular(10)),
                             child: tempNamaLaporan1.value == "klaim"
+                                ? Padding(
+                                    padding: const EdgeInsets.all(3),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Constanst.onPrimary,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                    ),
+                                  )
+                                : Container(),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  // highlightColor: Colors.white,
+                  onTap: () {
+                    Get.back();
+                    Get.back();
+                    Get.to(LaporanShift(
+                      title: 'shift',
+                    ));
+                    tempNamaLaporan1.value = "shift";
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 12, bottom: 12, left: 16, right: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/4_lembur.svg',
+                              height: 35,
+                              width: 35,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Text(
+                                'Laporan Shift',
+                                style: GoogleFonts.inter(
+                                    color: Constanst.fgPrimary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ],
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Get.back();
+                            Get.back();
+                            Get.to(LaporanShift(
+                              title: 'shift',
+                            ));
+                            tempNamaLaporan1.value = "shift";
+                          },
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: tempNamaLaporan1.value == "shift"
+                                        ? 2
+                                        : 1,
+                                    color: Constanst.onPrimary),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: tempNamaLaporan1.value == "shift"
                                 ? Padding(
                                     padding: const EdgeInsets.all(3),
                                     child: Container(

@@ -3,21 +3,18 @@ import 'dart:convert';
 
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 // import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-import 'package:ntp/ntp.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:siscom_operasional/controller/absen_controller.dart';
@@ -29,6 +26,7 @@ import 'package:siscom_operasional/controller/internet_controller.dart';
 import 'package:siscom_operasional/controller/izin_controller.dart';
 import 'package:siscom_operasional/controller/klaim_controller.dart';
 import 'package:siscom_operasional/controller/lembur_controller.dart';
+import 'package:siscom_operasional/controller/shift_controller.dart';
 import 'package:siscom_operasional/controller/tab_controller.dart';
 import 'package:siscom_operasional/controller/tracking_controller.dart';
 import 'package:siscom_operasional/controller/tugas_luar_controller.dart';
@@ -39,19 +37,16 @@ import 'package:siscom_operasional/model/menu_dashboard_model.dart';
 import 'package:google_maps_utils/google_maps_utils.dart' as maps;
 import 'package:siscom_operasional/model/user_model.dart';
 import 'package:siscom_operasional/screen/absen/absesi_location.dart';
-import 'package:siscom_operasional/screen/absen/camera_view.dart';
-import 'package:siscom_operasional/screen/absen/camera_view_location.dart';
 import 'package:siscom_operasional/screen/absen/form/form_lembur.dart';
 import 'package:siscom_operasional/screen/absen/form/form_pengajuan_izin.dart';
 import 'package:siscom_operasional/screen/absen/form/form_tugas_luar.dart';
 import 'package:siscom_operasional/screen/absen/history_absen.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_absen.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_cuti.dart';
-import 'package:siscom_operasional/screen/absen/laporan/laporan_dinas_luar.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_izin.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_klaim.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_lembur.dart';
-import 'package:siscom_operasional/screen/absen/laporan/laporan_semua_pengajuan.dart';
+import 'package:siscom_operasional/screen/absen/laporan/laporan_shift.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/absen/lembur.dart';
 import 'package:siscom_operasional/screen/absen/pengajuan_absen.dart';
@@ -59,7 +54,6 @@ import 'package:siscom_operasional/screen/absen/riwayat_izin.dart';
 import 'package:siscom_operasional/screen/absen/tugas_luar.dart';
 import 'package:siscom_operasional/screen/absen/form/form_pengajuan_cuti.dart';
 import 'package:siscom_operasional/screen/absen/riwayat_cuti.dart';
-import 'package:siscom_operasional/screen/absen/izin.dart';
 import 'package:siscom_operasional/screen/bpjs/bpjs_kesehatan.dart';
 import 'package:siscom_operasional/screen/bpjs/bpjs_ketenagakerjaan.dart';
 import 'package:siscom_operasional/screen/daily_task/daily_task.dart';
@@ -70,9 +64,10 @@ import 'package:siscom_operasional/screen/kandidat/list_kandidat.dart';
 import 'package:siscom_operasional/screen/kasbon/riwayat_kasbon.dart';
 import 'package:siscom_operasional/screen/klaim/form_klaim.dart';
 import 'package:siscom_operasional/screen/klaim/riwayat_klaim.dart';
-import 'package:siscom_operasional/screen/peraturan/detail_peraturan.dart';
 import 'package:siscom_operasional/screen/peraturan/detail_peraturan_dasboard.dart';
+import 'package:siscom_operasional/screen/pinjaman/pinjaman.dart';
 import 'package:siscom_operasional/screen/pph21/pphh21.dart';
+import 'package:siscom_operasional/screen/shift/shift.dart';
 import 'package:siscom_operasional/screen/slip_gaji/slip_gaji.dart';
 import 'package:siscom_operasional/screen/surat_peringatan.dart';
 import 'package:siscom_operasional/screen/teguran_lisan.dart';
@@ -94,7 +89,7 @@ class DashboardController extends GetxController {
   PageController menuController = PageController(initialPage: 0);
   PageController informasiController = PageController(initialPage: 0);
   final controllerTracking = Get.put(TrackingController());
-  final tabbController = Get.put(TabbController());
+  final tabbController = Get.find<TabbController>();
   var controller = Get.put(BpjsController());
 
   RxString signoutTime = "".obs;
@@ -111,17 +106,20 @@ class DashboardController extends GetxController {
   var searchController = TextEditingController();
   var bpjsController = Get.put(BpjsController());
 
-  var controllerAbsensi = Get.put(AbsenController());
+  var controllerAbsensi = Get.find<AbsenController>();
+
   var controllerIzin = Get.put(IzinController());
   var controllerLembur = Get.put(LemburController());
   var controllerCuti = Get.put(CutiController());
   var controllerTugasLuar = Get.put(TugasLuarController());
   var controllerKlaim = Get.put(KlaimController());
+  var controllerShift = Get.put(ShiftController());
   final authController = Get.put(AuthController());
-  final internetController = Get.put(InternetController());
+  final internetController =
+      Get.find<InternetController>(tag: 'AuthController');
 
   var menu = <MenuDashboardModel>[].obs;
-  var globalCtr = Get.put(GlobalController());
+  var globalCtr = Get.find<GlobalController>();
   var dashboardStatusAbsen = false.obs;
 
   var user = [].obs;
@@ -131,6 +129,8 @@ class DashboardController extends GetxController {
   var finalMenu = [].obs;
   var informasiDashboard = [].obs;
   var employeeUltah = [].obs;
+  var employeeApresiasi = [].obs;
+  var isShowAllApresiasi = false.obs;
   var employeeTidakHadir = [].obs;
   var menuShowInMain = [].obs;
   var menuShowInMainNew = [].obs;
@@ -144,6 +144,7 @@ class DashboardController extends GetxController {
   var dateNow = "".obs;
   var showUlangTahun = false.obs;
   var showPkwt = false.obs;
+  var showApresiasi = false.obs;
   var showPengumuman = false.obs;
   var showLaporan = false.obs;
   var showMonitDaily = false.obs;
@@ -199,19 +200,9 @@ class DashboardController extends GetxController {
 
   List sortcardPengajuan = [].obs;
 
-  @override
-  void onInit() async {
-    // if (menus.length<=0){
-    //   dashboardMenu();
-    // }
-    //  getUserInfo();
-    print("loginnn: ${AppData.isLogin}");
-    super.onInit();
-  }
-
   void versionCheck() async {
     final newVersion = NewVersionPlus(
-      androidId: 'com.siscom.siscomhrisnew',
+      androidId: 'com.siscom.myhris',
     );
     final infoStatus = await newVersion.getVersionStatus();
     statuz.value = infoStatus!.storeVersion;
@@ -222,6 +213,14 @@ class DashboardController extends GetxController {
     // }
 
     //ttetfewugfwihw8fhwi fhps
+  }
+
+  void onReady() {
+    super.onReady();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      updateInformasiUser();
+      updateWorkTime();
+    });
   }
 
   Future<void> initData() async {
@@ -248,14 +247,15 @@ class DashboardController extends GetxController {
     //   print("Informasi user tidak tersedia.");
     // }
 
+    updateInformasiUser();
     updateWorkTime();
     getBannerDashboard();
-    await updateInformasiUser();
     getEmployeeUltah(DateFormat('yyyy-MM-dd').format(DateTime.now()));
     getMenuDashboard();
     loadMenuShowInMain();
     loadMenuShowInMainUtama();
     getInformasiDashboard();
+    getApresiasi();
     getEmployeeBelumAbsen();
     timeString.value = formatDateTime(startDate);
     dateNow.value = dateNoww(startDate);
@@ -264,7 +264,7 @@ class DashboardController extends GetxController {
     getSizeDevice();
     checkStatusPermission();
     checkHakAkses();
-    showDialogHistoryTerlambat();
+    
     authController.sendAbsensiOffline();
     // } else {
     //   isLoading.value = false;
@@ -581,7 +581,7 @@ class DashboardController extends GetxController {
 
   Future<void> showDialogHistoryTerlambat() async {
     await controllerAbsensi.loadHistoryAbsenUser();
-    print('ini show');
+    print('ini show harusnya');
 
     Set<String> seenDates = {};
 
@@ -598,7 +598,6 @@ class DashboardController extends GetxController {
           return true;
         }
       }).toList();
-      print('ini absen terlambat yak ${controllerAbsensi.historyAbsen}');
     }
     // pulang cepet
     else {
@@ -638,91 +637,83 @@ class DashboardController extends GetxController {
               curve: Curves.elasticOut,
               reverseCurve: Curves.easeOutCubic,
             ),
-            child: WillPopScope(
-              onWillPop: () async {
-                controllerAbsensi.resetNotif();
-                return true;
-              },
-              child: Dialog(
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: <Widget>[
-                    IntrinsicHeight(
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                            top:
-                                25), // Mengatur posisi box agar berada di bawah ikon
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding:
-                            const EdgeInsets.only(top: 30, left: 20, right: 20),
-                        child: Column(
-                          mainAxisSize:
-                              MainAxisSize.min, // Ukuran kolom minimal
-                          children: <Widget>[
-                            Text(
-                              "${controllerAbsensi.deskripsi.value} ",
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w500,
-                                color: Constanst.fgPrimary,
-                                fontSize: 14,
-                              ),
-                              textAlign: TextAlign.justify,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              controllerAbsensi.titleNotif.value,
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w500,
-                                color: Constanst.fgPrimary,
-                                fontSize: 16,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height:
-                                  controllerAbsensi.historyAbsen.value.length ==
-                                          1
-                                      ? 120
-                                      : controllerAbsensi
-                                                  .historyAbsen.value.length ==
-                                              2
-                                          ? 180
-                                          : 200,
-                              child: listAbsen(),
-                            ),
-                            ButtonBar(
-                              buttonMinWidth: 100,
-                              alignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                TextButton(
-                                  child: const Text("Kembali"),
-                                  onPressed: () {
-                                    controllerAbsensi.resetNotif();
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const CircleAvatar(
-                      backgroundColor: Colors.red,
-                      maxRadius: 25.0,
-                      child: Icon(
-                        Iconsax.info_circle,
+            child: Dialog(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: <Widget>[
+                  IntrinsicHeight(
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                          top:
+                              25), // Mengatur posisi box agar berada di bawah ikon
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        size: 30,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding:
+                          const EdgeInsets.only(top: 30, left: 20, right: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min, // Ukuran kolom minimal
+                        children: <Widget>[
+                          Text(
+                            "${controllerAbsensi.deskripsi.value} ",
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                              color: Constanst.fgPrimary,
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.justify,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            controllerAbsensi.titleNotif.value,
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                              color: Constanst.fgPrimary,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(
+                            height:
+                                controllerAbsensi.historyAbsen.value.length == 1
+                                    ? 120
+                                    : controllerAbsensi
+                                                .historyAbsen.value.length ==
+                                            2
+                                        ? 180
+                                        : 200,
+                            child: listAbsen(),
+                          ),
+                          ButtonBar(
+                            buttonMinWidth: 100,
+                            alignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              TextButton(
+                                child: const Text("Kembali"),
+                                onPressed: () {
+                                  controllerAbsensi.resetNotif();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const CircleAvatar(
+                    backgroundColor: Colors.red,
+                    maxRadius: 25.0,
+                    child: Icon(
+                      Iconsax.info_circle,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -737,11 +728,14 @@ class DashboardController extends GetxController {
 
   Widget listAbsen() {
     return Obx(() {
-      controllerAbsensi.historyAbsen.sort((a, b) {
-        DateTime dateA = DateTime.parse(a.date);
-        DateTime dateB = DateTime.parse(b.date);
-        return dateB.compareTo(dateA);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controllerAbsensi.historyAbsen.sort((a, b) {
+          DateTime dateA = DateTime.parse(a.date);
+          DateTime dateB = DateTime.parse(b.date);
+          return dateB.compareTo(dateA);
+        });
       });
+
       return ListView.builder(
         physics: controllerAbsensi.historyAbsen.length <= 10
             ? const AlwaysScrollableScrollPhysics()
@@ -798,7 +792,6 @@ class DashboardController extends GetxController {
   }
 
   Widget tampilan2(AbsenModel index) {
-    print('ini data index ? ${controllerAbsensi.statusAbsen.value}');
     var jamMasuk = index.signin_time ?? '';
     var jamKeluar = index.signout_time ?? '';
     var jamKerja = index.jamKerja ?? '';
@@ -812,9 +805,6 @@ class DashboardController extends GetxController {
     var attenDate = index.atten_date ?? "";
     var batasJam = index.jamKerja.toString();
     var statusView;
-    print('ini jam pulang $jaamPulang');
-    print('ini jam pulang ${index.namaIzin}');
-    print('ini nama lembur ${index.namaLembur}');
     if (placeIn != "") {
       statusView =
           placeIn == "pengajuan" && placeOut == "pengajuan" ? true : false;
@@ -840,15 +830,12 @@ class DashboardController extends GetxController {
         index.offDay.toString() == '1' ||
         text == "") {
       if (index.atten_date == "" || index.atten_date == null) {
-        print('ini tampil yak gak sih');
       } else {
         if (controllerAbsensi.statusAbsen.value.toLowerCase() ==
             'pulang_cepat') {
           // Membuat dua objek DateTime
           DateTime waktuAwal = DateTime.parse("${index.date} $jamKeluar");
           DateTime waktuAkhir = DateTime.parse("${index.date} $jaamPulang");
-          print('ini WaktuAwal $waktuAwal');
-          print('ini WaktuAkhir $waktuAkhir');
 
           // Menghitung selisih waktu
           Duration selisih = waktuAkhir.difference(waktuAwal);
@@ -1341,7 +1328,6 @@ class DashboardController extends GetxController {
         }
 
         var valueBody = jsonDecode(response.body);
-        print("Cek data absen: ${valueBody}");
 
         var data = valueBody['data'] ?? [];
         List wfh = valueBody['wfh'] ?? [];
@@ -1363,8 +1349,7 @@ class DashboardController extends GetxController {
           _updateOfflineStatus(offline[0], data.isNotEmpty ? data[0] : null);
         }
 
-        print("Hasil signinTime: ${signinTime.value}");
-        print("Hasil signoutTime: ${signoutTime.value}");
+
       } catch (e) {
         print("Error fetching absen: $e");
         isLoading.value = false;
@@ -1391,6 +1376,12 @@ class DashboardController extends GetxController {
     signinTime.value = data['signin_time'] ?? '00:00:00';
     breakinTime.value = data['breakin_time'] ?? '00:00:00';
     breakoutTime.value = data['breakout_time'] ?? '00:00:00';
+    textPendingMasuk.value = false;
+    textPendingMasuk.value = false;
+    pendingSigninApr.value = false;
+    pendingSignoutApr.value = false;
+    absenOfflineStatus.value = false;
+    absenOfflineStatusOut.value = false;
     trx.value = data['trx'] ?? "";
   }
 
@@ -1620,8 +1611,6 @@ class DashboardController extends GetxController {
                           controller.employeDetaiBpjs();
                           controllerAbsensi.employeDetail();
 
-                          controller.onInit();
-
                           controllerAbsensi.userShift();
                           initData();
                           Future.delayed(const Duration(milliseconds: 500), () {
@@ -1751,7 +1740,7 @@ class DashboardController extends GetxController {
           stringTanggal,
           typeNotifFcm,
           pesan,
-          'Approval WFH');
+          'Pengajuan WFH');
 
       if (item['token_notif'] != null) {
         globalCtr.kirimNotifikasiFcm(
@@ -1772,355 +1761,6 @@ class DashboardController extends GetxController {
       }
     });
   }
-
-  // Future<void> checkAbsenUser(convert, getEmid) {
-  //   print("view last absen user");
-  //   print("tes ${AppData.informasiUser![0].startTime.toString()}");
-  //   var startTime = "";
-  //   var endTime = "";
-  //   var startDate = "";
-  //   var endDate = "";
-  //   TimeOfDay waktu1 = TimeOfDay(
-  //       hour: int.parse(
-  //           AppData.informasiUser![0].startTime.toString().split(':')[0]),
-  //       minute: int.parse(AppData.informasiUser![0].startTime
-  //           .toString()
-  //           .split(':')[1]));
-
-  //   TimeOfDay waktu2 = TimeOfDay(
-  //       hour: int.parse(
-  //           AppData.informasiUser![0].endTime.toString().split(':')[0]),
-  //       minute: int.parse(AppData.informasiUser![0].startTime
-  //           .toString()
-  //           .split(':')[1])); // Waktu kedua
-
-  //   int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
-  //   int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
-
-  //   //alur normal
-  //   if (totalMinutes1 < totalMinutes2) {
-  //     startTime = AppData.informasiUser![0].startTime;
-  //     endTime = AppData.informasiUser![0].endTime;
-
-  //     startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-  //   //alur beda hari
-  //   } else if (totalMinutes1 > totalMinutes2) {
-
-  //     var waktu3 =
-  //         TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
-  //     int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
-
-  //     if (totalMinutes2 > totalMinutes3) {
-
-  //     startTime = AppData.informasiUser![0].endTime;
-  //     endTime = AppData.informasiUser![0].startTime;
-
-  //     startDate = DateFormat('yyyy-MM-dd')
-  //          .format(DateTime.now().add(Duration(days: -1)));
-
-  //       endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-  //     } else {
-
-  //       startTime = AppData.informasiUser![0].endTime;
-  //       endTime = AppData.informasiUser![0].startTime;
-
-  //       endDate = DateFormat('yyyy-MM-dd')
-  //       .format(DateTime.now().add(Duration(days: 1)));
-
-  //       startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     }
-  //   } else {
-  //     startTime = AppData.informasiUser![0].startTime;
-  //     endTime = AppData.informasiUser![0].endTime;
-
-  //     startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     print("Waktu 1 sama dengan waktu 2");
-  //   }
-  //   Map<String, dynamic> body = {
-  //     'atten_date': DateFormat('yyyy-MM-dd')
-  //         .format(DateTime.now().add(Duration(days: -1))),
-  //     'em_id': getEmid,
-  //     'database': AppData.selectedDatabase,
-  //     'start_date': startDate,
-  //     'end_date': endDate,
-  //     'start_time': startTime,
-  //     'end_time': endTime,
-
-  //   };
-  //   var connect = Api.connectionApi("post", body, "view_last_absen_user");
-
-  //   connect.then((dynamic res) {
-  //     if (res.statusCode == 200) {
-  //       var valueBody = jsonDecode(res.body);
-  //       print("data login ${valueBody}");
-  //       var data = valueBody['data'];
-  //       if (data.isEmpty) {
-
-  //         AppData.statusAbsen = false;
-
-  //       } else {
-
-  //             AppData.statusAbsen =
-  //             data[0]['signout_time'] == "00:00:00" ? true : false;
-
-  //       }
-  //     }
-  //   });
-  // }
-
-  //Future<void> checkAbsenUser(convert, getEmid) async {
-  //   // Map<String, dynamic> body = {'atten_date': convert, 'em_id': getEmid};
-  //   // print(body);
-  //   print("view last absen user");
-  //   var startTime = "";
-  //   var endTime = "";
-
-  //   var startDate = "";
-  //   var endDate = "";
-
-  //   //sekarang jam 03:00
-  //   // start time 05:00
-  //   //end entimenua 02:04
-  //   //jika star time lebih besar dari end time maka  akan memeriksa attendance dari start time di hari sebelumya  tanggal sekarang dengan end time
-  //   //
-
-  //   TimeOfDay waktu1 = TimeOfDay(
-  //       hour: int.parse(
-  //           AppData.informasiUser![0].startTime.toString().split(':')[0]),
-  //       minute: int.parse(AppData.informasiUser![0].startTime
-  //           .toString()
-  //           .split(':')[1]));
-
-  //   // Waktu pertama
-  //   TimeOfDay waktu2 = TimeOfDay(
-  //       hour: int.parse(
-  //           AppData.informasiUser![0].endTime.toString().split(':')[0]),
-  //       minute: int.parse(AppData.informasiUser![0].startTime
-  //           .toString()
-  //           .split(':')[1]));
-
-  //   // Waktu kedua
-  //   int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
-  //   int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
-  //   if (totalMinutes1 < totalMinutes2) {
-  //     startTime = AppData.informasiUser![0].startTime;
-  //     endTime = AppData.informasiUser![0].endTime;
-
-  //     startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   } else if (totalMinutes1 > totalMinutes2) {
-  //     var waktu3 =
-  //         TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
-  //     int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
-
-  //     if (totalMinutes2 > totalMinutes3) {
-  //       startTime = AppData.informasiUser![0].endTime;
-  //       endTime = AppData.informasiUser![0].startTime;
-  //       startDate = DateFormat('yyyy-MM-dd')
-  //           .format(DateTime.now().add(Duration(days: -1)));
-  //       endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     } else {
-  //       startTime = AppData.informasiUser![0].endTime;
-  //       endTime = AppData.informasiUser![0].startTime;
-  //       startDate = DateFormat('yyyy-MM-dd')
-  //           .format(DateTime.now().add(Duration(days: 1)));
-  //       endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     }
-  //   } else {
-  //     startTime = AppData.informasiUser![0].startTime;
-  //     endTime = AppData.informasiUser![0].endTime;
-
-  //     startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //     print("Waktu 1 sama dengan waktu 2");
-  //   }
-  //   Map<String, dynamic> body = {
-  //     'atten_date': convert,
-  //     'em_id': getEmid,
-  //     'database': AppData.selectedDatabase,
-  //     'start_date': startDate,
-  //     'end_date': endDate,
-  //     'start_time': startTime,
-  //     'emd_time': endTime
-  //   };
-
-  //   var connect = Api.connectionApi("post", body, "view_last_absen_user");
-
-  //   connect.then((dynamic res) {
-  //     print("status code ${res.statusCode }");
-  //   if (res.statusCode == 200) {
-  //     var valueBody = jsonDecode(res.body);
-  //         List data = valueBody['data'];
-
-  //   if (data.isEmpty) {
-  //     AppData.statusAbsen = false;
-
-  //      Future.delayed(Duration.zero, () {});
-  //   } else {
-  //         AppData.statusAbsen =
-  //               data[0]['signout_time'] == "00:00:00" ? true : false;
-
-  //     //  var tanggalTerakhirAbsen = data[0]['atten_date'];
-  //     //     if (tanggalTerakhirAbsen == endDate) {
-  //     //       // print("siggin time ${data[0]['sign_time']}");
-  //     //       AppData.statusAbsen =
-  //     //           data[0]['signout_time'] == "00:00:00" ? true : false;
-
-  //     //     } else {
-  //     //       AppData.statusAbsen = false;
-  //     //     }
-
-  //   }
-
-  //   }
-  // });
-  //   // var value = await connect;
-  //   // var valueBody = jsonDecode(value.body);
-
-  //   // List data = valueBody['data'];
-
-  //   // print('data response $valueBody');
-  //   // if (data.isEmpty) {
-  //   //   AppData.statusAbsen = false;
-
-  //   //   // Future.delayed(Duration.zero, () {});
-  //   // } else {
-  //   //   var now = DateTime.parse(DateFormat("yyyy-MM-dd hh:mm:dd")
-  //   //       .format(DateTime.parse(DateTime.now().toString())));
-  //   //   var newStartDate = DateTime.parse(DateFormat('yyy-MM-dd hh:mm:ss')
-  //   //       .format(DateTime.parse(startDate + " " + startTime)));
-  //   //   var newEndDate = DateTime.parse(DateFormat('yyy-MM-dd hh:mm:ss')
-  //   //       .format(DateTime.parse(endDate + " " + endTime)));
-
-  //   //   if (now.isAfter(newStartDate) && now.isBefore(newEndDate)) {
-  //   //     AppData.statusAbsen =
-  //   //         data[0]['signout_time'] == "00:00:00" ? true : false;
-  //   //   } else {
-  //   //     if (totalMinutes1 < totalMinutes2) {
-  //   //       var tanggalTerakhirAbsen = data[0]['atten_date'];
-  //   //       if (tanggalTerakhirAbsen == convert) {
-  //   //         // print("siggin time ${data[0]['sign_time']}");
-  //   //         AppData.statusAbsen =
-  //   //             data[0]['signout_time'] == "00:00:00" ? true : false;
-  //   //       } else {
-  //   //         AppData.statusAbsen = false;
-  //   //       }
-  //   //     } else {
-  //   //       AppData.statusAbsen = false;
-  //   //     }
-  //   //   }
-  //   // }
-  //}
-
-  //   Future<void> checkAbsenUser(convert, getEmid) async {
-  //   // Map<String, dynamic> body = {'atten_date': convert, 'em_id': getEmid};
-  //   // print(body);
-  //   print("view last absen user");
-
-  //   //sekarang jam 03:00
-  //   // start time 05:00
-  //   //end entimenua 02:04
-  //   //jika star time lebih besar dari end time maka  akan memeriksa attendance dari start time di hari sebelumya  tanggal sekarang dengan end time
-  //   //
-  //   // TimeOfDay waktu1 = TimeOfDay(
-  //   //     hour: int.parse(
-  //   //         AppData.informasiUser![0].startTime.toString().split(':')[0]),
-  //   //     minute: int.parse(AppData.informasiUser![0].startTime
-  //   //         .toString()
-  //   //         .split(':')[1])); // Waktu pertama
-  //   // TimeOfDay waktu2 = TimeOfDay(
-  //   //     hour: int.parse(
-  //   //         AppData.informasiUser![0].endTime.toString().split(':')[0]),
-  //   //     minute: int.parse(AppData.informasiUser![0].startTime
-  //   //         .toString()
-  //   //         .split(':')[1])); // Waktu kedua
-  //   // int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
-  //   // int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
-  //   // if (totalMinutes1 < totalMinutes2) {
-  //   //   startTime = AppData.informasiUser![0].startTime;
-  //   //   endTime = AppData.informasiUser![0].endTime;
-
-  //   //   startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   //   endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   // } else if (totalMinutes1 > totalMinutes2) {
-  //   //   var waktu3 =
-  //   //       TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
-  //   //   int totalMinutes3 = waktu3.hour * 60 + waktu3.minute;
-
-  //   //   if (totalMinutes2 > totalMinutes3) {
-  //   //     startTime = AppData.informasiUser![0].endTime;
-  //   //     endTime = AppData.informasiUser![0].startTime;
-  //   //     startDate = DateFormat('yyyy-MM-dd')
-  //   //         .format(DateTime.now().add(Duration(days: -1)));
-  //   //     endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   //   } else {
-  //   //     startTime = AppData.informasiUser![0].endTime;
-  //   //     endTime = AppData.informasiUser![0].startTime;
-  //   //     startDate = DateFormat('yyyy-MM-dd')
-  //   //         .format(DateTime.now().add(Duration(days: 1)));
-  //   //     endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   //   }
-  //   // } else {
-  //   //   startTime = AppData.informasiUser![0].startTime;
-  //   //   endTime = AppData.informasiUser![0].endTime;
-
-  //   //   startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   //   endDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   //   print("Waktu 1 sama dengan waktu 2");
-  //   // }
-  //   Map<String, dynamic> body = {
-  //     'atten_date': convert,
-  //     'em_id': getEmid,
-  //     'database': AppData.selectedDatabase,
-
-  //   };
-
-  //   print(" last absen ${body}");
-
-  //   print("List absen usernew ");
-
-  //   var connect = Api.connectionApi("post", body, "view_last_absen_user");
-
-  //   connect.then((dynamic res) {
-  //     print("status code ${res.statusCode }");
-  //   if (res.statusCode == 200) {
-  //     var valueBody = jsonDecode(res.body);
-  //         List data = valueBody['data'];
-
-  //   if (data.isEmpty) {
-  //     AppData.statusAbsen = false;
-
-  //      Future.delayed(Duration.zero, () {});
-  //   } else {
-
-  //      var tanggalTerakhirAbsen = data[0]['atten_date'];
-  //         if (tanggalTerakhirAbsen == convert) {
-  //           // print("siggin time ${data[0]['sign_time']}");
-  //           AppData.statusAbsen =
-  //               data[0]['signout_time'] == "00:00:00" ? true : false;
-
-  //         } else {
-  //           AppData.statusAbsen = false;
-  //         }
-
-  //   }
-
-  //   }
-  // });
-
-  // }
-  // conne.then((dynamic res) {
-  //   if (res.statusCode == 200) {
-  //     var valueBody = jsonDecode(res.body);
-
-  //     print("value body ${valueBody}");
-
-  //   }
-  // });
 
   Future<bool> checkValidasipayroll({type, page}) async {
     var dataUser = AppData.informasiUser;
@@ -2164,15 +1804,13 @@ class DashboardController extends GetxController {
     } catch (e) {
       UtilsAlert.showToast(e);
       return false;
-      print(e.toString());
     }
   }
 
   Future<void> getDepartemen() async {
     controllerAbsensi.showButtonlaporan.value = false;
-    print("get departement ${controllerAbsensi.showButtonlaporan.value}");
     departementAkses.value = [];
-    print("get departement ");
+
     jumlahData.value = 0;
     var connect = Api.connectionApi("get", {}, "all_department");
     connect.then((dynamic res) {
@@ -2221,7 +1859,6 @@ class DashboardController extends GetxController {
           // print("hak akses ${dataUser![0].em_hak_akses}");
           this.departementAkses.refresh();
           if (departementAkses.value.isNotEmpty) {
-            print("get departement ${departementAkses} ");
             controllerAbsensi.showButtonlaporan.value = true;
           } else {
             controllerAbsensi.showButtonlaporan.value = false;
@@ -2619,11 +2256,9 @@ class DashboardController extends GetxController {
       var connect = Api.connectionApi("post", body, "work-schedule");
       connect.then((dynamic res) {
         var valueBody = jsonDecode(res.body);
-        print("data error wrok ${valueBody}");
-        print("data body ${body}");
+
 
         if (valueBody['status'] == false) {
-          print("data work time ${valueBody}");
           timeIn.value = AppData.informasiUser![0].timeIn;
           timeOut.value = AppData.informasiUser![0].timeOut;
         } else {
@@ -2724,6 +2359,7 @@ class DashboardController extends GetxController {
           controllerAbsensi.showButtonlaporan.value = false;
           controllerIzin.showButtonlaporan.value = false;
           controllerLembur.showButtonlaporan.value = false;
+          controllerShift.showButtonlaporan.value = false;
 
           controllerTugasLuar.showButtonlaporan.value = false;
           controllerKlaim.showButtonlaporan.value = false;
@@ -2736,6 +2372,7 @@ class DashboardController extends GetxController {
 
           temporary[0]['menu'].forEach((element) {
             print("Nama Menu ${element['nama']}");
+            print("Menu Id ${element['id']}");
 
             menus.add({
               'id': element['id'],
@@ -2800,6 +2437,10 @@ class DashboardController extends GetxController {
         sortcardPengajuan
             .add({"id": 7, "nama_pengajuan": "Pengajuan Kandidat"});
         break;
+      case "Change Shift":
+      controllerShift.showButtonlaporan.value = true;
+        sortcardPengajuan.add({"id": 17, "nama_pengajuan": "Pengajuan Shift"});
+        break;
     }
   }
 
@@ -2817,6 +2458,7 @@ class DashboardController extends GetxController {
       controllerTugasLuar.showButtonlaporan.value = false;
       controllerKlaim.showButtonlaporan.value = false;
       controllerCuti.showButtonlaporan.value = false;
+      controllerShift.showButtonlaporan.value = false;
 
       menusUtama.forEach((element) {
         print("Nama Menu ${element['nama']}");
@@ -2875,9 +2517,10 @@ class DashboardController extends GetxController {
             menu['url'].toString().toLowerCase().trim() == "dailytask");
         showAbsen.value = menusUtama.any(
             (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
+        showApresiasi.value = menusUtama.any((menu) =>
+            menu['url'].toString().toLowerCase().trim() == 'apresiasi');
       }
     } catch (error) {
-      print("Terjadi kesalahan: $error");
 
       var menusUtama = await SqliteDatabaseHelper().getMenusUtama();
       menuShowInMainUtama.value = menusUtama;
@@ -2894,6 +2537,8 @@ class DashboardController extends GetxController {
           (menu) => menu['url'].toString().toLowerCase().trim() == "dailytask");
       showAbsen.value = menusUtama.any(
           (menu) => menu['url'].toString().toLowerCase().trim() == "absen");
+      showApresiasi.value = menusUtama.any(
+          (menu) => menu['url'].toString().toLowerCase().trim() == "apresiasi");
     }
   }
 
@@ -2910,7 +2555,6 @@ class DashboardController extends GetxController {
           if (res.statusCode == 200) {
             var valueBody = jsonDecode(res.body);
             var data = valueBody['data'];
-            print("data informasi ${data}");
             var filter1 = [];
             var dt = DateTime.now();
             for (var element in data) {
@@ -2933,7 +2577,6 @@ class DashboardController extends GetxController {
 
   Future<void> getEmployeeUltah(dt) async {
     employeeUltah.clear();
-    print("ulang tahun ${dt}");
     var tanggal =
         "${DateFormat('yyyy-MM-dd').format(DateTime.parse(dt.toString()))}";
     Map<String, dynamic> body = {
@@ -2945,10 +2588,22 @@ class DashboardController extends GetxController {
         if (res.statusCode == 200) {
           var valueBody = jsonDecode(res.body);
           employeeUltah.value = valueBody['data'];
-          print("data ualgn tahun ${employeeUltah.length}");
           this.employeeUltah.refresh();
         }
       });
+    });
+  }
+
+  Future<void> getApresiasi() async {
+    employeeApresiasi.clear();
+    var connect = Api.connectionApi("get", {}, "apresiasi");
+
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        employeeApresiasi.value = valueBody['data'];
+        this.employeeApresiasi.refresh();
+      }
     });
   }
 
@@ -2970,7 +2625,6 @@ class DashboardController extends GetxController {
               .compareTo(b['full_name'].toUpperCase()));
 
           employeeTidakHadir.value = data;
-          print("data tidak hadir ${employeeTidakHadir}");
           final ids = employeeTidakHadir.map((e) => e['em_id']).toSet();
           employeeTidakHadir.retainWhere((x) => ids.remove(x['em_id']));
 
@@ -3187,14 +2841,16 @@ class DashboardController extends GetxController {
       Get.to(DailyTask());
     } else if (url == "RiwayatCuti") {
       Get.to(RiwayatCuti(), arguments: arguments);
-      // } else if (url == "Izin") {
-      //   Get.to(Izin(), arguments: arguments);
     } else if (url == "TugasLuar") {
       Get.to(TugasLuar(), arguments: arguments);
+    } else if (url == "shift") {
+      Get.to(ShiftScreen(), arguments: arguments);
     } else if (url == "Klaim") {
       Get.to(Klaim(), arguments: arguments);
     } else if (url == "Kasbon") {
       Get.to(Kasbon(), arguments: arguments);
+    } else if (url == "PinjamanAlat") {
+      Get.to(Pinjaman(), arguments: arguments);
     } else if (url == "FormKlaim") {
       Get.to(FormKlaim(
         dataForm: [[], false],
@@ -3298,6 +2954,9 @@ class DashboardController extends GetxController {
     } else if (id == 6) {
       Get.to(FormKlaim(
         dataForm: [[], false],
+      ));
+    }else if (id == 17) {
+      Get.to(ShiftScreen(
       ));
     } else {
       UtilsAlert.showToast("Tahap Development");
@@ -3428,10 +3087,11 @@ class DashboardController extends GetxController {
                         ),
                         TextButtonWidget(
                           title: "Lanjutkan",
-                          onTap: () async {
+                          onTap: () {
                             if (type == "checkTracking") {
                               print('kesini');
                               Get.back();
+
                               // await controllerAbsensi.deteksiFakeGps(context);
                               if (controllerAbsensi.statusDeteksi.value ==
                                       false &&
@@ -3439,6 +3099,8 @@ class DashboardController extends GetxController {
                                       false) {
                                 // if (authController.isConnected.value &&
                                 //     !controllerAbsensi.coordinate.value) {
+                                print(
+                                    'ini placecordinate ${controllerAbsensi.placeCoordinate}');
                                 controllerAbsensi.kirimDataAbsensi(
                                     typewfh: typewfh);
                                 // } else if (controllerAbsensi.coordinate.value ==
@@ -3496,8 +3158,8 @@ class DashboardController extends GetxController {
                             // }
                             else {
                               Navigator.pop(context);
-                              await Permission.camera.request();
-                              await Permission.location.request();
+                              Permission.camera.request();
+                              Permission.location.request();
                             }
                           },
                           colorButton: Constanst.colorButton1,
@@ -3657,6 +3319,7 @@ class DashboardController extends GetxController {
                   scrollDirection: Axis.vertical,
                   itemBuilder: (context, index) {
                     var id = sortcardPengajuan[index]['id'];
+                    print(id);
                     var gambar = sortcardPengajuan[index]['gambar'];
                     return InkWell(
                       // highlightColor: Colors.white,
@@ -4056,6 +3719,54 @@ class DashboardController extends GetxController {
                                     padding: const EdgeInsets.only(left: 12.0),
                                     child: Text(
                                       'Laporan Klaim',
+                                      style: GoogleFonts.inter(
+                                          color: Constanst.fgPrimary,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 18,
+                                  color: Constanst.fgSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+              controllerShift.showButtonlaporan.value == false
+                    ? const SizedBox()
+                    : InkWell(
+                        // highlightColor: Colors.white,
+                        onTap: () {
+                          Get.back();
+                          Get.to(LaporanShift(
+                            title: 'shift',
+                          ));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 12, bottom: 12, left: 16, right: 16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/4_lembur.svg',
+                                    height: 35,
+                                    width: 35,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 12.0),
+                                    child: Text(
+                                      'Laporan Shift',
                                       style: GoogleFonts.inter(
                                           color: Constanst.fgPrimary,
                                           fontSize: 16,

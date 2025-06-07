@@ -19,7 +19,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class Login extends StatelessWidget {
   final controller = Get.put(AuthController());
-  final internetController = Get.put(InternetController());
+  final internetController = Get.find<InternetController>(tag: 'AuthController');
 
   @override
   Widget build(BuildContext context) {
@@ -221,9 +221,56 @@ class Login extends StatelessWidget {
                             onTap: () {
                               print("tes");
                               if (controller.email.value.text != "") {
-                                if (controller.tempEmail.value.text ==
-                                    controller.email.value.text) {
-                                  if (controller.databases.isNotEmpty) {
+                                if (internetController.isConnected.value) {
+                                  if (controller.tempEmail.value.text ==
+                                      controller.email.value.text) {
+                                    if (controller.databases.isNotEmpty) {
+                                      controller.dataabse().then((value) {
+                                        if (value == true) {
+                                          showModalBottomSheet(
+                                            backgroundColor: Colors.transparent,
+                                            isScrollControlled: true,
+                                            context: context,
+                                            builder: (context) {
+                                              return FractionallySizedBox(
+                                                  heightFactor: 0.6,
+                                                  child: _bottomSheetBpjsDetail(
+                                                      context));
+                                            },
+                                          );
+                                        } else {
+                                          UtilsAlert.showToast(
+                                              "Database tidak tersedia");
+                                        }
+                                      });
+                                      // showModalBottomSheet(
+                                      //   backgroundColor: Colors.transparent,
+                                      //   isScrollControlled: true,
+                                      //   context: context,
+                                      //   builder: (context) {
+                                      //     return FractionallySizedBox(
+                                      //         heightFactor: 0.6,
+                                      //         child: _bottomSheetBpjsDetail(
+                                      //             context));
+                                      //   },
+                                      // );
+                                      // showModalBottomSheet(
+                                      //   backgroundColor: Colors.transparent,
+                                      //   isScrollControlled: true,
+                                      //   context: context,
+                                      //   builder: (context) {
+                                      //     return FractionallySizedBox(
+                                      //         heightFactor: 0.6,
+                                      //         child: _bottomSheetBpjsDetail(
+                                      //             context));
+                                      //   },
+                                      // );
+                                    } else {
+                                      UtilsAlert.showToast(
+                                          "User ESS Belum di daftarkan");
+                                    }
+                                  } else {
+                                    print('ini get data baru');
                                     controller.dataabse().then((value) {
                                       if (value == true) {
                                         showModalBottomSheet(
@@ -239,54 +286,13 @@ class Login extends StatelessWidget {
                                         );
                                       } else {
                                         UtilsAlert.showToast(
-                                            "Database tidak tersedia");
+                                            "User ESS Belum di daftarkan");
                                       }
                                     });
-                                    // showModalBottomSheet(
-                                    //   backgroundColor: Colors.transparent,
-                                    //   isScrollControlled: true,
-                                    //   context: context,
-                                    //   builder: (context) {
-                                    //     return FractionallySizedBox(
-                                    //         heightFactor: 0.6,
-                                    //         child: _bottomSheetBpjsDetail(
-                                    //             context));
-                                    //   },
-                                    // );
-                                    // showModalBottomSheet(
-                                    //   backgroundColor: Colors.transparent,
-                                    //   isScrollControlled: true,
-                                    //   context: context,
-                                    //   builder: (context) {
-                                    //     return FractionallySizedBox(
-                                    //         heightFactor: 0.6,
-                                    //         child: _bottomSheetBpjsDetail(
-                                    //             context));
-                                    //   },
-                                    // );
-                                  } else {
-                                    UtilsAlert.showToast(
-                                        "Database tidak tersedia");
                                   }
                                 } else {
-                                  controller.dataabse().then((value) {
-                                    if (value == true) {
-                                      showModalBottomSheet(
-                                        backgroundColor: Colors.transparent,
-                                        isScrollControlled: true,
-                                        context: context,
-                                        builder: (context) {
-                                          return FractionallySizedBox(
-                                              heightFactor: 0.6,
-                                              child: _bottomSheetBpjsDetail(
-                                                  context));
-                                        },
-                                      );
-                                    } else {
-                                      UtilsAlert.showToast(
-                                          "Database tidak tersedia");
-                                    }
-                                  });
+                                  UtilsAlert.showToast(
+                                    "Periksa Internet anda, dan silakan coba lagi");
                                 }
                               } else {
                                 UtilsAlert.showToast(
@@ -412,7 +418,8 @@ class Login extends StatelessWidget {
                                 String? savedEmail = AppData.emailUser;
                                 String? savedPassword = AppData.passwordUser;
                                 if (savedEmail == controller.email.value.text &&
-                                    savedPassword == controller.password.value.text) {
+                                    savedPassword ==
+                                        controller.password.value.text) {
                                   // AppData.loginOffline = true;
                                   AppData.isLogin = true;
                                   Get.offAll(InitScreen());

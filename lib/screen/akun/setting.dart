@@ -20,6 +20,8 @@ import 'package:siscom_operasional/screen/akun/edit_password.dart';
 import 'package:siscom_operasional/screen/akun/face_recognigration.dart';
 import 'package:siscom_operasional/screen/akun/info_karyawan.dart';
 import 'package:siscom_operasional/screen/akun/personal_info.dart';
+import 'package:siscom_operasional/screen/apresiasi.dart';
+import 'package:siscom_operasional/screen/signature_page.dart';
 import 'package:siscom_operasional/screen/surat_peringatan.dart';
 import 'package:siscom_operasional/screen/teguran_lisan.dart';
 import 'package:siscom_operasional/utils/api.dart';
@@ -39,11 +41,12 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
-  final controller = Get.put(SettingController());
+  final controller = Get.find<SettingController>();
   final controllerDashboard = Get.put(DashboardController());
   final authController = Get.put(AuthController());
   final suratController = Get.put(SuratPeringatanController());
-  final internetController = Get.find<InternetController>();
+  final internetController =
+      Get.find<InternetController>(tag: 'AuthController');
   var faceRecog = false;
   var namaVersi = "...".obs;
 
@@ -110,7 +113,8 @@ class _SettingState extends State<Setting> {
                       child: infoPeriode(),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                      padding: const EdgeInsets.only(
+                          left: 16.0, right: 16.0, top: 16.0),
                       child: infoCabang(),
                     ),
                     const SizedBox(
@@ -260,7 +264,10 @@ class _SettingState extends State<Setting> {
                                     Container(
                                       decoration: BoxDecoration(
                                           border: Border.all(
-                                            color: internetController.isConnected.value ? Constanst.color5 : Constanst.color4,
+                                            color: internetController
+                                                    .isConnected.value
+                                                ? Constanst.color5
+                                                : Constanst.color4,
                                             width: 2.0,
                                           ),
                                           borderRadius: const BorderRadius.all(
@@ -412,7 +419,10 @@ class _SettingState extends State<Setting> {
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.all(3),
-                                                color: internetController.isConnected.value ? Constanst.color5: Constanst.color4,
+                                                color: internetController
+                                                        .isConnected.value
+                                                    ? Constanst.color5
+                                                    : Constanst.color4,
                                                 child: const Icon(
                                                   Icons.check,
                                                   size: 12,
@@ -507,7 +517,6 @@ class _SettingState extends State<Setting> {
               onTap: () {
                 controller.getUserInfo();
                 Get.to(InfoKaryawan());
-
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -620,7 +629,8 @@ class _SettingState extends State<Setting> {
                                 ? Row(
                                     children: [
                                       Text(
-                                        Constanst.convertDate1(AppData.informasiUser![0]
+                                        Constanst.convertDate1(AppData
+                                            .informasiUser![0]
                                             .tanggalBerakhirKontrak
                                             .toString()),
                                         style: GoogleFonts.inter(
@@ -646,7 +656,6 @@ class _SettingState extends State<Setting> {
                                               color: Constanst.fgSecondary,
                                               fontWeight: FontWeight.w500,
                                               fontSize: 6),
-                                          
                                         ),
                                       ),
                                     ],
@@ -682,6 +691,8 @@ class _SettingState extends State<Setting> {
   Widget infoPeriode() {
     return GestureDetector(
       onTap: () {
+        print('ini start priode ${AppData.startPeriode}');
+        print('ini end priode ${AppData.endPeriode}');
         var dt = DateTime.parse(AppData.endPeriode);
         var outputFormat1 = DateFormat('MM');
         var outputFormat2 = DateFormat('yyyy');
@@ -1177,181 +1188,337 @@ class _SettingState extends State<Setting> {
               ],
             ),
           ),
-        ),     
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: () => Get.to(SuratPeringatan()),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 8.0),
-            child: Column(
-              children: [
-                Divider(
-                  height: 0,
-                  thickness: 1,
-                  color: Constanst.colorNeutralBgTertiary,
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Obx( () =>Stack(children: [
-                            Icon(
-                              Iconsax.warning_2,
-                              color: Constanst.fgSecondary,
-                              size: 24,
-                            ),
-                            Visibility(
-                              visible: suratController.notifSuratPeringatan.value
-                                      .toString() !=
-                                  "0",
-                              child: Positioned(
-                                top: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 18,
-                                  width: 18,
-                                  decoration: BoxDecoration(
-                                    color: Constanst.colorStateDangerBg,
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(100.0),
-                                    ),
-                                    border: Border.all(
-                                      width: 1.0,
-                                      color: Constanst.colorStateDangerBorder,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Obx(
-                                      () => Text(
-                                        "${suratController.notifSuratPeringatan.value}"
-                                                    .length >
-                                                2
-                                            ? '${"${suratController.notifSuratPeringatan.value}".substring(0, 2)}+'
-                                            : "${suratController.notifSuratPeringatan.value}",
-                                        style: GoogleFonts.inter(
-                                          color: Constanst.colorStateOnDangerBg,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ]),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12),
-                          child: Text(
-                            "Surat Peringatan",
-                            style: GoogleFonts.inter(
-                                color: Constanst.fgPrimary,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14),
-                          ),
-                        )
-                      ],
-                    ),
-                    Icon(Icons.arrow_forward_ios_rounded,
-                        size: 18, color: Constanst.fgSecondary)
-                  ],
-                ),
-              ],
-            ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: Divider(
+            height: 0,
+            thickness: 1,
+            color: Constanst.colorNeutralBgTertiary,
           ),
         ),
-        InkWell(
-          onTap: () => Get.to(TeguranLisan()),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 12.0),
-            child: Column(
-              children: [
-                Divider(
-                  height: 0,
-                  thickness: 1,
-                  color: Constanst.colorNeutralBgTertiary,
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Obx( () =>Stack(children: [
-                            Icon(
-                              Iconsax.warning_2,
-                              color: Constanst.fgSecondary,
-                              size: 24,
-                            ),
-                            Visibility(
-                              visible: suratController.notifTeguranLisan.value
-                                      .toString() !=
-                                  "0",
-                              child: Positioned(
-                                top: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 18,
-                                  width: 18,
-                                  decoration: BoxDecoration(
-                                    color: Constanst.colorStateDangerBg,
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(100.0),
-                                    ),
-                                    border: Border.all(
-                                      width: 1.0,
-                                      color: Constanst.colorStateDangerBorder,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Obx(
-                                      () => Text(
-                                        "${suratController.notifTeguranLisan.value}"
-                                                    .length >
-                                                2
-                                            ? '${"${suratController.notifTeguranLisan.value}".substring(0, 2)}+'
-                                            : "${suratController.notifTeguranLisan.value}",
-                                        style: GoogleFonts.inter(
-                                          color: Constanst.colorStateOnDangerBg,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ]),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12),
-                          child: Text(
-                            "Surat Teguran Lisan",
-                            style: GoogleFonts.inter(
-                                color: Constanst.fgPrimary,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14),
-                          ),
-                        )
-                      ],
-                    ),
-                    Icon(Icons.arrow_forward_ios_rounded,
-                        size: 18, color: Constanst.fgSecondary)
-                  ],
-                ),
-              ],
-            ),
-          ),
+        signature(),
+        apresiasi(),
+        SizedBox(
+          height: 8,
         ),
+        suratPeringatan(),
+        SizedBox(
+          height: 8,
+        ),
+        teguranLisan()
       ],
+    );
+  }
+
+  InkWell signature() {
+    return InkWell(
+      onTap: () {
+        Get.to(SignaturePage());
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 12.0, 20.0, 12.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.sign_language,
+                      color: Constanst.fgSecondary,
+                      size: 24,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        "Tanda Tangan Digital",
+                        style: GoogleFonts.inter(
+                            color: Constanst.fgPrimary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14),
+                      ),
+                    )
+                  ],
+                ),
+                Icon(Icons.arrow_forward_ios_rounded,
+                    size: 18, color: Constanst.fgSecondary)
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget teguranLisan() {
+    return InkWell(
+      onTap: () => Get.to(TeguranLisan()),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 20.0, 12.0),
+        child: Column(
+          children: [
+            Divider(
+              height: 0,
+              thickness: 1,
+              color: Constanst.colorNeutralBgTertiary,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Obx(
+                      () => Stack(children: [
+                        Icon(
+                          Iconsax.warning_2,
+                          color: Constanst.fgSecondary,
+                          size: 24,
+                        ),
+                        Visibility(
+                          visible: suratController.notifTeguranLisan.value
+                                  .toString() !=
+                              "0",
+                          child: Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              height: 18,
+                              width: 18,
+                              decoration: BoxDecoration(
+                                color: Constanst.colorStateDangerBg,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(100.0),
+                                ),
+                                border: Border.all(
+                                  width: 1.0,
+                                  color: Constanst.colorStateDangerBorder,
+                                ),
+                              ),
+                              child: Center(
+                                child: Obx(
+                                  () => Text(
+                                    "${suratController.notifTeguranLisan.value}"
+                                                .length >
+                                            2
+                                        ? '${"${suratController.notifTeguranLisan.value}".substring(0, 2)}+'
+                                        : "${suratController.notifTeguranLisan.value}",
+                                    style: GoogleFonts.inter(
+                                      color: Constanst.colorStateOnDangerBg,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        "Surat Teguran Lisan",
+                        style: GoogleFonts.inter(
+                            color: Constanst.fgPrimary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14),
+                      ),
+                    )
+                  ],
+                ),
+                Icon(Icons.arrow_forward_ios_rounded,
+                    size: 18, color: Constanst.fgSecondary)
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget suratPeringatan() {
+    return InkWell(
+      onTap: () => Get.to(SuratPeringatan()),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 20.0, 8.0),
+        child: Column(
+          children: [
+            Divider(
+              height: 0,
+              thickness: 1,
+              color: Constanst.colorNeutralBgTertiary,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Obx(
+                      () => Stack(children: [
+                        Icon(
+                          Iconsax.warning_2,
+                          color: Constanst.fgSecondary,
+                          size: 24,
+                        ),
+                        Visibility(
+                          visible: suratController.notifSuratPeringatan.value
+                                  .toString() !=
+                              "0",
+                          child: Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              height: 18,
+                              width: 18,
+                              decoration: BoxDecoration(
+                                color: Constanst.colorStateDangerBg,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(100.0),
+                                ),
+                                border: Border.all(
+                                  width: 1.0,
+                                  color: Constanst.colorStateDangerBorder,
+                                ),
+                              ),
+                              child: Center(
+                                child: Obx(
+                                  () => Text(
+                                    "${suratController.notifSuratPeringatan.value}"
+                                                .length >
+                                            2
+                                        ? '${"${suratController.notifSuratPeringatan.value}".substring(0, 2)}+'
+                                        : "${suratController.notifSuratPeringatan.value}",
+                                    style: GoogleFonts.inter(
+                                      color: Constanst.colorStateOnDangerBg,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        "Surat Peringatan",
+                        style: GoogleFonts.inter(
+                            color: Constanst.fgPrimary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14),
+                      ),
+                    )
+                  ],
+                ),
+                Icon(Icons.arrow_forward_ios_rounded,
+                    size: 18, color: Constanst.fgSecondary)
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  InkWell apresiasi() {
+    return InkWell(
+      onTap: () => Get.to(Apresiasi()),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 20.0, 8.0),
+        child: Column(
+          children: [
+            Divider(
+              height: 0,
+              thickness: 1,
+              color: Constanst.colorNeutralBgTertiary,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Obx(
+                      () => Stack(children: [
+                        Icon(
+                          Icons.card_giftcard,
+                          color: Constanst.fgSecondary,
+                          size: 24,
+                        ),
+                        Visibility(
+                          visible: suratController.notifSuratPeringatan.value
+                                  .toString() !=
+                              "0",
+                          child: Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              height: 18,
+                              width: 18,
+                              decoration: BoxDecoration(
+                                color: Constanst.colorStateDangerBg,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(100.0),
+                                ),
+                                border: Border.all(
+                                  width: 1.0,
+                                  color: Constanst.colorStateDangerBorder,
+                                ),
+                              ),
+                              child: Center(
+                                child: Obx(
+                                  () => Text(
+                                    "${suratController.notifSuratPeringatan.value}"
+                                                .length >
+                                            2
+                                        ? '${"${suratController.notifSuratPeringatan.value}".substring(0, 2)}+'
+                                        : "${suratController.notifSuratPeringatan.value}",
+                                    style: GoogleFonts.inter(
+                                      color: Constanst.colorStateOnDangerBg,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        "Apresiasi",
+                        style: GoogleFonts.inter(
+                            color: Constanst.fgPrimary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14),
+                      ),
+                    )
+                  ],
+                ),
+                Icon(Icons.arrow_forward_ios_rounded,
+                    size: 18, color: Constanst.fgSecondary)
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 

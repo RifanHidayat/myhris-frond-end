@@ -20,7 +20,7 @@ class Informasi extends StatelessWidget {
   final index;
   Informasi({this.index});
   final controller = Get.put(DashboardController());
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
 
   @override
   Widget build(BuildContext context) {
@@ -185,43 +185,6 @@ class Informasi extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Expanded(
-        //   child: InkWell(
-        //     onTap: () {
-        //       controller.selectedInformasiView.value = 0;
-        //       controller.informasiController.jumpToPage(0);
-        //       controller.selectedInformasiView.refresh();
-        //     },
-        //     child: Padding(
-        //       padding: const EdgeInsets.only(top: 8.0),
-        //       child: Container(
-        //         decoration: BoxDecoration(
-        //           border: Border(
-        //             bottom: BorderSide(
-        //               color: controller.selectedInformasiView.value == 0
-        //                   ? Constanst.colorPrimary
-        //                   : Constanst.color6,
-        //               width: 3.0,
-        //             ),
-        //           ),
-        //         ),
-        //         child: Padding(
-        //           padding: const EdgeInsets.only(bottom: 8),
-        //           child: Text(
-        //             "Informasi",
-        //             textAlign: TextAlign.center,
-        //             style: GoogleFonts.inter(
-        //                 color: controller.selectedInformasiView.value == 0
-        //                     ? Constanst.colorPrimary
-        //                     : Constanst.colorText2,
-        //                 fontWeight: FontWeight.w500,
-        //                 fontSize: 14),
-        //           ),
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
         Expanded(
           child: InkWell(
             onTap: () {
@@ -248,7 +211,7 @@ class Informasi extends StatelessWidget {
                     "Ulang Tahun",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                        color: controller.selectedInformasiView.value ==0
+                        color: controller.selectedInformasiView.value == 0
                             ? Constanst.colorPrimary
                             : Constanst.colorText2,
                         fontWeight: FontWeight.w500,
@@ -272,7 +235,7 @@ class Informasi extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: controller.selectedInformasiView.value ==1
+                      color: controller.selectedInformasiView.value == 1
                           ? Constanst.colorPrimary
                           : Constanst.color6,
                       width: 2.0,
@@ -349,17 +312,17 @@ class Informasi extends StatelessWidget {
           controller.selectedInformasiView.refresh();
         },
         // itemCount: !controller.viewInformasiSisaKontrak.value ? 3 : 4,
-        itemCount: 4,
+        itemCount: 3,
         itemBuilder: (context, index) {
           return Padding(
               padding: const EdgeInsets.all(0),
               child: index == 0
-                      ? screenUltah(context)
-                      : index == 1
-                          ? screenTidakHadir()
-                          : index == 2
-                              ? screenSisaKontrak()
-                              : const SizedBox());
+                  ? screenUltah(context)
+                  : index == 1
+                      ? screenTidakHadir()
+                      : index == 2
+                          ? screenSisaKontrak()
+                          : const SizedBox());
         });
   }
 
@@ -460,12 +423,15 @@ class Informasi extends StatelessWidget {
   }
 
   Widget screenUltah(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width; // Ambil lebar layar
-  const crossAxisCount = 2; // Jumlah kolom
-  const crossAxisSpacing = 12.0; // Spasi antar kolom
-  final itemWidth = (screenWidth - (crossAxisSpacing * (crossAxisCount - 1))) / crossAxisCount; // Lebar item
-  final itemHeight = itemWidth * 1.4; // Misalnya tinggi 20% lebih besar dari lebar
-  final childAspectRatio = itemWidth / itemHeight; // Hitung rasio aspek
+    final screenWidth = MediaQuery.of(context).size.width; // Ambil lebar layar
+    const crossAxisCount = 2; // Jumlah kolom
+    const crossAxisSpacing = 12.0; // Spasi antar kolom
+    final itemWidth =
+        (screenWidth - (crossAxisSpacing * (crossAxisCount - 1))) /
+            crossAxisCount; // Lebar item
+    final itemHeight =
+        itemWidth * 1.4; // Misalnya tinggi 20% lebih besar dari lebar
+    final childAspectRatio = itemWidth / itemHeight; // Hitung rasio aspek
     return controller.employeeUltah.value.isEmpty
         ? const Center(
             child: Padding(
@@ -525,58 +491,46 @@ class Informasi extends StatelessWidget {
                                       Radius.circular(100))),
                               child: Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: 
-                                // image == ""
-                                //     ? SvgPicture.asset(
-                                //         'assets/avatar_default.svg',
-                                //         width: 56,
-                                //         height: 56,
-                                //       )
-                                //     : 
-                                    Center(
-                                        child: CircleAvatar(
-                                          radius: 28,
-                                          child: ClipOval(
-                                            child: ClipOval(
-                                              child: CachedNetworkImage(
-                                                imageUrl:
-                                                    "${Api.UrlfotoProfile}$image",
-                                                progressIndicatorBuilder:
-                                                    (context, url,
-                                                            downloadProgress) =>
-                                                        Container(
-                                                  alignment: Alignment.center,
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.5,
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                          value:
-                                                              downloadProgress
-                                                                  .progress),
-                                                ),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        Container(
-                                                  color: Colors.white,
-                                                  child: SvgPicture.asset(
-                                                    'assets/avatar_default.svg',
-                                                    width: 56,
-                                                    height: 56,
-                                                  ),
-                                                ),
-                                                fit: BoxFit.cover,
-                                                width: 56,
-                                                height: 56,
-                                              ),
+                                child: Center(
+                                  child: CircleAvatar(
+                                    radius: 28,
+                                    child: ClipOval(
+                                      child: ClipOval(
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              "${Api.UrlfotoProfile}$image",
+                                          progressIndicatorBuilder: (context,
+                                                  url, downloadProgress) =>
+                                              Container(
+                                            alignment: Alignment.center,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.5,
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            child: CircularProgressIndicator(
+                                                value:
+                                                    downloadProgress.progress),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                            color: Colors.white,
+                                            child: SvgPicture.asset(
+                                              'assets/avatar_default.svg',
+                                              width: 56,
+                                              height: 56,
                                             ),
                                           ),
+                                          fit: BoxFit.cover,
+                                          width: 56,
+                                          height: 56,
                                         ),
                                       ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ],

@@ -24,7 +24,7 @@ class Pesan extends StatefulWidget {
 }
 
 class _PesanState extends State<Pesan> {
-  final controller = Get.put(PesanController());
+  final controller = Get.find<PesanController>();
   final authController = Get.put(AuthController());
 
   Future<void> refreshData() async {
@@ -605,25 +605,14 @@ class _PesanState extends State<Pesan> {
                                               controller
                                                   .aksilihatNotif(idNotif);
                                             }
-                                            print('ini id detail notifikasi ${idDetail.toString()}');
-                                            print('ini id detail notifikasi ${emId.toString()}');
-                                            print('ini id detail notifikasi ${emIdPengaju.toString()}');
-                                            controller.routeApprovalNotif(
-                                              title: titleNotif,
-                                              emIdPengaju:
-                                                  emIdPengaju.toString(),
-                                              idx: idDetail.toString(),
-                                              delegasi: emId.toString(),
-                                              url: urlRoute,
-                                            );
+                                            
                                           } else if (emIdPengaju.toString() ==
                                               AppData.informasiUser![0].em_id) {
                                             if (view == 0) {
                                               controller
                                                   .aksilihatNotif(idNotif);
                                             }
-                                            controller.redirectToPage(
-                                                urlRoute, idDetail);
+                                            
                                           } else {
                                             if (view == 0) {
                                               controller
@@ -840,9 +829,7 @@ class _PesanState extends State<Pesan> {
                                           print(
                                               "wkwkwk: ${controller.listNotifikasiApproval.value[index]['notifikasi'][idx]}");
 
-                                          if (emIdPengaju !=
-                                                  AppData.informasiUser![0]
-                                                      .em_id &&
+                                          if (
                                               idDetail != null) {
                                             if (view == 0) {
                                               controller
@@ -1098,6 +1085,7 @@ class _PesanState extends State<Pesan> {
                       itemBuilder: (context, index) {
                         var title = controller
                             .dataScreenPersetujuan.value[index]['title'];
+                        print(title);
                         var jumlah = controller.dataScreenPersetujuan
                             .value[index]['jumlah_approve'];
                         return InkWell(
@@ -1170,7 +1158,9 @@ class _PesanState extends State<Pesan> {
                                                                                     ? 'Persetujuan Kasbon'
                                                                                     : title == 'Surat Peringatan'
                                                                                         ? 'Persetujuan Surat Peringatan'
-                                                                                        : 'Persetujuan Teguran Lisan',
+                                                                                        : title == 'Teguran Lisan'
+                                                                                        ? 'Persetujuan Teguran Lisan'
+                                                                                        : 'Persetujuan Shift',
                                             style: GoogleFonts.inter(
                                                 fontWeight: FontWeight.w500,
                                                 color: Constanst.fgPrimary,

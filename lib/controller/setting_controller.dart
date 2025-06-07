@@ -29,7 +29,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 class SettingController extends GetxController {
   var fotoUser = File("").obs;
   final controllerTracking = Get.put(TrackingController());
-  final internetController = Get.put(InternetController());
+  final internetController = Get.find<InternetController>(tag: 'AuthController');
   Rx<List<String>> jenisKelaminDropdown = Rx<List<String>>([]);
   Rx<List<String>> golonganDarahDropdown = Rx<List<String>>([]);
 
@@ -106,7 +106,7 @@ class SettingController extends GetxController {
     setDate(DateTime.now());
     // getTimeNow();
     toRouteSimpanData();
-    getPusatBantuan();
+    // getPusatBantuan();
     allDepartement();
     getUserInfo();
     checkSelesaiKontrak();
@@ -324,41 +324,6 @@ class SettingController extends GetxController {
   }
 
   logout() async {
-    // var connectivityResult = await Connectivity().checkConnectivity();
-    // var offline =
-    //     (connectivityResult[0].toString() == "${ConnectivityResult.none}");
-    // if (!authController.isConnected.value) {
-    // showGeneralDialog(
-    //   barrierDismissible: false,
-    //   context: Get.context!,
-    //   barrierColor: Colors.black54, // space around dialog
-    //   transitionDuration: Duration(milliseconds: 200),
-    //   transitionBuilder: (context, a1, a2, child) {
-    //     return ScaleTransition(
-    //       scale: CurvedAnimation(
-    //           parent: a1,
-    //           curve: Curves.elasticOut,
-    //           reverseCurve: Curves.easeOutCubic),
-    //       child: CustomDialog(
-    //         // our custom dialog
-    //         title: "Peringatan",
-    //         content:
-    //             "Menunggu indikator menjadi hijau untuk keluar akun mohon periksa internet anda",
-    //         positiveBtnText: "Kembali",
-    //         style: 1,
-    //         buttonStatus: 1,
-    //         positiveBtnPressed: () async {
-    //           Get.back();
-    //         },
-    //       ),
-    //     );
-    //   },
-    //   pageBuilder: (BuildContext context, Animation animation,
-    //       Animation secondaryAnimation) {
-    //     return null!;
-    //   },
-    // );
-    // } else {
     showGeneralDialog(
       barrierDismissible: false,
       context: Get.context!,
