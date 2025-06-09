@@ -7,66 +7,53 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:siscom_operasional/controller/kasbon_controller.dart';
+import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
+import 'package:siscom_operasional/utils/helper.dart';
 import 'package:siscom_operasional/utils/month_year_picker.dart';
 import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class FormKasbon extends StatefulWidget {
-  List? dataForm;
+  final List? dataForm;
   FormKasbon({Key? key, this.dataForm}) : super(key: key);
   @override
   _FormKasbonState createState() => _FormKasbonState();
 }
 
 class _FormKasbonState extends State<FormKasbon> {
-  var controller = Get.put(KasbonController());
+  final controller = Get.put(KasbonController());
 
   @override
   void initState() {
+    super.initState();
+
     print(widget.dataForm![0]);
     if (widget.dataForm![1] == true) {
-      // controller.selectedTypeKasbon.value = widget.dataForm![0]['type'];
-
       controller.tanggalKasbon.value.text =
           Constanst.convertDate("${widget.dataForm![0]['tanggal_pinjaman']}");
       controller.totalPinjaman.value.text =
           "${widget.dataForm![0]['total_loan']}";
 
-      // String yang ingin dipisahkan
       String date = widget.dataForm![0]['periode'] ?? "2024-01";
-      // Memisahkan string berdasarkan karakter "-"
       List<String> parts = date.split('-');
       String year = parts[0];
-      String month = parts[1];
 
       controller.tahunSelectedSearchHistory.value = year;
-      // controller.bulanSelectedSearchHistory.value = month;
-
-      // var convertDariJam = widget.dataForm![0]['dari_jam'].split(":");
-      // var convertSampaiJam = widget.dataForm![0]['sampai_jam'].split(":");
-      // var hasilDarijam = "${convertDariJam[0]}:${convertDariJam[1]}";
-      // var hasilSampaijam = "${convertSampaiJam[0]}:${convertSampaiJam[1]}";
-      // controller.dariJam.value.text = hasilDarijam;
-      // controller.sampaiJam.value.text = hasilSampaijam;
       controller.catatan.value.text = widget.dataForm![0]['description'];
       controller.statusForm.value = true;
       controller.idpengajuanKasbon.value = "${widget.dataForm![0]['id']}";
       controller.emIdDelegasi.value = "${widget.dataForm![0]['em_delegation']}";
       controller.durasiCicilan.value.text =
           widget.dataForm![0]['durasi_cicil'].toString();
-      // controller.checkingDelegation(widget.dataForm![0]['em_delegation']);
       controller.nomorAjuan.value.text =
           "${widget.dataForm![0]['nomor_ajuan']}";
-
-      // controller.id.value = widget.dataForm![0]['tanggal_pinjaman'];
     } else {
-      // controller.selectedTypeKasbon.value = "";
-      // controller.tanggalKasbon.value.text = "";
       controller.getTypeKasbon();
       controller.removeAll();
+      controller.tanggalKasbon.value.text = Constanst.convertDate(
+          "${DateFormat('yyyy-MM-dd').format(DateTime.now())}");
     }
-    super.initState();
   }
 
   @override
@@ -98,94 +85,76 @@ class _FormKasbonState extends State<FormKasbon> {
         ),
       ),
       body: WillPopScope(
-          onWillPop: () async {
-            Get.back();
-            return true;
-          },
-          child: SafeArea(
-            child: Obx(
-              () => Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Constanst.fgBorder,
-                          width: 1.0,
-                        ),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(12))),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // controller.viewTypeKasbon.value == false
-                        //     ? const SizedBox()
-                        //     : formType(),
-                        formHariDanTanggal(),
-                        formTotalPinjaman(),
-                        pickDate(),
-                        durasiCician(),
-                        formCatatan(),
-                      ],
+        onWillPop: () async {
+          Get.back();
+          return true;
+        },
+        child: SafeArea(
+          child: Obx(
+            () => Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+              child: SingleChildScrollView(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Constanst.fgBorder,
+                      width: 1.0,
                     ),
-                  )),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      formHariDanTanggal(),
+                      formTotalPinjaman(),
+                      pickDate(),
+                      durasiCician(),
+                      formCatatan(),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          )),
+          ),
+        ),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(16.0),
-            ),
-            color: Constanst.colorWhite,
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                offset: Offset(0, 2.0),
-                blurRadius: 12.0,
-              )
-            ]),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(16.0),
+          ),
+          color: Constanst.colorWhite,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0, 2.0),
+              blurRadius: 12.0,
+            )
+          ],
+        ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
           child: ElevatedButton(
             onPressed: () {
-              print("tes ${controller.dariJam.value.text.toString()}");
-              // TimeOfDay _startTime = TimeOfDay(
-              //     hour: int.parse(
-              //         controller.dariJam.value.text.toString().split(":")[0]),
-              //     minute: int.parse(
-              //         controller.dariJam.value.text.toString().split(":")[1]));
-              // TimeOfDay _endTime = TimeOfDay(
-              //     hour: int.parse(
-              //         controller.sampaiJam.value.text.toString().split(":")[0]),
-              //     minute: int.parse(controller.sampaiJam.value.text
-              //         .toString()
-              //         .split(":")[1]));
+              var totalPinjaman = toInt(controller.totalPinjaman.value.text);
+              var limit = AppData.informasiUser![0].loanLimit;
 
-              // if (_endTime.hour >= _startTime.hour) {
-              // if (_endTime.hour == _startTime.hour) {
-              //   if (_endTime.minute < _startTime.minute) {
-              //     UtilsAlert.showToast(
-              //         "waktu yang dimasukan tidak valid, coba periksa lagi waktu kasbonmu");
-
-              //     return;
-              //   }
-              // }
-              print("masuk sini");
+              if (double.parse(totalPinjaman.toString()) >
+                  double.parse(limit.toString())) {
+                UtilsAlert.showToast("Anda melebihi batas maksimal pinjaman");
+                return;
+              }
               controller.validasiKirimPengajuan();
-              // } else {
-              //   UtilsAlert.showToast(
-              //       "waktu yang dimasukan tidak valid, coba periksa lagi waktu kasbonmu");
-              // }
-
-              //
             },
             style: ElevatedButton.styleFrom(
-                foregroundColor: Constanst.colorWhite,
-                backgroundColor: Constanst.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 0,
-                padding: const EdgeInsets.fromLTRB(0, 12, 0, 12)),
+              foregroundColor: Constanst.colorWhite,
+              backgroundColor: Constanst.onPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              elevation: 0,
+              padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+            ),
             child: Text(
               'Kirim',
               style: GoogleFonts.inter(
@@ -450,6 +419,74 @@ class _FormKasbonState extends State<FormKasbon> {
       ),
     );
   }
+    Widget pickDate() {
+    return InkWell(
+      onTap: () {
+        DatePicker.showPicker(
+          Get.context!,
+          pickerModel: CustomMonthPicker(
+            minTime: DateTime(2020, 1, 1),
+            maxTime: DateTime(2050, 1, 1),
+            currentTime: DateTime(
+                int.parse(controller.tahunSelectedSearchHistory.value),
+                int.parse(controller.bulanSelectedSearchHistory.value),
+                1),
+          ),
+          onConfirm: (time) {
+            if (time != null) {
+              print("$time");
+              var filter = DateFormat('yyyy-MM').format(time);
+              var array = filter.split('-');
+              var bulan = array[1];
+              var tahun = array[0];
+              controller.bulanSelectedSearchHistory.value = bulan;
+              controller.tahunSelectedSearchHistory.value = tahun;
+              controller.bulanDanTahunNow.value = "$bulan-$tahun";
+              controller.loadDataKasbon();
+              this.controller.bulanSelectedSearchHistory.refresh();
+              this.controller.tahunSelectedSearchHistory.refresh();
+              this.controller.bulanDanTahunNow.refresh();
+            }
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Iconsax.timer, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Periode cicilan *",
+                    style: GoogleFonts.inter(
+                        color: Constanst.fgPrimary,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 8.0, 12.0, 0.0),
+                    child: Text(
+                      "${getMonthName(int.parse(controller.bulanSelectedSearchHistory.value))} ${controller.tahunSelectedSearchHistory.value}",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Constanst.fgPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget formTotalPinjaman() {
     return Padding(
@@ -521,6 +558,13 @@ class _FormKasbonState extends State<FormKasbon> {
             thickness: 1,
             color: Constanst.fgBorder,
           ),
+          Text(
+            "Maxsimal Pinjaman: ${toCurrency("${AppData.informasiUser![0].loanLimit}")}",
+            style: GoogleFonts.inter(
+                color: Constanst.fgPrimary,
+                fontWeight: FontWeight.w300,
+                fontSize: 11),
+          ),
         ],
       ),
     );
@@ -573,7 +617,7 @@ class _FormKasbonState extends State<FormKasbon> {
                         this.controller.durasiCicilan.refresh();
                       },
                       decoration: InputDecoration(
-                        hintText: '0',
+                        hintText: '1',
                         border: InputBorder.none,
                         hintStyle: GoogleFonts.inter(
                             color: Constanst.fgSecondary,
@@ -827,74 +871,7 @@ class _FormKasbonState extends State<FormKasbon> {
     return monthFormat.format(date);
   }
 
-  Widget pickDate() {
-    return InkWell(
-      onTap: () {
-        DatePicker.showPicker(
-          Get.context!,
-          pickerModel: CustomMonthPicker(
-            minTime: DateTime(2020, 1, 1),
-            maxTime: DateTime(2050, 1, 1),
-            currentTime: DateTime(
-                int.parse(controller.tahunSelectedSearchHistory.value),
-                int.parse(controller.bulanSelectedSearchHistory.value),
-                1),
-          ),
-          onConfirm: (time) {
-            if (time != null) {
-              print("$time");
-              var filter = DateFormat('yyyy-MM').format(time);
-              var array = filter.split('-');
-              var bulan = array[1];
-              var tahun = array[0];
-              controller.bulanSelectedSearchHistory.value = bulan;
-              controller.tahunSelectedSearchHistory.value = tahun;
-              controller.bulanDanTahunNow.value = "$bulan-$tahun";
-              controller.loadDataKasbon();
-              this.controller.bulanSelectedSearchHistory.refresh();
-              this.controller.tahunSelectedSearchHistory.refresh();
-              this.controller.bulanDanTahunNow.refresh();
-            }
-          },
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Iconsax.timer, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Periode cicilan *",
-                    style: GoogleFonts.inter(
-                        color: Constanst.fgPrimary,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0.0, 8.0, 12.0, 0.0),
-                    child: Text(
-                      "${getMonthName(int.parse(controller.bulanSelectedSearchHistory.value))} ${controller.tahunSelectedSearchHistory.value}",
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: Constanst.fgPrimary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   // Widget formDelegasiKepada() {
   //   return InkWell(

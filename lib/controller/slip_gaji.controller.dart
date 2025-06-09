@@ -75,6 +75,7 @@ class SlipGajiController extends GetxController {
       connect.then((dynamic res) {
         if (res.statusCode == 200) {
           var valueBody = jsonDecode(res.body);
+         // UtilsAlert.showToast(valuBody);
           print(valueBody);
           if (valueBody['status'] == true) {
             List pendapatanList = valueBody['data_pendapatan'];

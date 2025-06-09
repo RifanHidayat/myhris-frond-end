@@ -65,7 +65,6 @@ import 'package:siscom_operasional/screen/absen/absen_masuk_keluar.dart';
 
 import 'package:flutter/services.dart';
 
-
 class AbsenController extends GetxController {
   var globalCt = Get.find<GlobalController>();
   final controllerTracking = Get.put(TrackingController());
@@ -103,6 +102,7 @@ class AbsenController extends GetxController {
   var nomorAjuan = "".obs;
   var tipeAlphaAbsen = 0.obs;
   var catatanAlpha = ''.obs;
+  var idLokasiTerpilih = ''.obs;
 
   var pengajuanAbsensi = [].obs;
 
@@ -274,7 +274,7 @@ class AbsenController extends GetxController {
     statusCari.value = !statusCari.value;
   }
 
-    void getPlaceCoordinateCheckoutRest() {
+  void getPlaceCoordinateCheckoutRest() {
     print("place coordinates Rest");
     placeCoordinate.clear();
 
@@ -409,8 +409,6 @@ class AbsenController extends GetxController {
       //  }
     } catch (e) {}
   }
-
-
 
   void showBottomBranch() {
     showModalBottomSheet(
@@ -657,16 +655,17 @@ class AbsenController extends GetxController {
   }
 
   Future<void> getPlaceCoordinate() async {
-    placeCoordinate.clear();
+    //placeCoordinate.clear();
 
-    placeCoordinateDropdown.value.clear();
+    //placeCoordinqateDropdown.value.clear();
     var connect = Api.connectionApi("get", {}, "places_coordinate",
         params: "&id=${AppData.informasiUser![0].em_id}");
     connect.then((dynamic res) {
       if (res == false) {
         print("errror");
+
         coordinate.value = true;
-        getPlaceCoordinateOffline();
+        // getPlaceCoordinateOffline();
         //UtilsAlert.koneksiBuruk();
       } else {
         if (res.statusCode == 200) {
@@ -718,18 +717,21 @@ class AbsenController extends GetxController {
               }
             }
           }
+
           print('ini dropdoen place value ${placeCoordinateDropdown.value}');
           List filter = [];
-          for (var element in valueBody['data']) {
-            if (element['isFilterView'] == 1) {
-              filter.add(element);
-            }
-          }
+          print("data  ini oyy ${valueBody['data']}");
+          // for (var element in valueBody['data']) {
+          //   if (element['isFilterView'] == 1) {
+          //     filter.add(element);
+          //   }
+          // }
 
           print("data plcea ${placeCoordinate}");
           print('ini data filter ${filter}');
           // placeCoordinate.clear();
-          placeCoordinate.add(filter);
+          placeCoordinate.value = valueBody['data'];
+          //  UtilsAlert.showToast(placeCoordinate.value);
           print('ini data place cordinate dari get $placeCoordinate');
         } else {
           print("Place cordinate !=200" + res.body.toString());
@@ -737,13 +739,14 @@ class AbsenController extends GetxController {
         }
       }
     }).catchError((error) {
-      print('ini serius lu kemari');
+      print('ini serius lu kemari ${error}');
       coordinate.value = true;
       getPlaceCoordinateOffline();
     });
   }
 
   void getPlaceCoordinateOffline() async {
+   
     var body = await SqliteDatabaseHelper().getTipeLokasi();
 
     placeCoordinateDropdown.value.clear();
@@ -1940,7 +1943,6 @@ class AbsenController extends GetxController {
     //  }
   }
 
-
   void kirimDataAbsensi({typewfh}) async {
 //// untuk cek absensi
     print("view last absen user 3");
@@ -2129,86 +2131,86 @@ class AbsenController extends GetxController {
           var connect = Api.connectionApi(
               "post", body, typewfh == "wfh" ? "wfh" : "kirimAbsen");
           connect.then((dynamic res) async {
-            if(res == false){
+            if (res == false) {
               isLoaingAbsensi.value = false;
-              Get.back(); 
+              Get.back();
               UtilsAlert.koneksiBuruk();
-            }else{
-              if (res.statusCode == 200) {
-              var valueBody = jsonDecode(res.body);
-              print("respon wfh ${valueBody}");
-              // for (var element in sysData.value) {
-              //   if (element['kode'] == '006') {
-              //     intervalControl.value = int.parse(element['name'].toString());
-              //   }
-              // }
-              titleNotif.value = valueBody['title'] ?? "";
-              isShowNotif.value = valueBody['is_show_notif'] ?? false;
-              deskripsi.value = valueBody['deskription'] ?? "";
-              statusAbsen.value = valueBody['status_absen'] ?? "";
-
-              isLoaingAbsensi.value = false;
-              this.intervalControl.refresh();
-
-              print("dapat interval ${intervalControl.value}");
-              // Navigator.pop(Get.context!);
-              ;
-
-              print(
-                  "isViewTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
-              print("isViewTracking ${typeAbsen.value}");
-
-              if (AppData.informasiUser![0].isViewTracking.toString() == '0') {
-                controllerTracking.bagikanlokasi.value = "aktif";
-
-                // final service = FlutterBackgroundService();
-                // FlutterBackgroundService().invoke("setAsBackground");
-
-                // service.startService();
-                controllerTracking.updateStatus('1');
-                controllerTracking.isTrackingLokasi.value = true;
-                // controllerTFFracking.detailTracking(emIdEmployee: '');
-                print(
-                    "startTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
-              }
-
-              if (typeAbsen.value == 2) {
-                controllerTracking.bagikanlokasi.value = "tidak aktif";
-                // await LocationDao().clear();
-                // await _getLocations();
-                // await BackgroundLocationTrackerManager.stopTracking();
-                // final service = FlutterBackgroundService();
-                // FlutterBackgroundService().invoke("setAsBackground");
-
-                // service.invoke("stopService");
-                controllerTracking.updateStatus('0');
-                controllerTracking.isTrackingLokasi.value = false;
-                print(
-                    "stopTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
-              }
-
-              Get.to(BerhasilAbsensi(
-                dataBerhasil: [
-                  titleAbsen.value,
-                  timeString.value,
-                  typeAbsen.value,
-                  intervalControl.value
-                ],
-              ));
             } else {
-              isLoaingAbsensi.value = false;
-              Get.back(); 
-              UtilsAlert.koneksiBuruk();
-              // UtilsAlert.showCheckOfflineAbsensiKesalahanServer(
-              //     positiveBtnPressed: () {
-              //   // kirimDataAbsensiOffline(typewfh: typewfh);
-              //   Get.back();
-              //   widgetButtomSheetLanjutkanOffline(type: 'offlineAbsensi');
-              // });
-              //error
+              if (res.statusCode == 200) {
+                var valueBody = jsonDecode(res.body);
+                print("respon wfh ${valueBody}");
+                // for (var element in sysData.value) {
+                //   if (element['kode'] == '006') {
+                //     intervalControl.value = int.parse(element['name'].toString());
+                //   }
+                // }
+                titleNotif.value = valueBody['title'] ?? "";
+                isShowNotif.value = valueBody['is_show_notif'] ?? false;
+                deskripsi.value = valueBody['deskription'] ?? "";
+                statusAbsen.value = valueBody['status_absen'] ?? "";
+
+                isLoaingAbsensi.value = false;
+                this.intervalControl.refresh();
+
+                print("dapat interval ${intervalControl.value}");
+                // Navigator.pop(Get.context!);
+                ;
+
+                print(
+                    "isViewTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
+                print("isViewTracking ${typeAbsen.value}");
+
+                if (AppData.informasiUser![0].isViewTracking.toString() ==
+                    '0') {
+                  controllerTracking.bagikanlokasi.value = "aktif";
+
+                  // final service = FlutterBackgroundService();
+                  // FlutterBackgroundService().invoke("setAsBackground");
+
+                  // service.startService();
+                  controllerTracking.updateStatus('1');
+                  controllerTracking.isTrackingLokasi.value = true;
+                  // controllerTFFracking.detailTracking(emIdEmployee: '');
+                  print(
+                      "startTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
+                }
+
+                if (typeAbsen.value == 2) {
+                  controllerTracking.bagikanlokasi.value = "tidak aktif";
+                  // await LocationDao().clear();
+                  // await _getLocations();
+                  // await BackgroundLocationTrackerManager.stopTracking();
+                  // final service = FlutterBackgroundService();
+                  // FlutterBackgroundService().invoke("setAsBackground");
+
+                  // service.invoke("stopService");
+                  controllerTracking.updateStatus('0');
+                  controllerTracking.isTrackingLokasi.value = false;
+                  print(
+                      "stopTracking ${AppData.informasiUser![0].isViewTracking.toString()}");
+                }
+
+                Get.to(BerhasilAbsensi(
+                  dataBerhasil: [
+                    titleAbsen.value,
+                    timeString.value,
+                    typeAbsen.value,
+                    intervalControl.value
+                  ],
+                ));
+              } else {
+                isLoaingAbsensi.value = false;
+                Get.back();
+                UtilsAlert.koneksiBuruk();
+                // UtilsAlert.showCheckOfflineAbsensiKesalahanServer(
+                //     positiveBtnPressed: () {
+                //   // kirimDataAbsensiOffline(typewfh: typewfh);
+                //   Get.back();
+                //   widgetButtomSheetLanjutkanOffline(type: 'offlineAbsensi');
+                // });
+                //error
+              }
             }
-            }
-            
           });
           // .catchError((error) {
           //   isLoaingAbsensi.value = false;
@@ -2654,10 +2656,13 @@ class AbsenController extends GetxController {
   var date = DateTime.now().obs;
   var beginPayroll = DateFormat('MMMM', 'id').format(DateTime.now()).obs;
   var endPayroll = DateFormat('MMMM', 'id').format(DateTime.now()).obs;
-  var lastDate = DateFormat('dd').format(DateTime(DateTime.now().year, DateTime.now().month + 1, 0)).obs;
+  var lastDate = DateFormat('dd')
+      .format(DateTime(DateTime.now().year, DateTime.now().month + 1, 0))
+      .obs;
 
   Future<void> loadHistoryAbsenUser() async {
     print("masuk sini terbaru new");
+
     historyAbsen.value.clear();
     historyAbsenShow.value.clear();
 
@@ -2665,7 +2670,6 @@ class AbsenController extends GetxController {
 
     print('ini dataUserALpha: ${dataUser![0].tipeAlpha}');
     print('ini dataTipeAbsen: ${dataUser![0].tipeAbsen}');
-
 
     var getEmpId = dataUser![0].em_id;
     print(getEmpId);
@@ -3597,6 +3601,8 @@ class AbsenController extends GetxController {
                           var place = placeCoordinate.value[index]['place'];
                           return InkWell(
                             onTap: () {
+                              idLokasiTerpilih.value = id.toString();
+
                               if (selectedViewFilterAbsen.value == 0) {
                                 filterLokasiAbsenBulan(place);
                               } else {
@@ -3617,7 +3623,7 @@ class AbsenController extends GetxController {
                                       color: Constanst.fgPrimary,
                                     ),
                                   ),
-                                  "$id" == idDepartemenTerpilih.value
+                                  "$id" == idLokasiTerpilih.value
                                       ? InkWell(
                                           onTap: () {},
                                           child: Container(
@@ -3643,6 +3649,9 @@ class AbsenController extends GetxController {
                                         )
                                       : InkWell(
                                           onTap: () {
+                                            idLokasiTerpilih.value =
+                                                id.toString();
+
                                             if (selectedViewFilterAbsen.value ==
                                                 0) {
                                               filterLokasiAbsenBulan(place);
@@ -3705,9 +3714,11 @@ class AbsenController extends GetxController {
             "Data periode $bulanSelectedSearchHistory belum tersedia, harap hubungi HRD");
       } else {
         var data = valueBody['data'];
+
         List listFilterLokasi = [];
         for (var element in data) {
-          if (element['place_in'] == place) {
+          if (element['place_in'].toString().trim() ==
+              place.toString().trim()) {
             listFilterLokasi.add(element);
           }
         }
@@ -3717,9 +3728,9 @@ class AbsenController extends GetxController {
 
         this.listLaporanFilter.refresh();
         this.filterLokasiKoordinate.refresh();
-        loading.value = listLaporanFilter.value.length == 0
-            ? "Data tidak tersedia"
-            : "Memuat data...";
+        // loading.value = listLaporanFilter.value.length == 0
+        //     ? "Data tidak tersedia"
+        //     : "Memuat data...";
 
         statusLoadingSubmitLaporan.value = false;
         this.statusLoadingSubmitLaporan.refresh();
@@ -4645,7 +4656,7 @@ class AbsenController extends GetxController {
 
     var connect = Api.connectionApi("post", body, "delete-employee-attendance");
     connect.then((dynamic res) {
-      if (res.statusCode == 200)  {
+      if (res.statusCode == 200) {
         dataPengajuanAbsensi();
         Get.back();
         Get.back();
@@ -5485,7 +5496,7 @@ class AbsenController extends GetxController {
                     ),
                   ),
                 ),
-              InkWell(
+                InkWell(
                   // highlightColor: Colors.white,
                   onTap: () {
                     Get.back();
@@ -5557,7 +5568,6 @@ class AbsenController extends GetxController {
                     ),
                   ),
                 ),
-              
               ],
             ),
           ),

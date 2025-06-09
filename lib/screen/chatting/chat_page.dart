@@ -403,7 +403,7 @@ class _ChatPageState extends State<ChatPage> {
 
         _scrollToBottomnew();
       } else {
-        UtilsAlert.showToast("tes");
+       // UtilsAlert.showToast("tes");
       }
     });
   }

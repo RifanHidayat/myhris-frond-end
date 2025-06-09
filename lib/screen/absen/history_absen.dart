@@ -728,7 +728,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
             DateTime atten_date =
                 DateFormat('yyyy-MM-dd').parse(data['atten_date']);
             DateTime tgl_ajuan =
-                DateFormat('yyyy-MM-dd').parse(data['tgl_ajuan']);
+                DateFormat('yyyy-MM-dd').parse(data['tgl_ajuan']==null || data['tgl_ajuan']==''? data['atten_date']:data['tgl_ajuan']);
             String formatDateAjuan =
                 DateFormat('dd MMM yyyy', 'id').format(tgl_ajuan);
             // Format the date using the Indonesian month format
@@ -2910,7 +2910,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                   TextLabell(
                                     text: DateFormat('EEEE, dd MMM yyyy', 'id')
                                         .format(DateFormat('yyyy-MM-dd')
-                                            .parse(data['tgl_ajuan'] ?? '')),
+                                            .parse(data['tgl_ajuan']=='' ||data['tgl_ajuan']==null   ?data['atten_date']:data['tgl_ajuan'])),
                                     color: Constanst.fgPrimary,
                                     size: 16,
                                     weight: FontWeight.w500,

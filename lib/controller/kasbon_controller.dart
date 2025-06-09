@@ -12,6 +12,7 @@ import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/custom_dialog.dart';
+import 'package:siscom_operasional/utils/helper.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,6 +60,8 @@ class KasbonController extends GetxController {
   var allEmployee = [].obs;
   var dataTypeAjuan = [].obs;
   var departementAkses = [].obs;
+  var dataCicilan = [].obs;
+  var infoPengajuan = "-".obs;
 
   Rx<DateTime> initialDate = DateTime.now().obs;
 
@@ -71,7 +74,7 @@ class KasbonController extends GetxController {
     "Pending"
   ];
 
-  GlobalController globalCt = Get.find<GlobalController>();
+  GlobalController globalCt = Get.put(GlobalController());
 
   @override
   void onReady() async {
@@ -252,7 +255,7 @@ class KasbonController extends GetxController {
   }
 
   void getTimeNow() {
-    var dt = DateTime.now();
+    var dt = DateTime.parse(AppData.startPeriode);
     bulanSelectedSearchHistory.value = "${dt.month}";
     tahunSelectedSearchHistory.value = "${dt.year}";
     bulanDanTahunNow.value = "${dt.month}-${dt.year}";
@@ -284,6 +287,9 @@ class KasbonController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         print("body loadDataKasbon ${valueBody}");
+
+        infoPengajuan.value = valueBody['description'].toString();
+
         // if (valueBody['status'] == false) {
         //   loadingString.value = "Anda tidak memiliki\nRiwayat Pengajuan Kasbon";
         //   this.loadingString.refresh();
@@ -303,7 +309,7 @@ class KasbonController extends GetxController {
         this.listKasbon.refresh();
         this.listKasbonAll.refresh();
         this.loadingString.refresh();
-      }
+      } else {}
       // }
     });
   }
@@ -400,6 +406,7 @@ class KasbonController extends GetxController {
         if (res.statusCode == 200) {
           var valueBody = jsonDecode(res.body);
           var data = valueBody['data'];
+          print("data delegasi ${data}");
           for (var element in data) {
             if (element['status'] == 'ACTIVE') {
               var fullName = element['full_name'] ?? "";
@@ -445,19 +452,39 @@ class KasbonController extends GetxController {
     if (tanggalKasbon.value.text == "" ||
         // dariJam.value.text == "" ||
         // sampaiJam.value.text == "" ||
-        selectedTypeKasbon.value == "" ||
         catatan.value.text == "" ||
+        totalPinjaman.value.text.toString() == "0" ||
         totalPinjaman.value.text == "" ||
-        durasiCicilan.value.text == "") {
+        durasiCicilan.value.text == "0") {
       UtilsAlert.showToast("Lengkapi form *");
     } else {
-      if (statusForm.value == false) {
-        UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
-        checkNomorAjuan();
-      } else {
-        UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
-        kirimPengajuan(nomorAjuan.value.text);
+      // UtilsAlert.showToast(
+      //     );
+      dataCicilan.value = [];
+      var durasiCicilanMew = int.parse(durasiCicilan.value.text.toString());
+      var periodeCicilan = DateTime.parse(
+          "${tahunSelectedSearchHistory.value}-${bulanSelectedSearchHistory.value}-01");
+
+      var totalPinjamanNew =
+          toInt(totalPinjaman.value.text.toString())! / durasiCicilanMew;
+      for (var i = 0; i < durasiCicilanMew; i++) {
+        var newDate = DateTime(
+            periodeCicilan.year, periodeCicilan.month + i, periodeCicilan.day);
+        dataCicilan.add({
+          "periode": newDate.toString(),
+          "total": totalPinjamanNew.toString()
+        });
       }
+      UtilsAlert.showToast("tes");
+      previewCicilan(dataCicilan);
+
+      // if (statusForm.value == false) {
+      //   UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
+      //   checkNomorAjuan();
+      // } else {
+      //   UtilsAlert.loadingSimpanData(Get.context!, "Sedang Menyimpan");
+      //   kirimPengajuan(nomorAjuan.value.text);
+      // }
     }
   }
 
@@ -571,6 +598,8 @@ class KasbonController extends GetxController {
   }
 
   void kirimPengajuan(getNomorAjuanTerakhir) {
+    // UtilsAlert.showToast("data ${dataCicilan.value}");
+    // return;
     // check id type kasbon
     var finalIdKasbon = checkKasbon();
     var listTanggal = tanggalKasbon.value.text.split(',');
@@ -587,7 +616,7 @@ class KasbonController extends GetxController {
         ? tanggalPengajuanInsert
         : tanggalKasbonEditData;
     // var hasilDurasi = hitungDurasi();
-    Map<String, dynamic> body = {
+    var body = {
       'em_id': getEmid,
       'tanggal_pinjaman': convertDateString(tanggalKasbon.value.text),
       'total_pinjaman': convertCurrencyString(totalPinjaman.value.text),
@@ -597,6 +626,7 @@ class KasbonController extends GetxController {
           "${tahunSelectedSearchHistory.value}-${bulanSelectedSearchHistory.value}",
       'tanggal': formatDateToYYYYMMDD(DateTime.now()),
       'id': idpengajuanKasbon.value,
+      'cicilan': dataCicilan.value
 
       // 'typeid': finalIdKasbon,
       // 'nomor_ajuan': getNomorAjuanTerakhir,
@@ -809,7 +839,7 @@ class KasbonController extends GetxController {
             title: typeNotifFcm,
             message: description,
             tokens: fcmTokenDelegasi);
-        // UtilsAlert.showToast("Berhasil kirim delegasi");
+        UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -846,7 +876,7 @@ class KasbonController extends GetxController {
         //     title: typeNotifFcm,
         //     message: description,
         //     tokens: fcmTokenDelegasi);
-        // UtilsAlert.showToast("Berhasil kirim delegasi");
+        UtilsAlert.showToast("Berhasil kirim delegasi");
       }
     });
   }
@@ -1039,6 +1069,178 @@ class KasbonController extends GetxController {
     );
   }
 
+  void previewCicilan(data) {
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16.0),
+        ),
+      ),
+      builder: (context) {
+        return DefaultTabController(
+          length: 1,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                        height: 6,
+                        width: 34,
+                        decoration: BoxDecoration(
+                            color: Constanst.colorNeutralBgTertiary,
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(20.0),
+                            ))),
+                  ),
+                  const SizedBox(height: 12),
+                  TabBar(
+                    indicatorColor: Constanst.onPrimary,
+                    indicatorWeight: 4.0,
+                    labelPadding: const EdgeInsets.fromLTRB(0, 14, 0, 14),
+                    indicatorSize: TabBarIndicatorSize.label,
+                    physics: const BouncingScrollPhysics(),
+                    labelColor: Constanst.onPrimary,
+                    unselectedLabelColor: Constanst.fgSecondary,
+                    tabs: [
+                      Text(
+                        "Cicilan Pinjaman",
+                        style: GoogleFonts.inter(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    thickness: 1,
+                    height: 1,
+                    color: Constanst.fgBorder,
+                  ),
+                  SizedBox(height: 12),
+                  Container(
+                    height: 540,
+                    child: TabBarView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: data.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            border: Border.all(
+                                                color:
+                                                    Constanst.colorNonAktif)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Periode Bayar",
+                                                style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Constanst.fgSecondary,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                formatDate(data[index]
+                                                        ['periode']
+                                                    .toString()),
+                                                style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16,
+                                                  color: Constanst.fgPrimary,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Divider(
+                                                height: 0,
+                                                thickness: 1,
+                                                color: Constanst.border,
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Text(
+                                                "Jumlah Bayar",
+                                                style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Constanst.fgSecondary,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                toCurrency(data[index]['total']
+                                                    .toString()),
+                                                style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16,
+                                                  color: Constanst.fgPrimary,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 12),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  kirimPengajuan(nomorAjuan.value.text);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    foregroundColor: Constanst.colorWhite,
+                                    backgroundColor: Constanst.onPrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.fromLTRB(
+                                        0, 12, 0, 12)),
+                                child: Text(
+                                  'Lanjutkan',
+                                  style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: Constanst.colorWhite),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void showDetailKasbon(detailData, approve, alasanReject) {
     var nomorAjuan = detailData['nomor'];
     var tanggalMasukAjuan = detailData['tanggal_ajuan'];
@@ -1048,7 +1250,7 @@ class KasbonController extends GetxController {
     var durasi_cicil = detailData['durasi_cicil'];
     var total_loan = detailData['total_loan'];
     var id = detailData['id'];
-    loadDataDetailKasbon(id);
+    loadDataDetailKasbon(nomorAjuan);
 
     // String yang ingin dipisahkan
     var periode = detailData['periode'];
@@ -1075,6 +1277,7 @@ class KasbonController extends GetxController {
     // var dariJam = detailData['dari_jam'];
     // var sampaiJam = detailData['sampai_jam'];
     // var listTanggalTerpilih = detailData['date_selected'].split(',');
+    print('Isi tanggalMasukAjuan: $tanggalMasukAjuan');
     showModalBottomSheet(
       context: Get.context!,
       isScrollControlled: true,
@@ -1138,547 +1341,471 @@ class KasbonController extends GetxController {
                     child: TabBarView(
                       physics: const BouncingScrollPhysics(),
                       children: [
-                        Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: Constanst.colorNonAktif)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Tanggal Pengajuan",
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14,
-                                              color: Constanst.fgSecondary,
+                        SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Constanst.colorNonAktif)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Tanggal Pengajuan",
+                                              style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14,
+                                                color: Constanst.fgSecondary,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            tanggalMasukAjuan == null
-                                                ? ''
-                                                : Constanst.convertDate6(
-                                                    "$tanggalMasukAjuan"),
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16,
-                                              color: Constanst.fgPrimary,
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              tanggalMasukAjuan == null
+                                                  ? ''
+                                                  : Constanst.convertDate(
+                                                      "$tanggalMasukAjuan"),
+                                              style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                                color: Constanst.fgPrimary,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "No. Pengajuan",
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14,
-                                              color: Constanst.fgSecondary,
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "No. Pengajuan",
+                                              style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14,
+                                                color: Constanst.fgSecondary,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            nomorAjuan,
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16,
-                                              color: Constanst.fgPrimary,
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              nomorAjuan,
+                                              style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                                color: Constanst.fgPrimary,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: Constanst.colorNonAktif)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Text(
-                                    //   "Nama Pengajuan",
-                                    //   style: GoogleFonts.inter(
-                                    //     fontWeight: FontWeight.w400,
-                                    //     fontSize: 14,
-                                    //     color: Constanst.fgSecondary,
-                                    //   ),
-                                    // ),
-                                    // const SizedBox(height: 4),
-                                    // Text(
-                                    //   "$namaTypeAjuan",
-                                    //   style: GoogleFonts.inter(
-                                    //     fontWeight: FontWeight.w500,
-                                    //     fontSize: 16,
-                                    //     color: Constanst.fgPrimary,
-                                    //   ),
-                                    // ),
-                                    // const SizedBox(height: 12),
-                                    // Divider(
-                                    //   height: 0,
-                                    //   thickness: 1,
-                                    //   color: Constanst.border,
-                                    // ),
-                                    // const SizedBox(height: 12),
-
-                                    Text(
-                                      "Total Loan",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        color: Constanst.fgSecondary,
+                              const SizedBox(height: 16),
+                              Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Constanst.colorNonAktif)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Total Loan",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Constanst.fgSecondary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "$total_loan",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: Constanst.fgPrimary,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "$total_loan",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: Constanst.fgPrimary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                      color: Constanst.border,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      "Tanggal Pinjaman",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        color: Constanst.fgSecondary,
+                                      const SizedBox(height: 12),
+                                      Divider(
+                                        height: 0,
+                                        thickness: 1,
+                                        color: Constanst.border,
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      Constanst.convertDate6(
-                                          "$tanggalPinjaman"),
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: Constanst.fgPrimary,
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        "Tanggal Pinjaman",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Constanst.fgSecondary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                      color: Constanst.border,
-                                    ),
-                                    // const SizedBox(height: 12),
-                                    // Row(
-                                    //   children: [
-                                    //     Expanded(
-                                    //       child: Column(
-                                    //         crossAxisAlignment: CrossAxisAlignment.start,
-                                    //         mainAxisAlignment: MainAxisAlignment.start,
-                                    //         children: [
-                                    //           Text(
-                                    //             "Dari Jam",
-                                    //             style: GoogleFonts.inter(
-                                    //               fontWeight: FontWeight.w400,
-                                    //               fontSize: 14,
-                                    //               color: Constanst.fgSecondary,
-                                    //             ),
-                                    //           ),
-                                    //           const SizedBox(height: 4),
-                                    //           Text(
-                                    //             dariJam,
-                                    //             style: GoogleFonts.inter(
-                                    //               fontWeight: FontWeight.w500,
-                                    //               fontSize: 16,
-                                    //               color: Constanst.fgPrimary,
-                                    //             ),
-                                    //           ),
-                                    //           const SizedBox(height: 12),
-                                    //           Divider(
-                                    //             height: 0,
-                                    //             thickness: 1,
-                                    //             color: Constanst.border,
-                                    //           ),
-                                    //         ],
-                                    //       ),
-                                    //     ),
-                                    //     const SizedBox(width: 24),
-                                    //     Expanded(
-                                    //       child: Column(
-                                    //         crossAxisAlignment: CrossAxisAlignment.start,
-                                    //         mainAxisAlignment: MainAxisAlignment.start,
-                                    //         children: [
-                                    //           Text(
-                                    //             "Sampai Jam",
-                                    //             style: GoogleFonts.inter(
-                                    //               fontWeight: FontWeight.w400,
-                                    //               fontSize: 14,
-                                    //               color: Constanst.fgSecondary,
-                                    //             ),
-                                    //           ),
-                                    //           const SizedBox(height: 4),
-                                    //           Text(
-                                    //             sampaiJam,
-                                    //             style: GoogleFonts.inter(
-                                    //               fontWeight: FontWeight.w500,
-                                    //               fontSize: 16,
-                                    //               color: Constanst.fgPrimary,
-                                    //             ),
-                                    //           ),
-                                    //           const SizedBox(height: 12),
-                                    //           Divider(
-                                    //             height: 0,
-                                    //             thickness: 1,
-                                    //             color: Constanst.border,
-                                    //           ),
-                                    //         ],
-                                    //       ),
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      "Catatan",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        color: Constanst.fgSecondary,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        Constanst.convertDate6(
+                                            "$tanggalPinjaman"),
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: Constanst.fgPrimary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "$keterangan",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: Constanst.fgPrimary,
+                                      const SizedBox(height: 12),
+                                      Divider(
+                                        height: 0,
+                                        thickness: 1,
+                                        color: Constanst.border,
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                      color: Constanst.border,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      "Periode Cicilan",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        color: Constanst.fgSecondary,
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        "Catatan",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Constanst.fgSecondary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      // formatDate(periode),
-                                      periode,
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: Constanst.fgPrimary,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "$keterangan",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: Constanst.fgPrimary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                      color: Constanst.border,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      "Durasi Cicilan",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        color: Constanst.fgSecondary,
+                                      const SizedBox(height: 12),
+                                      Divider(
+                                        height: 0,
+                                        thickness: 1,
+                                        color: Constanst.border,
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "$durasi_cicil",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: Constanst.fgPrimary,
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        "Periode Cicilan",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Constanst.fgSecondary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    leave_files == "" ||
-                                            leave_files == "NULL" ||
-                                            leave_files == null
-                                        ? const SizedBox()
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Divider(
-                                                height: 0,
-                                                thickness: 1,
-                                                color: Constanst.border,
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Text(
-                                                "File disematkan",
-                                                style: GoogleFonts.inter(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14,
-                                                  color: Constanst.fgSecondary,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        // formatDate(periode),
+                                        periode,
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: Constanst.fgPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Divider(
+                                        height: 0,
+                                        thickness: 1,
+                                        color: Constanst.border,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        "Durasi Cicilan",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Constanst.fgSecondary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "$durasi_cicil",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: Constanst.fgPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      leave_files == "" ||
+                                              leave_files == "NULL" ||
+                                              leave_files == null
+                                          ? const SizedBox()
+                                          : Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Divider(
+                                                  height: 0,
+                                                  thickness: 1,
+                                                  color: Constanst.border,
                                                 ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              InkWell(
-                                                  onTap: () {
-                                                    viewLampiranAjuan(
-                                                        leave_files);
-                                                  },
-                                                  child: Text(
-                                                    "$leave_files",
-                                                    style: GoogleFonts.inter(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 16,
-                                                      color:
-                                                          Constanst.fgPrimary,
-                                                    ),
-                                                  )),
-                                              const SizedBox(height: 12),
-                                            ],
-                                          ),
-                                    Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                      color: Constanst.border,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    status == 'Rejected'
-                                        ? Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Icon(
-                                                Iconsax.close_circle,
-                                                color: Constanst.color4,
-                                                size: 22,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text("Rejected by $approve",
+                                                const SizedBox(height: 12),
+                                                Text(
+                                                  "File disematkan",
+                                                  style: GoogleFonts.inter(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14,
+                                                    color:
+                                                        Constanst.fgSecondary,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                InkWell(
+                                                    onTap: () {
+                                                      viewLampiranAjuan(
+                                                          leave_files);
+                                                    },
+                                                    child: Text(
+                                                      "$leave_files",
                                                       style: GoogleFonts.inter(
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Constanst
-                                                              .fgPrimary,
-                                                          fontSize: 14)),
-                                                  const SizedBox(height: 6),
-                                                  Text(
-                                                    alasanReject,
-                                                    style: GoogleFonts.inter(
                                                         fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Constanst
-                                                            .fgSecondary,
-                                                        fontSize: 14),
-                                                  )
-                                                ],
-                                              ),
-                                            ],
-                                          )
-                                        : status == "Approve" ||
-                                                status == "Approve 1" ||
-                                                status == "Approve 2"
-                                            ? Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  const Icon(
-                                                    Iconsax.tick_circle,
-                                                    color: Colors.green,
-                                                    size: 22,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text("Approved by $approve",
+                                                            FontWeight.w500,
+                                                        fontSize: 16,
+                                                        color:
+                                                            Constanst.fgPrimary,
+                                                      ),
+                                                    )),
+                                                const SizedBox(height: 12),
+                                              ],
+                                            ),
+                                      Divider(
+                                        height: 0,
+                                        thickness: 1,
+                                        color: Constanst.border,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      status == 'Rejected'
+                                          ? Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Icon(
+                                                  Iconsax.close_circle,
+                                                  color: Constanst.color4,
+                                                  size: 22,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("Rejected by $approve",
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Constanst
+                                                                    .fgPrimary,
+                                                                fontSize: 14)),
+                                                    const SizedBox(height: 6),
+                                                    Text(
+                                                      alasanReject ?? '',
                                                       style: GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Constanst
+                                                              .fgSecondary,
+                                                          fontSize: 14),
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            )
+                                          : status == "Approve" ||
+                                                  status == "Approve 1" ||
+                                                  status == "Approve 2"
+                                              ? Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    const Icon(
+                                                      Iconsax.tick_circle,
+                                                      color: Colors.green,
+                                                      size: 22,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Flexible(
+                                                      child: Text(
+                                                        "Approved by $approve",
+                                                        style:
+                                                            GoogleFonts.inter(
                                                           fontWeight:
                                                               FontWeight.w500,
                                                           color: Constanst
                                                               .fgPrimary,
-                                                          fontSize: 14)),
-                                                ],
-                                              )
-                                            : Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Icon(
-                                                    Iconsax.timer,
-                                                    color: Constanst.color3,
-                                                    size: 22,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text("Pending Approval",
-                                                          style: GoogleFonts.inter(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color: Constanst
-                                                                  .fgPrimary,
-                                                              fontSize: 14)),
-                                                      const SizedBox(height: 4),
-                                                      InkWell(
-                                                          onTap: () {
-                                                            var dataEmployee = {
-                                                              'nameType':
-                                                                  '$namaTypeAjuan',
-                                                              'nomor_ajuan':
-                                                                  '$nomorAjuan',
-                                                            };
-                                                            globalCt
-                                                                .showDataPilihAtasan(
-                                                                    dataEmployee);
-                                                          },
-                                                          child: Text(
-                                                              "Konfirmasi via Whatsapp",
-                                                              style: GoogleFonts.inter(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Constanst
-                                                                      .infoLight,
-                                                                  fontSize:
-                                                                      14))),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                  ],
+                                                          fontSize: 14,
+                                                        ),
+                                                        softWrap: true,
+                                                        overflow: TextOverflow
+                                                            .visible,
+                                                      ),
+                                                    )
+                                                  ],
+                                                )
+                                              : Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Icon(
+                                                      Iconsax.timer,
+                                                      color: Constanst.color3,
+                                                      size: 22,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text("Pending Approval",
+                                                            style: GoogleFonts.inter(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Constanst
+                                                                    .fgPrimary,
+                                                                fontSize: 14)),
+                                                        const SizedBox(
+                                                            height: 4),
+                                                        InkWell(
+                                                            onTap: () {
+                                                              var dataEmployee =
+                                                                  {
+                                                                'nameType':
+                                                                    '$namaTypeAjuan',
+                                                                'nomor_ajuan':
+                                                                    '$nomorAjuan',
+                                                              };
+                                                              globalCt.showDataPilihAtasan(
+                                                                  dataEmployee);
+                                                            },
+                                                            child: Text(
+                                                                "Konfirmasi via Whatsapp",
+                                                                style: GoogleFonts.inter(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Constanst
+                                                                        .infoLight,
+                                                                    fontSize:
+                                                                        14))),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            status == "Approve" ||
-                                    status == "Approve 1" ||
-                                    status == "Approve 2"
-                                ? Container()
-                                : Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 16.0),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            height: 40,
-                                            padding: const EdgeInsets.fromLTRB(
-                                                0, 0, 0, 0),
-                                            margin: const EdgeInsets.fromLTRB(
-                                                0, 0, 0, 0),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Constanst
-                                                    .border, // Set the desired border color
-                                                width: 1.0,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                            ),
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                // Get.back();
-                                                batalkanPengajuan(detailData);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                  foregroundColor:
-                                                      Constanst.color4,
-                                                  backgroundColor:
-                                                      Constanst.colorWhite,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  elevation: 0,
-                                                  // padding: EdgeInsets.zero,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          0, 0, 0, 0)),
-                                              child: Text(
-                                                'Batalkan',
-                                                style: GoogleFonts.inter(
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Constanst.color4,
-                                                    fontSize: 14),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: SizedBox(
-                                            height: 40,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                print(detailData.toString());
-                                                Get.to(FormKasbon(
-                                                  dataForm: [detailData, true],
-                                                ));
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                foregroundColor:
-                                                    Constanst.colorWhite,
-                                                backgroundColor:
-                                                    Constanst.colorPrimary,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                elevation: 0,
-                                                // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
-                                              ),
-                                              child: Text(
-                                                'Edit',
-                                                style: GoogleFonts.inter(
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Constanst.colorWhite,
-                                                    fontSize: 14),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                          ],
+                              const SizedBox(height: 16),
+                              status == "Approve" ||
+                                      status == "Approve 1" ||
+                                      status == "Approve 2"
+                                  ? Container()
+                                  : Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16.0),
+                                      child: Row(
+                                        children: [
+                                          // Expanded(
+                                          //   child: Container(
+                                          //     height: 40,
+                                          //     padding: const EdgeInsets.fromLTRB(
+                                          //         0, 0, 0, 0),
+                                          //     margin: const EdgeInsets.fromLTRB(
+                                          //         0, 0, 0, 0),
+                                          //     decoration: BoxDecoration(
+                                          //       border: Border.all(
+                                          //         color: Constanst
+                                          //             .border, // Set the desired border color
+                                          //         width: 1.0,
+                                          //       ),
+                                          //       borderRadius:
+                                          //           BorderRadius.circular(8.0),
+                                          //     ),
+                                          //     child: ElevatedButton(
+                                          //       onPressed: () {
+                                          //         // Get.back();
+                                          //         batalkanPengajuan(detailData);
+                                          //       },
+                                          //       style: ElevatedButton.styleFrom(
+                                          //           foregroundColor:
+                                          //               Constanst.color4,
+                                          //           backgroundColor:
+                                          //               Constanst.colorWhite,
+                                          //           shape: RoundedRectangleBorder(
+                                          //             borderRadius:
+                                          //                 BorderRadius.circular(
+                                          //                     8),
+                                          //           ),
+                                          //           elevation: 0,
+                                          //           // padding: EdgeInsets.zero,
+                                          //           padding:
+                                          //               const EdgeInsets.fromLTRB(
+                                          //                   0, 0, 0, 0)),
+                                          //       child: Text(
+                                          //         'Batalkan',
+                                          //         style: GoogleFonts.inter(
+                                          //             fontWeight: FontWeight.w500,
+                                          //             color: Constanst.color4,
+                                          //             fontSize: 14),
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // const SizedBox(width: 8),
+                                          // Expanded(
+                                          //   child: SizedBox(
+                                          //     height: 40,
+                                          //     child: ElevatedButton(
+                                          //       onPressed: () {
+                                          //         print(detailData.toString());
+                                          //         Get.to(FormKasbon(
+                                          //           dataForm: [detailData, true],
+                                          //         ));
+                                          //       },
+                                          //       style: ElevatedButton.styleFrom(
+                                          //         foregroundColor:
+                                          //             Constanst.colorWhite,
+                                          //         backgroundColor:
+                                          //             Constanst.colorPrimary,
+                                          //         shape: RoundedRectangleBorder(
+                                          //           borderRadius:
+                                          //               BorderRadius.circular(8),
+                                          //         ),
+                                          //         elevation: 0,
+                                          //         // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12)
+                                          //       ),
+                                          //       child: Text(
+                                          //         'Edit',
+                                          //         style: GoogleFonts.inter(
+                                          //             fontWeight: FontWeight.w500,
+                                          //             color: Constanst.colorWhite,
+                                          //             fontSize: 14),
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                        ],
+                                      ),
+                                    )
+                            ],
+                          ),
                         ),
                         Obx(
                           () => Column(
@@ -1705,7 +1832,7 @@ class KasbonController extends GetxController {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "Periode Pinjaman",
+                                                  "Periode Bayar",
                                                   style: GoogleFonts.inter(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14,

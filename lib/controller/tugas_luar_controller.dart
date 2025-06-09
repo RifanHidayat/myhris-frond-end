@@ -407,10 +407,12 @@ class TugasLuarController extends GetxController {
   }
 
   void checkDelegation(em_id) {
+    // UtilsAlert.showToast(allEmployee.value.toString());
     var getData =
         allEmployee.value.firstWhere((element) => element["em_id"] == em_id);
+    //UtilsAlert.showToast(getData.toString());
     selectedDropdownDelegasi.value = getData["full_name"];
-    this.selectedDropdownDelegasi.refresh();
+    // this.selectedDropdownDelegasi.refresh();
   }
 
   void changeTypeAjuan(name) {
@@ -488,6 +490,7 @@ class TugasLuarController extends GetxController {
   }
 
   void validasiKirimPengajuan() {
+    ;
     if (viewTugasLuar.value) {
       if (tanggalTugasLuar.value.text == "" ||
           dariJam.value.text == "" ||
@@ -903,6 +906,10 @@ class TugasLuarController extends GetxController {
       'ajuan': "4",
       'apply_status': "Pending"
     };
+  //  
+    //   "body dinas luar ${body}",
+    // );
+    // return;
     var typeNotifFcm = "Pengajuan Dinas Luar";
     if (status == false) {
       body['created_by'] = getEmid;
@@ -1341,7 +1348,7 @@ class TugasLuarController extends GetxController {
 
   void showDetailRiwayat(tipe, detailData, approve_by, alasanReject) {
     var nomorAjuan = detailData['nomor_ajuan'];
-    var tanggalMasukAjuan = detailData['tgl_ajuan'];
+    var tanggalMasukAjuan = detailData['atten_date'];
     var tanggalTugas = detailData['atten_date'];
     var namaTypeAjuan = "Dinas Luar";
     var tanggalAjuanDari = detailData['start_date'];
@@ -1816,7 +1823,13 @@ class TugasLuarController extends GetxController {
                               height: 40,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  viewTugasLuar.value = true;
+                                  if (nomorAjuan.toString().contains("DL")) {
+                                    viewTugasLuar.value = false;
+                                  } else {
+                                    viewTugasLuar.value = true;
+                                  }
+                                  // UtilsAlert.showToast(
+                                  //     viewTugasLuar.value.toString());
                                   Get.to(FormTugasLuar(
                                     dataForm: [detailData, true],
                                   ));

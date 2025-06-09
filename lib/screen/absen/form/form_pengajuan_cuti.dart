@@ -1531,19 +1531,24 @@ class _FormPengajuanCutiState extends State<FormPengajuanCuti> {
   //           )));
   // }
 
+final GlobalKey _menuKey = GlobalKey();
+
   Widget formDelegasiKepada() {
-    return InkWell(
+   return GestureDetector(
+  key: _menuKey,
       onTap: () async {
+         final RenderBox renderBox = _menuKey.currentContext!.findRenderObject() as RenderBox;
+      final Offset offset = renderBox.localToGlobal(Offset.zero);
+      final Size size = renderBox.size;
         print(controller.allEmployeeDelegasi.value);
         await showMenu(
           context: context,
-          position: controller.selectedTypeCuti.value
-                  .toString()
-                  .toLowerCase()
-                  .toLowerCase()
-                  .contains("Cuti Melahirkan".toLowerCase())
-              ? const RelativeRect.fromLTRB(17, 388, 17, 0)
-              : const RelativeRect.fromLTRB(17, 665, 17, 0),
+            position:  RelativeRect.fromLTRB(
+          offset.dx,
+          offset.dy + size.height,
+          offset.dx + size.width,
+          offset.dy,
+        ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),

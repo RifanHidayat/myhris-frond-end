@@ -1552,7 +1552,7 @@ class _DetailPersetujuanAbsensiState extends State<DetailPersetujuanAbsensi> {
                                   const SizedBox(height: 4),
                                   Text(
                                     Constanst.convertDate6(
-                                        "${controller.detailData[0]['waktu_pengajuan']}"),
+                                        "${controller.detailData[0]['waktu_pengajuan']=='' ||controller.detailData[0]['waktu_pengajuan']==null? controller.detailData[0]['atten_date']:controller.detailData[0]['waktu_pengajuan']}"),
                                     style: GoogleFonts.inter(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16,

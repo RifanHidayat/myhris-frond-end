@@ -31,7 +31,7 @@ class _SlipGajiState extends State<SlipGaji> {
     // TODO: implement initState
     super.initState();
     controller.fetchSlipGaji();
-    controller.fetchSlipGajiCurrent();
+    //controller.fetchSlipGajiCurrent();
   }
 
   @override

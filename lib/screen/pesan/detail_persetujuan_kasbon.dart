@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'dart:math';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:siscom_operasional/utils/custom_dialog.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
@@ -13,6 +17,9 @@ import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/custom_dialog.dart';
+import 'package:siscom_operasional/utils/helper.dart';
+import 'package:siscom_operasional/utils/month_year_picker.dart';
+import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,8 +36,10 @@ class DetailPersetujuanKasbon extends StatefulWidget {
 }
 
 class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
-  var controller = Get.find<ApprovalController>();
-  var controllerGlobal = Get.find<GlobalController>();
+  var controller = Get.put(ApprovalController());
+  var controllerGlobal = Get.put(GlobalController());
+  var durasi = TextEditingController();
+  var totalPinjaman = TextEditingController();
   int hours = 0, minutes = 0, second = 0;
 
   void showBottomAlasanReject(em_id) {
@@ -129,8 +138,8 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                           title: "Tolak",
                           onTap: () {
                             if (controller.alasanReject.value.text != "") {
-                              Navigator.pop(Get.context!);
-                              validasiMenyetujui(false, em_id);
+                              // Navigator.pop(Get.context!);
+                              controller.aksiMenyetujuiKasbon('Tolak');
                             } else {
                               UtilsAlert.showToast(
                                   "Harap isi alasan terlebih dahulu");
@@ -161,6 +170,26 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
 
     // Format the DateTime object to 'yyyy-MM-dd'
     String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+
+    return formattedDate;
+  }
+
+  String formatDates(String dateString) {
+    // Parse the original date string to a DateTime object
+    DateTime dateTime = DateTime.parse(dateString);
+
+    // Format the DateTime object to 'yyyy-MM-dd'
+    String formattedDate = DateFormat('MMMM yyyy dd').format(dateTime);
+
+    return formattedDate;
+  }
+
+  String formatDatesNew(String dateString) {
+    // Parse the original date string to a DateTime object
+    DateTime dateTime = DateTime.parse(dateString);
+
+    // Format the DateTime object to 'yyyy-MM-dd'
+    String formattedDate = DateFormat('MMMM yyyy ').format(dateTime);
 
     return formattedDate;
   }
@@ -224,10 +253,11 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                 print(formatDate(
                     controller.detailData[0]['tanggal_ajuan'].toString()));
                 print(controller.detailData[0]['approve_status'].toString());
-                UtilsAlert.loadingSimpanData(
-                    Get.context!, "Proses $stringPilihan pengajuan");
-                // controller.aksiMenyetujui(pilihan);
-                controller.aksiMenyetujuiKasbon('setuju');
+                // UtilsAlert.loadingSimpanData(
+                //     Get.context!, "Proses $stringPilihan pengajuan");
+                // controller.aksiMenyetujui(pilihan)
+                controller.aksiMenyetujuiKasbon(
+                    pilihan == false ? "Tolak" : 'setuju');
               }
               controllerGlobal.kirimNotifikasi(
                   title: 'Kasbon',
@@ -270,6 +300,7 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
 
   @override
   void initState() {
+    controller.isEditDetailKasbon.value = false;
     controller.getDetailData(
         widget.idxDetail, widget.emId, widget.title, widget.delegasi);
     super.initState();
@@ -383,6 +414,7 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
               // leadingWidth: controller.statusFormPencarian.value ? 50 : 16,
               titleSpacing: 0,
               centerTitle: true,
+
               title: Text(
                 "Detail Persetujuan Kasbon",
                 style: GoogleFonts.inter(
@@ -390,6 +422,7 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                     fontWeight: FontWeight.w500,
                     fontSize: 20),
               ),
+
               leading: controller.statusCari.value
                   ? IconButton(
                       icon: Icon(
@@ -439,8 +472,10 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                           print(controller.detailData[0]['em_report_to']);
                           print(controller.detailData[0]['em_report2_to']);
                           // print("tes");
-                          // showBottomAlasanReject(em_id);
-                          controller.aksiMenyetujuiKasbon('tolak');
+                          // controller.aksiMenyetujuiKasbon('Tolak');
+                          // controller.aksiMenyetujuiKasbon('Tolak');
+                          validasiMenyetujui(false, em_id);
+                          //  showBottomAlasanReject(em_id);
                         },
                         style: ElevatedButton.styleFrom(
                             foregroundColor: Constanst.color4,
@@ -660,8 +695,10 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          Constanst.convertDate6(
-                                              "${controller.detailData[0]['tanggal_ajuan']}"),
+                                          Constanst.convertDate6(controller
+                                              .detailData[0]['tanggal_ajuan']),
+                                          // Constanst.convertDate6(
+                                          //     "${controller.detailData[0]['tanggal_ajuan']}"),
                                           style: GoogleFonts.inter(
                                             fontWeight: FontWeight.w500,
                                             fontSize: 16,
@@ -1053,6 +1090,64 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                               //     ),
                               //   ],
                               // ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 12.0, bottom: 12.0),
+                                child: Divider(
+                                  thickness: 1,
+                                  height: 0,
+                                  color: Constanst.border,
+                                ),
+                              ),
+                              Text(
+                                "Total Pinjaman",
+                                style: GoogleFonts.inter(
+                                    color: Constanst.fgSecondary,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14),
+                              ),
+                              const SizedBox(height: 4),
+
+                              Text(
+                                NumberFormat.currency(
+                                  locale: 'id_ID',
+                                  symbol: 'Rp',
+                                  decimalDigits: 0,
+                                ).format(
+                                    controller.detailData[0]['total_pinjaman']),
+                                style: GoogleFonts.inter(
+                                  color: Constanst.fgPrimary,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
+
+                              const SizedBox(height: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 12.0, bottom: 12.0),
+                                child: Divider(
+                                  thickness: 1,
+                                  height: 0,
+                                  color: Constanst.border,
+                                ),
+                              ),
+                              Text(
+                                "Durasi Cicilan",
+                                style: GoogleFonts.inter(
+                                    color: Constanst.fgSecondary,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "${controller.detailData[0]['durasi_cicil']}",
+                                style: GoogleFonts.inter(
+                                    color: Constanst.fgPrimary,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16),
+                              ),
+                              const SizedBox(height: 4),
 
                               Padding(
                                 padding: const EdgeInsets.only(
@@ -1073,7 +1168,7 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                               const SizedBox(height: 4),
                               Text(
                                 controller.detailData[0]['type'] == "absensi"
-                                    ? "${controller.detailData[0]['deskripsi']}"
+                                    ? "${controller.detailData[0]['total_pinjaman']}"
                                     : "${controller.detailData[0]['description']}",
                                 style: GoogleFonts.inter(
                                     color: Constanst.fgPrimary,
@@ -1141,7 +1236,7 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                               controller.valuePolaPersetujuan == 1 ||
                                       controller.valuePolaPersetujuan == "1"
                                   ? singgleApproval(controller.detailData[0])
-                                  : multipleApproval(controller.detailData[0])
+                                  : multipleApproval(controller.detailData[0]),
                               // typeAjuan == 'Rejected'
                               //     ? Row(
                               //         crossAxisAlignment:
@@ -1389,12 +1484,340 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 16),
+                      Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16, right: 16, top: 12),
+                          child: Column(children: [
+                            InkWell(
+                              onTap: () {
+                                controller
+                                    .loanDetail(widget.idxDetail)
+                                    .then((value) {
+                                  if (value == true) {
+                                    controller.durasiPinjamCtr.text =
+                                        "${toCurrency(controller.detailData[0]['durasi_cicil'])}";
+                                    controller.totalPinjamCtr.text = controller
+                                        .detailData[0]['durasi_cicil']
+                                        .toString();
+                                    // durasi.text =
+
+                                    // totalPinjaman.text =
+                                    //     "${toCurrency(controller.detailData[0]['total_pinjaman'])}";
+                                    _showBottomDialog(context);
+                                  } else {
+                                    // Get.snackbar("gada", "gada");
+                                  }
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(top: 6, bottom: 6),
+                                decoration: BoxDecoration(
+                                    color: Constanst.infoLight1,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        width: 1, color: Constanst.infoLight)),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 10,
+                                        child: Icon(
+                                          Iconsax.info_circle,
+                                          size: 13,
+                                        )),
+                                    Expanded(
+                                      flex: 90,
+                                      child:
+                                          Text("Lihat detail info pinjam... "),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ])),
                     ],
                   ),
                 ),
               ),
             ),
           )),
+    );
+  }
+
+  void _showBottomDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Obx(() {
+          int listLength = controller.amountLoan.length;
+          double baseHeight = MediaQuery.of(context).size.height * 0.7;
+          double itemHeight = 60;
+          double maxSheetHeight = MediaQuery.of(context).size.height * 0.8;
+          double calculatedHeight = baseHeight + (listLength * itemHeight);
+
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+            ),
+            height: calculatedHeight > maxSheetHeight
+                ? maxSheetHeight
+                : calculatedHeight,
+            width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 20, bottom: 12, right: 12, left: 12),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 12),
+                  Text(
+                    "Detail Peminjaman Kasbon",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 24),
+                  controller.isEditDetailKasbon.value == true
+                      ? _totalPinjaman()
+                      : SizedBox(),
+                  controller.isEditDetailKasbon.value == true
+                      ? durasiPinjaman()
+                      : SizedBox(),
+                  Obx(() {
+                    return controller.isEditDetailKasbon.value == true
+                        ? Expanded(
+                            child: ListView.builder(
+                            itemCount: listLength,
+                            itemBuilder: (context, index) {
+                              var data = controller.amountLoan[index];
+                              return Padding(
+                                padding: EdgeInsets.only(top: 12),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          width: 1,
+                                          color: Constanst.greyLight100)),
+                                  child: Column(
+                                    children: [
+                                      pickDate(index),
+                                      formTotalPinjaman(index)
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ))
+                        : Expanded(
+                            child: ListView.builder(
+                            itemCount: listLength,
+                            itemBuilder: (context, index) {
+                              var data = controller.amountLoan[index];
+                              return Column(
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        flex: 70,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              formatDatesNew(
+                                                  "${data['periode']}-01"),
+                                              style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            SizedBox(
+                                              height: 2,
+                                            ),
+                                            Text(
+                                              NumberFormat.currency(
+                                                locale: 'id_ID',
+                                                symbol: 'Rp',
+                                                decimalDigits: 0,
+                                              ).format(data['amount']),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 2,
+                                            ),
+                                            Text(
+                                              data['status'].toString(),
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Divider(color: Constanst.greyLight100),
+                                ],
+                              );
+                            },
+                          ));
+                  }),
+                  // Obx(() {
+                  //   return controller.isEditDetailKasbon.value == false
+                  //       ? Container(
+                  //           child: Row(
+                  //             children: [
+                  //               Expanded(
+                  //                 child: InkWell(
+                  //                   onTap: () {
+                  //                     controller.isEditDetailKasbon.value =
+                  //                         true;
+                  //                   },
+                  //                   child: Container(
+                  //                     padding: EdgeInsets.all(12),
+                  //                     decoration: BoxDecoration(
+                  //                       color: Constanst.onPrimary,
+                  //                       borderRadius: BorderRadius.circular(
+                  //                         6,
+                  //                       ),
+                  //                     ),
+                  //                     child: Row(
+                  //                       crossAxisAlignment:
+                  //                           CrossAxisAlignment.center,
+                  //                       mainAxisAlignment:
+                  //                           MainAxisAlignment.center,
+                  //                       children: [
+                  //                         Icon(
+                  //                           Iconsax.edit,
+                  //                           color: Colors.white,
+                  //                           size: 16,
+                  //                         ),
+                  //                         SizedBox(
+                  //                           width: 5,
+                  //                         ),
+                  //                         TextLabell(
+                  //                           text: "Edit",
+                  //                           size: 13,
+                  //                           weight: FontWeight.bold,
+                  //                           color: Colors.white,
+                  //                         ),
+                  //                       ],
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               SizedBox(
+                  //                 width: 5,
+                  //               ),
+                  //               Expanded(
+                  //                 child: InkWell(
+                  //                   onTap: () {
+                  //                     Get.back();
+                  //                   },
+                  //                   child: Container(
+                  //                     padding: EdgeInsets.all(12),
+                  //                     decoration: BoxDecoration(
+                  //                         borderRadius: BorderRadius.circular(
+                  //                           6,
+                  //                         ),
+                  //                         border: Border.all(
+                  //                           width: 1,
+                  //                           color: Constanst.colorPrimary,
+                  //                         )),
+                  //                     child: Center(
+                  //                         child: TextLabell(
+                  //                       text: "Kembali ",
+                  //                       color: Constanst.colorPrimary,
+                  //                       weight: FontWeight.bold,
+                  //                     )),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         )
+                  //       : Container(
+                  //           child: Row(
+                  //             children: [
+                  //               Expanded(
+                  //                 child: Container(
+                  //                   padding: EdgeInsets.all(12),
+                  //                   decoration: BoxDecoration(
+                  //                     color: Constanst.onPrimary,
+                  //                     borderRadius: BorderRadius.circular(
+                  //                       6,
+                  //                     ),
+                  //                   ),
+                  //                   child: Row(
+                  //                     crossAxisAlignment:
+                  //                         CrossAxisAlignment.center,
+                  //                     mainAxisAlignment:
+                  //                         MainAxisAlignment.center,
+                  //                     children: [
+                  //                       Icon(
+                  //                         Iconsax.edit,
+                  //                         color: Colors.white,
+                  //                         size: 16,
+                  //                       ),
+                  //                       SizedBox(
+                  //                         width: 5,
+                  //                       ),
+                  //                       TextLabell(
+                  //                         text: "Save",
+                  //                         size: 13,
+                  //                         weight: FontWeight.bold,
+                  //                         color: Colors.white,
+                  //                       ),
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               SizedBox(
+                  //                 width: 5,
+                  //               ),
+                  //               Expanded(
+                  //                 child: InkWell(
+                  //                   onTap: () {
+                  //                     //   Get.back();
+                  //                     controller.isEditDetailKasbon.value =
+                  //                         false;
+                  //                   },
+                  //                   child: Container(
+                  //                     padding: EdgeInsets.all(12),
+                  //                     decoration: BoxDecoration(
+                  //                         borderRadius: BorderRadius.circular(
+                  //                           6,
+                  //                         ),
+                  //                         border: Border.all(
+                  //                           width: 1,
+                  //                           color: Constanst.colorPrimary,
+                  //                         )),
+                  //                     child: Center(
+                  //                         child: TextLabell(
+                  //                       text: "Batalkan ",
+                  //                       color: Constanst.colorPrimary,
+                  //                       weight: FontWeight.bold,
+                  //                     )),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         );
+                  // })
+                ],
+              ),
+            ),
+          );
+        });
+      },
     );
   }
 
@@ -1642,11 +2065,17 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("${text} ",
+                          Flexible(
+                            child: Text(
+                              "${text} ",
                               style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w500,
                                   color: Constanst.fgPrimary,
-                                  fontSize: 14)),
+                                  fontSize: 14),
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                         ],
                       ),
@@ -1660,6 +2089,45 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
       ),
     );
   }
+
+  // Widget detailLoan() {
+  //   return Padding(
+  //       padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
+  //       child: Column(children: [
+  //         InkWell(
+  //           onTap: () {
+  //             controller.loanDetail(widget.idxDetail).then((value) {
+  //               if (value == true) {
+  //                 _showBottomDialog(context);
+  //               } else {
+  //                 // Get.snackbar("gada", "gada");
+  //               }
+  //             });
+  //           },
+  //           child: Container(
+  //             padding: EdgeInsets.only(top: 6, bottom: 6),
+  //             decoration: BoxDecoration(
+  //                 color: Constanst.infoLight1,
+  //                 borderRadius: BorderRadius.circular(5),
+  //                 border: Border.all(width: 1, color: Constanst.infoLight)),
+  //             child: Row(
+  //               children: [
+  //                 Expanded(
+  //                     flex: 10,
+  //                     child: Icon(
+  //                       Iconsax.info_circle,
+  //                       size: 13,
+  //                     )),
+  //                 Expanded(
+  //                   flex: 90,
+  //                   child: Text("Lihat detail info pinjam... "),
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ]));
+  // }
 
   Widget multipleApproval(data) {
     var text = "";
@@ -1692,122 +2160,453 @@ class _DetailPersetujuanKasbonState extends State<DetailPersetujuanKasbon> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
+              Expanded(
+                // Ensures the column takes the available width
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Status Pengajuan",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        color: Constanst.fgSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (data['approve_status'] == "Pending") ...[
+                          Icon(
+                            Iconsax.timer,
+                            color: Constanst.warning,
+                            size: 22,
+                          )
+                        ] else if (data['approve_status'] == "Rejected") ...[
+                          Icon(
+                            Iconsax.close_circle,
+                            color: Colors.red,
+                            size: 22,
+                          )
+                        ] else ...[
+                          Icon(
+                            Iconsax.tick_circle,
+                            color: Colors.green,
+                            size: 22,
+                          )
+                        ],
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${text}",
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w500,
+                                  color: Constanst.fgPrimary,
+                                  fontSize: 14,
+                                ),
+                                maxLines: null, // Allows wrapping
+                                overflow: TextOverflow
+                                    .visible, // Ensures text does not get cut off
+                              ),
+                              const SizedBox(height: 4),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget pickDate(index) {
+    var data = controller.amountLoan[index];
+    return InkWell(
+      onTap: () {
+        // DatePicker.showPicker(
+        //   Get.context!,
+        //   pickerModel: CustomMonthPicker(
+        //     minTime: DateTime(2020, 1, 1),
+        //     maxTime: DateTime(2050, 1, 1),
+        //     // currentTime: DateTime(
+        //     //     int.parse(controller.tahunSelectedSearchHistory.value),
+        //     //     int.parse(controller.bulanSelectedSearchHistory.value),
+        //     //     1),
+        //   ),
+        //   onConfirm: (time) {
+        //     if (time != null) {
+        //       // print("$time");
+        //       // var filter = DateFormat('yyyy-MM').format(time);
+        //       // var array = filter.split('-');
+        //       // var bulan = array[1];
+        //       // var tahun = array[0];
+        //       // controller.bulanSelectedSearchHistory.value = bulan;
+        //       // controller.tahunSelectedSearchHistory.value = tahun;
+        //       // controller.bulanDanTahunNow.value = "$bulan-$tahun";
+        //       // controller.loadDataKasbon();
+        //       // this.controller.bulanSelectedSearchHistory.refresh();
+        //       // this.controller.tahunSelectedSearchHistory.refresh();
+        //       // this.controller.bulanDanTahunNow.refresh();
+        //     }
+        //   },
+        // );
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Iconsax.timer, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Status Pengajuan",
+                    "Periode cicilan *",
                     style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Constanst.fgSecondary,
+                        color: Constanst.fgPrimary,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 8.0, 12.0, 0.0),
+                    child: Text(
+                      "${data['periode']}",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Constanst.fgPrimary,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      data['approve_status'] == "Pending"
-                          ? Icon(
-                              Iconsax.timer,
-                              color: Constanst.warning,
-                              size: 22,
-                            )
-                          : data['approve_status'] == "Rejected"
-                              ? Icon(
-                                  Iconsax.close_circle,
-                                  color: Colors.red,
-                                  size: 22,
-                                )
-                              : Icon(
-                                  Iconsax.tick_circle,
-                                  color: Colors.green,
-                                  size: 22,
-                                ),
-                      // Icon(
-                      //   Iconsax.close_circle,
-                      //   color: Constanst.color4,
-                      //   size: 22,
-                      // ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${text}",
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  color: Constanst.fgPrimary,
-                                  fontSize: 14)),
-                          const SizedBox(height: 4),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // data['approve_status'] == "Approve"
-                  //     ? Column(
-                  //         crossAxisAlignment: CrossAxisAlignment.start,
-                  //         children: [
-                  //           Padding(
-                  //             padding:
-                  //                 EdgeInsets.only(left: 2.5, top: 2, bottom: 2),
-                  //             child: Container(
-                  //               height: 30,
-                  //               child: VerticalDivider(
-                  //                 color: Constanst.Secondary,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Padding(
-                  //             padding: EdgeInsets.only(top: 0),
-                  //             child: Row(
-                  //               crossAxisAlignment: CrossAxisAlignment.start,
-                  //               children: [
-                  //                 data['approve2_status'] == "Pending" ||
-                  //                         data['approve2_status'] == null
-                  //                     ? Icon(
-                  //                         Iconsax.timer,
-                  //                         color: Constanst.warning,
-                  //                         size: 22,
-                  //                       )
-                  //                     : data['approve2_status'] == "Rejected"
-                  //                         ? Icon(
-                  //                             Iconsax.close_circle,
-                  //                             color: Colors.red,
-                  //                             size: 22,
-                  //                           )
-                  //                         : Icon(
-                  //                             Iconsax.tick_circle,
-                  //                             color: Colors.green,
-                  //                             size: 22,
-                  //                           ),
-                  //                 // Icon(
-                  //                 //   Iconsax.close_circle,
-                  //                 //   color: Constanst.color4,
-                  //                 //   size: 22,
-                  //                 // ),
-                  //                 const SizedBox(width: 8),
-                  //                 Column(
-                  //                   crossAxisAlignment:
-                  //                       CrossAxisAlignment.start,
-                  //                   children: [
-                  //                     Text("${text2} ",
-                  //                         style: GoogleFonts.inter(
-                  //                             fontWeight: FontWeight.w500,
-                  //                             color: Constanst.fgPrimary,
-                  //                             fontSize: 14)),
-                  //                     const SizedBox(height: 4),
-                  //                   ],
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       )
-                  //     : SizedBox(),
                 ],
               ),
-            ],
-          )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _periideCicilan(i) {
+    return InkWell(
+      onTap: () {
+        // DatePicker.showPicker(
+        //   Get.context!,
+        //   pickerModel: CustomMonthPicker(
+        //     minTime: DateTime(2020, 1, 1),
+        //     maxTime: DateTime(2050, 1, 1),
+        // currentTime: DateTime(
+        //       int.parse(controller.tahunSelectedSearchHistory.value),
+        //       int.parse(controller.bulanSelectedSearchHistory.value),
+        //       1),
+        // ),
+        // onConfirm: (time) {
+        //   if (time != null) {
+        //     // print("$time");
+        //     // var filter = DateFormat('yyyy-MM').format(time);
+        //     // var array = filter.split('-');
+        //     // var bulan = array[1];
+        //     // var tahun = array[0];
+
+        //     // controller.bulanSelectedSearchHistory.value = bulan;
+        //     // controller.tahunSelectedSearchHistory.value = tahun;
+        //     // controller.bulanDanTahunNow.value = "$bulan-$tahun";
+        //     // controller.loadDataKasbon();
+        //     // this.controller.bulanSelectedSearchHistory.refresh();
+        //     // this.controller.tahunSelectedSearchHistory.refresh();
+        //     // this.controller.bulanDanTahunNow.refresh();
+        //   }
+        // },
+        // );
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Iconsax.timer, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Periode Mulai cicil",
+                    style: GoogleFonts.inter(
+                        color: Constanst.fgPrimary,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 8.0, 12.0, 0.0),
+                    child: Text(
+                      "${controller.periodeCicilan.value}",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Constanst.fgPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget formTotalPinjaman(index) {
+    var data = controller.amountLoan[index];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Divider(
+            height: 0,
+            thickness: 1,
+            color: Constanst.fgBorder,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Iconsax.money_tick, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Cicilan *",
+                      style: GoogleFonts.inter(
+                          color: Constanst.fgPrimary,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14),
+                    ),
+                    TextField(
+                      controller: data['cicilan_ctr'] as TextEditingController,
+                      inputFormatters: [
+                        CurrencyTextInputFormatter.currency(
+                          locale: 'id',
+                          symbol: 'Rp ',
+                          decimalDigits: 0,
+                        )
+                      ],
+                      // controller: controller.totalPinjaman.value,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(signed: true),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        // controller.totalPinjaman.value.text = value;
+                        // this.controller.totalPinjaman.refresh();
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rp ',
+                        border: InputBorder.none,
+                        hintStyle: GoogleFonts.inter(
+                            color: Constanst.fgSecondary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16),
+                      ),
+                      maxLines: null,
+                      style: GoogleFonts.inter(
+                          color: Constanst.fgPrimary,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16),
+                    )
+                  ],
+                ))
+              ],
+            ),
+          ),
+          // Divider(
+          //   height: 0,
+          //   thickness: 1,
+          //   color: Constanst.fgBorder,
+          // ),
+          // Text(
+          //   "Maxsimal Pinjaman: ${toCurrency("${AppData.informasiUser![0].loanLimit}")}",
+          //   style: GoogleFonts.inter(
+          //       color: Constanst.fgPrimary,
+          //       fontWeight: FontWeight.w300,
+          //       fontSize: 11),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  Widget _totalPinjaman() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Divider(
+            height: 0,
+            thickness: 1,
+            color: Constanst.fgBorder,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Iconsax.money_tick, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Cicilan *",
+                      style: GoogleFonts.inter(
+                          color: Constanst.fgPrimary,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14),
+                    ),
+                    TextField(
+                      controller: controller.totalPinjamCtr,
+                      inputFormatters: [
+                        CurrencyTextInputFormatter.currency(
+                          locale: 'id',
+                          symbol: 'Rp ',
+                          decimalDigits: 0,
+                        )
+                      ],
+                      // controller: controller.totalPinjaman.value,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(signed: true),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        // controller.totalPinjaman.value.text = value;
+                        // this.controller.totalPinjaman.refresh();
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rp ',
+                        border: InputBorder.none,
+                        hintStyle: GoogleFonts.inter(
+                            color: Constanst.fgSecondary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16),
+                      ),
+                      maxLines: null,
+                      style: GoogleFonts.inter(
+                          color: Constanst.fgPrimary,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16),
+                    )
+                  ],
+                ))
+              ],
+            ),
+          ),
+          // Divider(
+          //   height: 0,
+          //   thickness: 1,
+          //   color: Constanst.fgBorder,
+          // ),
+          // Text(
+          //   "Maxsimal Pinjaman: ${toCurrency("${AppData.informasiUser![0].loanLimit}")}",
+          //   style: GoogleFonts.inter(
+          //       color: Constanst.fgPrimary,
+          //       fontWeight: FontWeight.w300,
+          //       fontSize: 11),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  Widget durasiPinjaman() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Divider(
+            height: 0,
+            thickness: 1,
+            color: Constanst.fgBorder,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Iconsax.money_tick, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Durasi cicilan",
+                      style: GoogleFonts.inter(
+                          color: Constanst.fgPrimary,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14),
+                    ),
+                    TextField(
+                      controller: controller.durasiPinjamCtr,
+
+                      // controller: controller.totalPinjaman.value,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(signed: true),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        // controller.totalPinjaman.value.text = value;
+                        // this.controller.totalPinjaman.refresh();
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rp ',
+                        border: InputBorder.none,
+                        hintStyle: GoogleFonts.inter(
+                            color: Constanst.fgSecondary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16),
+                      ),
+                      maxLines: null,
+                      style: GoogleFonts.inter(
+                          color: Constanst.fgPrimary,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16),
+                    )
+                  ],
+                ))
+              ],
+            ),
+          ),
+          // Divider(
+          //   height: 0,
+          //   thickness: 1,
+          //   color: Constanst.fgBorder,
+          // ),
+          // Text(
+          //   "Maxsimal Pinjaman: ${toCurrency("${AppData.informasiUser![0].loanLimit}")}",
+          //   style: GoogleFonts.inter(
+          //       color: Constanst.fgPrimary,
+          //       fontWeight: FontWeight.w300,
+          //       fontSize: 11),
+          // ),
         ],
       ),
     );

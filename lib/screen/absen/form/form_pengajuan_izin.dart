@@ -1472,44 +1472,51 @@ class _FormPengajuanIzinState extends State<FormPengajuanIzin> {
       ),
     );
   }
-
+final GlobalKey _menuKey = GlobalKey();
   Widget formDelegasiKepada() {
-    return InkWell(
-      onTap: () async {
-        print(controller.allEmployeeDelegasi.value);
-        await showMenu(
-          context: context,
-          position: controller.viewFormWaktu.value == false
-              ? const RelativeRect.fromLTRB(17, 635, 17, 0)
-              : const RelativeRect.fromLTRB(17, 665, 17, 0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          // initialValue: controller.selectedTypeLembur.value,
-          items: controller.allEmployeeDelegasi.value
-              .map<PopupMenuItem<String>>((String value) {
-            return PopupMenuItem<String>(
-              value: value,
-              padding: EdgeInsets.zero,
-              onTap: () {
-                controller.selectedDropdownFormTidakMasukKerjaDelegasi.value =
-                    value;
-                print(controller
-                    .selectedDropdownFormTidakMasukKerjaDelegasi.value);
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
-                child: Text(
-                  value,
-                  style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Constanst.fgPrimary),
+  return GestureDetector(
+  key: _menuKey,
+        onTap: () async {
+          final RenderBox renderBox = _menuKey.currentContext!.findRenderObject() as RenderBox;
+      final Offset offset = renderBox.localToGlobal(Offset.zero);
+      final Size size = renderBox.size;
+          print(controller.allEmployeeDelegasi.value);
+          await showMenu(
+            context: context,
+            position:  RelativeRect.fromLTRB(
+          offset.dx,
+          offset.dy + size.height,
+          offset.dx + size.width,
+          offset.dy,
+        ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            // initialValue: controller.selectedTypeLembur.value,
+            items: controller.allEmployeeDelegasi.value
+                .map<PopupMenuItem<String>>((String value) {
+              return PopupMenuItem<String>(
+                value: value,
+                padding: EdgeInsets.zero,
+                onTap: () {
+                  controller.selectedDropdownFormTidakMasukKerjaDelegasi.value =
+                      value;
+                  print(controller
+                      .selectedDropdownFormTidakMasukKerjaDelegasi.value);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
+                  child: Text(
+                    value,
+                    style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Constanst.fgPrimary),
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
-        );
+              );
+            }).toList(),
+          );
       },
       child: Column(
         children: [

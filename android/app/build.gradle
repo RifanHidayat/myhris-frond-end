@@ -67,14 +67,11 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
         minSdkVersion 24
         targetSdkVersion 34
-
-        versionCode 21
-        versionName "1.0.5"
-
+        versionCode 22
+        versionName "1.0.6"
         multiDexEnabled true
 
     }
-
 
 //         buildTypes {
 //        release {
@@ -85,15 +82,14 @@ android {
 //        }
 //    }
 
-
-    signingConfigs {
+   signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
             storeFile file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
         }
-    }
+   }
     buildTypes {
               
         release {
@@ -104,42 +100,22 @@ android {
     }
     
 
-
     // signingConfigs {
+        
     //     release {
     //         keyAlias keystoreProperties['keyAlias']
     //         keyPassword keystoreProperties['keyPassword']
-    //         storeFile file(keystoreProperties['storeFile'])
-    //         storePassword keystoreProperties['storePassword']
+    //         storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+    //         storePassword 1 ['storePassword']
     //     }
     // }
     // buildTypes {
-              
     //     release {
     //         // TODO: Add your own signing config for the release build.
     //         // Signing with the debug keys for now, so `flutter run --release` works.
-    //         signingConfig signingConfigs.release
+    //        signingConfig signingConfigs.debug
     //     }
     // }
-
-    
-
-    signingConfigs {
-        
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-           storePassword keystoreProperties['storePassword']
-        }
-    }
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-           signingConfig signingConfigs.release
-        }
-    }
      aaptOptions {
         noCompress "tflite"  // Your model's file extension: "tflite", "lite", etc.
     }

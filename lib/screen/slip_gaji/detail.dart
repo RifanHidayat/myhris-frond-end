@@ -253,43 +253,45 @@ class SlipGajiDetail extends StatelessWidget {
                                                         var data = args
                                                             .pendapatan![index];
 
-                                                        return TextGroupRow(
-                                                            title: data.name,
-                                                            subtitle: args
+                                                            var amount=args
                                                                         .index ==
                                                                     "value01"
-                                                                ? toCurrency(data
-                                                                    .value01)
+                                                                ? data
+                                                                    .value01
                                                                 :args
                                                                             .index
                                                                             .toString() ==
                                                                         "value02"
-                                                                    ? toCurrency(data
-                                                                        .value02)
+                                                                    ? data
+                                                                        .value02
                                                                     : args.index ==
                                                                             "value03"
-                                                                        ? toCurrency(data
-                                                                            .value03)
+                                                                        ? data
+                                                                            .value03
                                                                         : args.index ==
                                                                                 "value04"
-                                                                            ? toCurrency(data.value04)
+                                                                            ? data.value04
                                                                             : args.index == "value05"
-                                                                                ? toCurrency(data.value05)
+                                                                                ? data.value05
                                                                                 : args.index == "value06"
-                                                                                    ? toCurrency(data.value06)
+                                                                                    ? data.value06
                                                                                     : args.index == "value07"
-                                                                                        ? toCurrency(data.value07)
+                                                                                        ? data.value07
                                                                                         : args.index == "value08"
-                                                                                            ? toCurrency(data.value08)
+                                                                                            ? data.value08
                                                                                             : args.index == "value09"
-                                                                                                ? toCurrency(data.value09)
+                                                                                                ? data.value09
                                                                                                 : args.index == "value10"
-                                                                                                    ? toCurrency(data.value10)
+                                                                                                    ? data.value10
                                                                                                     : args.index == "value11"
-                                                                                                        ? toCurrency(data.value11)
+                                                                                                        ? data.value11
                                                                                                         : args.index == "value12"
-                                                                                                            ? toCurrency(data.value12)
-                                                                                                            : toCurrency(data.value12));
+                                                                                                            ? data.value12
+                                                                                                            : data.value12;
+
+                                                        return amount.toString()=="0" ||amount==null ?SizedBox(): TextGroupRow(
+                                                            title: data.name,
+                                                            subtitle: toCurrency(amount.toString()));
                                                       }),
                                                     ),
                                                   )
@@ -424,42 +426,44 @@ class SlipGajiDetail extends StatelessWidget {
                                                             (index) {
                                                           var data = args
                                                               .pemotong![index];
-                                                          return TextGroupRow(
-                                                              title: data.name,
-                                                              subtitle: args
+
+                                                              var amount=args
                                                                           .index ==
                                                                       "value01"
-                                                                  ? toCurrency(data
-                                                                      .value01)
+                                                                  ? data
+                                                                      .value01
                                                                   : args
                                                                               .index
                                                                               .toString() ==
                                                                           "value02"
-                                                                      ? toCurrency(data
-                                                                          .value02)
+                                                                      ? data
+                                                                          .value02
                                                                       : args.index ==
                                                                               "value03"
-                                                                          ? toCurrency(
-                                                                              data.value03)
+                                                                          ? 
+                                                                              data.value03
                                                                           : args.index == "value04"
-                                                                              ? toCurrency(data.value04)
+                                                                              ? data.value04
                                                                               : args.index == "value05"
-                                                                                  ? toCurrency(data.value05)
+                                                                                  ? data.value05
                                                                                   : args.index == "value06"
-                                                                                      ? toCurrency(data.value06)
+                                                                                      ? data.value06
                                                                                       : args.index == "value07"
-                                                                                          ? toCurrency(data.value07)
+                                                                                          ? data.value07
                                                                                           : args.index == "value08"
-                                                                                              ? toCurrency(data.value08)
+                                                                                              ? data.value08
                                                                                               : args.index == "value09"
-                                                                                                  ? toCurrency(data.value09)
+                                                                                                  ? data.value09
                                                                                                   : args.index == "value10"
-                                                                                                      ? toCurrency(data.value10)
+                                                                                                      ? data.value10
                                                                                                       : args.index == "value11"
-                                                                                                          ? toCurrency(data.value11)
+                                                                                                          ? data.value11
                                                                                                           : args.index == "value12"
-                                                                                                              ? toCurrency(data.value12)
-                                                                                                              : toCurrency(data.value12));
+                                                                                                              ? data.value12
+                                                                                                              : data.value12;
+                                                          return amount.toString()=="0" || amount==null? SizedBox(): TextGroupRow(
+                                                              title: data.name,
+                                                              subtitle: toCurrency(amount.toString()) );
                                                         }),
                                                       ),
                                                     )

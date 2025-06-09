@@ -351,7 +351,7 @@ class _PersetujuanAbsensiState extends State<PersetujuanAbsensi>
             var sampaiJam = controller.listData.value[index]['sampai_jam'];
             var nomor_ajuan = controller.listData.value[index]['nomor_ajuan'];
             var tanggalPengajuan =
-                controller.listData.value[index]['waktu_pengajuan'];
+                controller.listData.value[index]['waktu_pengajuan']=='' || controller.listData.value[index]['waktu_pengajuan']==null?controller.listData.value[index]['atten_date']:controller.listData.value[index]['waktu_pengajuan'];
             var titleAjuan = controller.listData.value[index]['title_ajuan'];
             var namaTypeAjuan = controller.listData.value[index]['name'];
             var categoryAjuan = controller.listData.value[index]['category'];

@@ -265,7 +265,7 @@ class DashboardController extends GetxController {
     checkStatusPermission();
     checkHakAkses();
     
-    authController.sendAbsensiOffline();
+    //authController.sendAbsensiOffline();
     // } else {
     //   isLoading.value = false;
     //   GetStorage().write("face_recog", true);

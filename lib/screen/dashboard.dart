@@ -3845,6 +3845,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('init state dasbord ke panggil?');
       _setIsloading();
@@ -3856,6 +3857,7 @@ class _DashboardState extends State<Dashboard> {
       if (controllerTracking.bagikanlokasi.value == "aktif") {
         controllerTracking.absenSelfie();
       }
+      controllerAbsensi.getBranch();
 
       controller.versionCheck();
       _checkversion();

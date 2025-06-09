@@ -16,6 +16,7 @@ import 'package:siscom_operasional/utils/api.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/month_year_picker.dart';
+import 'package:siscom_operasional/utils/widget/text_labe.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 
@@ -26,7 +27,7 @@ class Kasbon extends StatefulWidget {
 
 class _KasbonState extends State<Kasbon> {
   final controller = Get.put(KasbonController());
-  var controllerGlobal = Get.find<GlobalController>();
+  var controllerGlobal = Get.put(GlobalController());
   final dashboardController = Get.put(DashboardController());
   var idx = 0;
 
@@ -210,6 +211,7 @@ class _KasbonState extends State<Kasbon> {
                         ],
                       ),
               ],
+
               leading: controller.statusFormPencarian.value
                   ? IconButton(
                       icon: Icon(
@@ -256,6 +258,40 @@ class _KasbonState extends State<Kasbon> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Obx(
+                  () => controller.infoPengajuan.value == "-" ||
+                          controller.infoPengajuan.value == ""
+                      ? SizedBox()
+                      : Container(
+                          padding: EdgeInsets.only(top: 8, bottom: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 1, color: Constanst.infoLight),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  flex: 10,
+                                  child: Icon(
+                                    Iconsax.info_circle,
+                                    size: 25,
+                                    color: Constanst.infoLight,
+                                  )),
+                              Expanded(
+                                  flex: 80,
+                                  child: TextLabell(
+                                    text: controller.infoPengajuan.value
+                                        .toString(),
+                                    color: Constanst.Secondary,
+                                  ))
+                            ],
+                          ),
+                        ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
                 // controller.bulanDanTahunNow.value == ""
                 //     ? SizedBox()
                 //     : Row(
@@ -373,18 +409,20 @@ class _KasbonState extends State<Kasbon> {
       //           ],
       //         ),
       // ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: Constanst.colorPrimary,
-      //   onPressed: () {
-      //     Get.to(FormKasbon(
-      //       dataForm: [[], false],
-      //     ));
-      //   },
-      //   child: const Icon(
-      //     Iconsax.add,
-      //     size: 34,
-      //   ),
-      // ),
+      // floatingActionButton: Obx(() => controller.infoPengajuan.value == ""
+      //     ? FloatingActionButton(
+      //         backgroundColor: Constanst.colorPrimary,
+      //         onPressed: () {
+      //           Get.to(FormKasbon(
+      //             dataForm: [[], false],
+      //           ));
+      //         },
+      //         child: const Icon(
+      //           Iconsax.add,
+      //           size: 34,
+      //         ),
+      //       )
+      //     : SizedBox()),
       // bottomNavigationBar: Obx(
       //   () => Padding(
       //       padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 12),
@@ -823,6 +861,12 @@ class _KasbonState extends State<Kasbon> {
   }
 
   Widget riwayatKasbon() {
+    // controller.listKasbon.value.sort((a, b){
+    //   DateTime dateA = DateTime.parse(a['tanggal_ajuan']);
+    //   DateTime dateB = DateTime.parse(b['tanggal_ajuan']);
+    //   return dateB.compareTo(dateA);
+    // });
+    print('ini data history kasbo ${controller.listKasbon.value}');
     return ListView.builder(
         physics: const BouncingScrollPhysics(),
         itemCount: controller.listKasbon.value.length,
@@ -1013,7 +1057,7 @@ class _KasbonState extends State<Kasbon> {
                                               fontSize: 14)),
                                       const SizedBox(height: 6),
                                       Text(
-                                        alasanReject,
+                                        alasanReject ?? '',
                                         style: GoogleFonts.inter(
                                             fontWeight: FontWeight.w400,
                                             color: Constanst.fgSecondary,
@@ -1036,11 +1080,18 @@ class _KasbonState extends State<Kasbon> {
                                         size: 22,
                                       ),
                                       const SizedBox(width: 8),
-                                      Text("Approved by $approve",
+                                      Flexible(
+                                        child: Text(
+                                          "Approved by $approve",
                                           style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              color: Constanst.fgPrimary,
-                                              fontSize: 14)),
+                                            fontWeight: FontWeight.w500,
+                                            color: Constanst.fgPrimary,
+                                            fontSize: 14,
+                                          ),
+                                          softWrap: true,
+                                          overflow: TextOverflow.visible,
+                                        ),
+                                      ),
                                     ],
                                   )
                                 : Row(

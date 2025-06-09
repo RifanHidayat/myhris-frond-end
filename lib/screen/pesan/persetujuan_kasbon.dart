@@ -22,7 +22,7 @@ class PersetujuanKasbon extends StatefulWidget {
 
 class _PersetujuanKasbonState extends State<PersetujuanKasbon>
     with SingleTickerProviderStateMixin {
-  var controller = Get.find<ApprovalController>();
+  var controller = Get.put(ApprovalController());
 
   @override
   void initState() {
@@ -331,6 +331,11 @@ class _PersetujuanKasbonState extends State<PersetujuanKasbon>
   // }
 
   Widget listDataApproval() {
+    controller.listData.value.sort((a, b){
+      DateTime dateA = DateTime.parse(a['tanggal_ajuan']);
+      DateTime dateB = DateTime.parse(b['tanggal_ajuan']);
+      return dateB.compareTo(dateA);
+    });
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
       child: ListView.builder(
@@ -367,6 +372,7 @@ class _PersetujuanKasbonState extends State<PersetujuanKasbon>
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                   onTap: () {
+                    //    controller.loanDetail();
                     Get.to(DetailPersetujuanKasbon(
                       emId: emIdPengaju,
                       title: typeAjuan,

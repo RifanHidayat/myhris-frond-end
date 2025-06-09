@@ -16,7 +16,7 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 
 class InitController extends GetxController {
   void loadDashboard() async {
-    getSettingApp();
+   getSettingApp();
   }
 
   void getSettingApp() {
@@ -80,6 +80,7 @@ class InitController extends GetxController {
         Get.offAll(Login());
       }
     } else {
+    
       // final service = FlutterBackgroundService();
       // service.invoke("stopService");
       Get.offAll(OnBoardingPage());

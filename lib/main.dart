@@ -35,9 +35,7 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 late List<CameraDescription> cameras;
 
 Future<void> main() async {
-  Get.put(InitController());
-  Get.put(GlobalController());
-  Get.put(ApprovalController());
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarIconBrightness: Brightness.dark,
     statusBarBrightness: Brightness.dark,
@@ -421,8 +419,13 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final controller = Get.find<InitController>();
-  final pesanController = Get.put(PesanController());
+final globalController=Get.put(GlobalController());
+   final controller =  Get.put(InitController());
+   final approval =Get.put(ApprovalController());
+ final pesanController = Get.put(PesanController());
+  
+   
+
 
   @override
   void initState() {

@@ -53,6 +53,7 @@ class UserModel {
   var tipeAlpha;
   var periodeAwal;
   var isAudit;
+   var loanLimit;
   
 
   UserModel({
@@ -106,6 +107,7 @@ class UserModel {
     this.tipeAlpha,
     this.periodeAwal,
     this.isAudit,
+        this.loanLimit,
   });
 
   Map<String, dynamic> toMap() {
@@ -159,7 +161,8 @@ class UserModel {
       "tipe_absen": tipeAbsen,
       'tipe_alpha': tipeAlpha,
       "periode_awal": periodeAwal,
-      'is_audit': isAudit
+      'is_audit': isAudit,
+            'loan_limit':loanLimit,
     };
   }
 
@@ -215,6 +218,7 @@ class UserModel {
       tipeAbsen: map['tipe_absen'],
       tipeAlpha: map['tipe_alpha'],
       isAudit: map['is_audit'],
+           loanLimit: map['loan_limit']??"0",
     );
   }
 

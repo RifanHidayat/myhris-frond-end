@@ -12,6 +12,8 @@ import 'package:siscom_operasional/screen/login.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
+import 'package:intl/intl.dart';
+
 
 class Api {
   static var basicAuth = 'Basic ' +
@@ -20,18 +22,14 @@ class Api {
 
   // API PROD
 
-
-
   static var basicUrl = "http://mobilehris.siscom.id:3009/";
-]
 
-
-  //  static var basicUrl = "http://mobilehris.siscom.id:3009/";
+   // static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API DEV
 
-  //  static var basicUrl = "http://kantor.membersis.com:2627/";
- // static var basicUrl = "http://kantor.membersis.com:2627/";
+// static var basicUrl = "http://kantor.membersis.com:2627/";
+  // static var basicUrl = "http://kantor.membersis.com:2627/";
 
 //
   // API LOCAL
@@ -74,13 +72,14 @@ class Api {
     // if (startPeriode != null && endPeriode != null) {
     //   params += "&start_date=$startPeriode&endPeriode=$endPeriode";
     // }
+  
 
     print("params" + params);
     // var getUrl = basicUrl + url + '?database=demohr' + params;
 
     var getUrl = basicUrl +
         url +
-        "?database=${AppData.selectedDatabase}&start_periode=${AppData.startPeriode}&end_periode=${AppData.endPeriode}" +
+        "?database=${AppData.selectedDatabase==""?"sisrajj":AppData.selectedDatabase}&start_periode=${AppData.startPeriode==""?DateFormat('yyyy-MM-hh').format(DateTime.now()):AppData.startPeriode}&end_periode=${AppData.endPeriode==""?DateFormat('yyyy-MM-hh').format(DateTime.now()):AppData.endPeriode}" +
         params;
     print("Url yang di pake ${getUrl}");
     Map<String, String> headers = {
@@ -114,7 +113,6 @@ class Api {
             await post(url, body: jsonEncode(valFormData), headers: headers);
 
         if (response.statusCode == 401) {
-
           var authController = Get.put(AuthController());
           var res = jsonDecode(response.body);
           var resp = res['message'];
@@ -218,15 +216,10 @@ class ApiRequest {
 
   // API PROD
 
-
-  static var basicUrl = "http://mobilehris.siscom.id:3009/";
-
-
+static var basicUrl = "http://mobilehris.siscom.id:3009/";
 
   // API DEV
-
-  //  static var basicUrl = "http://kantor.membersis.com:2627/";
-
+  //static var basicUrl = "http://kantor.membersis.com:2627/";
 
   Map<String, String> headers = {
     'Authorization': basicAuth,

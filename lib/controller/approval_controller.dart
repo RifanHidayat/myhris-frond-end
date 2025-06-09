@@ -9,6 +9,7 @@ import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
 import 'package:siscom_operasional/utils/constans.dart';
 import 'package:siscom_operasional/utils/custom_dialog.dart';
+import 'package:siscom_operasional/utils/helper.dart';
 import 'package:siscom_operasional/utils/widget_textButton.dart';
 import 'package:siscom_operasional/utils/widget_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,16 +37,23 @@ class ApprovalController extends GetxController {
   var fullNameApprove2 = [].obs;
   var valuePolaPersetujuan = "".obs;
   var loadingString = "Memuat Data...".obs;
+  var durasiPinjamCtr = TextEditingController();
+  var totalPinjamCtr = TextEditingController();
+    var idLoan = "".obs;
+  var loadingLoan = true.obs;
+  var amountLoan = [].obs;
+    var periodeCicilan = "".obs;
 
+  var isEditDetailKasbon = false.obs;
   var statusCari = false.obs;
   var listStatusPengajuan = <Map<String, String>>[].obs;
 
   var statusPemgajuanIzin = 'none'.obs;
   var listStatusPengajuanSP = [
-            {'name': "None", 'value': "none"},
-            {'name': "Potong Cuti", 'value': "potong_cuti"},
-            {'name': "Potong Gaji", 'value': "potong_gaji"},
-          ].obs;
+    {'name': "None", 'value': "none"},
+    {'name': "Potong Cuti", 'value': "potong_cuti"},
+    {'name': "Potong Gaji", 'value': "potong_gaji"},
+  ].obs;
   var listStatusPengajuanSPTolak = [
     {'name': "None", 'value': "none"},
     {'name': "Teguran Lisan", 'value': "teguran_lisan"}
@@ -88,10 +96,23 @@ class ApprovalController extends GetxController {
   void showInputCari() {
     statusCari.value = !statusCari.value;
   }
+  void calculateDurasiPinjam() {
+    amountLoan.clear();
+
+    var amount = 0;
+
+    // for (var i=0;i<durasiPinjam;i++){
+    //   var amount=total
+
+    // }
+  }
+
 
   Future<void> startLoadData(title, bulan, tahun, status) async {
     getLoadsysData(title, bulan, tahun, status);
   }
+
+  
 
   void updateListStatus() {
     print('ini di update gak sih');
@@ -111,7 +132,6 @@ class ApprovalController extends GetxController {
     listStatusPengajuan.refresh();
     print(listStatusPengajuan);
   }
-
 
   void getSaldo({emId, id}) {
     print("saldo new ");
@@ -172,7 +192,7 @@ class ApprovalController extends GetxController {
               loadSuratPeringatan(status);
             } else if (title == 'Teguran Lisan') {
               loadTeguranLisan(status);
-            } else if (title == 'Shift'){
+            } else if (title == 'Shift') {
               loadShift(status);
             }
           }
@@ -515,7 +535,7 @@ class ApprovalController extends GetxController {
         for (var element in valueBody['data']) {
           var fullName = element['full_name'] ?? "";
           var convertNama = "$fullName";
-              Constanst.convertDate1("${element['atten_date']}");
+          Constanst.convertDate1("${element['atten_date']}");
           var filterStatus = element['status'];
           var data = {
             'id': element['id'],
@@ -647,9 +667,9 @@ class ApprovalController extends GetxController {
       }
     });
   }
-
   void loadkasbon(status) {
-    print("data wfh");
+    print("data kasbon");
+
     var urlLoad = valuePolaPersetujuan.value == "1"
         ? "spesifik_approval"
         : "spesifik_approval_multi";
@@ -658,25 +678,32 @@ class ApprovalController extends GetxController {
     listDataAll.value.clear();
     var dataUser = AppData.informasiUser;
     var getEmCode = dataUser![0].em_id;
-    var body = {
+    Map<String, dynamic> body = {
       'em_id': getEmCode,
       'name_data': 'kasbon',
       'bulan': bulanSelected.value,
       'tahun': tahunSelected.value,
-      'status': status == "riwayat" ? '' : 'pending',
+      'status': status == 'riwayat' ? '' : 'pending',
     };
     var connect = Api.connectionApi("post", body, urlLoad);
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        print("value body ${valueBody}");
         if (valueBody['data'].length == 0) {
           loadingString.value = 'Tidak ada pengajuan';
         }
-        listNotModif.value = valueBody['data'];
-
-        print("data body 2 ${valueBody['data']}");
-        for (var element in valueBody['data']) {
+        var filteredData = valueBody['data'];
+      if (status == "riwayat") {
+        filteredData = valueBody['data']
+            .where((element) {
+              print("Status element: ${element['approve_status']}");
+              return element['approve_status'] != 'Pending';
+            })
+            .toList();
+      }
+        listNotModif.value = filteredData;
+        debugPrint('data kasbon : $filteredData', wrapWidth: 5000);
+        for (var element in filteredData) {
           var fullName = element['full_name'] ?? "";
           var convertNama = "$fullName";
           var tanggalDari =
@@ -715,7 +742,7 @@ class ApprovalController extends GetxController {
             'approve_id': element['approve_id'],
             'approve_by': element['approve_by'],
             'approve_date': element['approve_date'],
-            'status': element['status'],
+            'status': element['approve_status'],
             'approve_status': element['approve_status'],
             'approve2_status': element['approve2_status'],
             'tanggal_ajuan': element['tanggal_ajuan'],
@@ -726,7 +753,7 @@ class ApprovalController extends GetxController {
           };
           listData.value.add(data);
           listDataAll.value.add(data);
-          print("data body 2 ${valueBody['data']}");
+          // print("data body 2 ${valueBody['data']}");
         }
         // listData.value.sort(
         //     (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
@@ -735,6 +762,121 @@ class ApprovalController extends GetxController {
       }
     });
   }
+
+  Future<bool> loanDetail(var id) async {
+    print("detail kasbon : ");
+    UtilsAlert.loadingSimpanData(Get.context!, "Tunggu Sebentar...");
+
+    var body = {
+      "id": id.toString(),
+    };
+    var connect = await Api.connectionApi("post", body, "employee-loan-detail");
+
+    if (connect.statusCode == 200) {
+      var valueBody = jsonDecode(connect.body);
+      amountLoan.value = valueBody['data'];
+      // UtilsAlert.showToast("EmP Loan ${amountLoan}");
+
+      amountLoan.forEach((item) {
+        item['cicilan_ctr'] =
+            TextEditingController(text: toCurrency(item['amount'].toString()));
+      });
+
+      Get.back();
+      return true;
+    }
+    Get.back();
+    return false;
+  }
+
+
+  // void loadkasbon(status) {
+  //   print("data wfh");
+  //   var urlLoad = valuePolaPersetujuan.value == "1"
+  //       ? "spesifik_approval"
+  //       : "spesifik_approval_multi";
+  //   listNotModif.value.clear();
+  //   listData.value.clear();
+  //   listDataAll.value.clear();
+  //   var dataUser = AppData.informasiUser;
+  //   var getEmCode = dataUser![0].em_id;
+  //   var body = {
+  //     'em_id': getEmCode,
+  //     'name_data': 'kasbon',
+  //     'bulan': bulanSelected.value,
+  //     'tahun': tahunSelected.value,
+  //     'status': status == "riwayat" ? '' : 'pending',
+  //   };
+  //   var connect = Api.connectionApi("post", body, urlLoad);
+  //   connect.then((dynamic res) {
+  //     if (res.statusCode == 200) {
+  //       var valueBody = jsonDecode(res.body);
+  //       print("value body ${valueBody}");
+  //       if (valueBody['data'].length == 0) {
+  //         loadingString.value = 'Tidak ada pengajuan';
+  //       }
+  //       listNotModif.value = valueBody['data'];
+
+  //       print("data body 2 ${valueBody['data']}");
+  //       for (var element in valueBody['data']) {
+  //         var fullName = element['full_name'] ?? "";
+  //         var convertNama = "$fullName";
+  //         var tanggalDari =
+  //             Constanst.convertDate1("${element['tanggal_ajuan']}");
+  //         var tanggalSampai =
+  //             Constanst.convertDate1("${element['tanggal_ajuan']}");
+  //         var filterStatus = element['leave_status'];
+  //         var data = {
+  //           'id': element['id'],
+  //           'nama_pengaju': convertNama,
+  //           'emId_pengaju': element['em_id'],
+  //           'em_id': element['em_id'],
+  //           'title_ajuan': 'Pengajuan Kasbon',
+  //           'waktu_dari': "${tanggalDari} ${element['dari_jam'] ?? "_ _:_ _"}",
+  //           'waktu_sampai': "${tanggalDari} ${element['sampai_jam']}",
+  //           'durasi': element['leave_duration'],
+  //           'leave_status': filterStatus,
+  //           'delegasi': element['em_delegation'],
+  //           'nama_approve1': element['approve_by'],
+  //           'nama_approve2': element['approve2_by'],
+  //           'waktu_pengajuan': element['atten_date'],
+  //           'catatan': element['reason'],
+  //           'type': 'kasbon',
+  //           'category': element['category'],
+  //           'lainnya': "",
+  //           'file': element['req_file'] ?? "",
+  //           'dari_jam': element['dari_jam'],
+  //           'sampai_jam': element['sampai_jam'],
+  //           'deskripsi': element['uraian'],
+  //           'nomor_ajuan': element['nomor_ajuan'],
+  //           'em_report_to': element['em_report_to'],
+  //           'em_report2_to': element['em_report2_to'],
+  //           'nama_divisi': element['nama_divisi'],
+  //           'place_in': element['place_in'],
+  //           'place_out': element['place_out'],
+  //           'approve_id': element['approve_id'],
+  //           'approve_by': element['approve_by'],
+  //           'approve_date': element['approve_date'],
+  //           'status': element['status'],
+  //           'approve_status': element['approve_status'],
+  //           'approve2_status': element['approve2_status'],
+  //           'tanggal_ajuan': element['tanggal_ajuan'],
+  //           'description': element['description'],
+  //           'total_pinjaman': element['total_pinjaman'],
+  //           'durasi_cicil': element['durasi_cicil'],
+  //           'periode': element['periode']
+  //         };
+  //         listData.value.add(data);
+  //         listDataAll.value.add(data);
+  //         print("data body 2 ${valueBody['data']}");
+  //       }
+  //       // listData.value.sort(
+  //       //     (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
+  //       this.listData.refresh();
+  //       this.listNotModif.refresh();
+  //     }
+  //   });
+  // }
 
   void loadDataTidakHadir(status) {
     var urlLoad = valuePolaPersetujuan.value == "1"
@@ -1146,7 +1288,8 @@ class ApprovalController extends GetxController {
       'tanggal': formatDate(detailData[0]['waktu_pengajuan'].toString()),
       'status': pilihan == 'Tolak' ? 'Rejected' : 'Approve',
       'id': detailData[0]['id'].toString(),
-      'alasan': alasan1.value.text == '' ? alasan2.value.text : alasan1.value.text
+      'alasan':
+          alasan1.value.text == '' ? alasan2.value.text : alasan1.value.text
     };
     var connect = Api.connectionApi("post", body, "shift/approval");
     connect.then((dynamic res) {
@@ -1155,9 +1298,8 @@ class ApprovalController extends GetxController {
         Get.back();
         Get.back();
         Get.back();
-        startLoadData(
-            'Shift', "${dt.month}", "${dt.year}", 'persetujuan');
-      } else{
+        startLoadData('Shift', "${dt.month}", "${dt.year}", 'persetujuan');
+      } else {
         UtilsAlert.showToast('gagal approve shift');
       }
     });
@@ -1414,8 +1556,15 @@ class ApprovalController extends GetxController {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         print(valueBody);
-        fullNameDelegasi.value = valueBody['data'][0]['full_name'];
+        if (valueBody['data'].isNotEmpty){
+ fullNameDelegasi.value = valueBody['data'][0]['full_name'];
         this.fullNameDelegasi.refresh();
+        }else{
+          fullNameDelegasi.value = "";
+
+          
+        }
+       
       }
     });
   }
@@ -2754,9 +2903,9 @@ class ApprovalController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        UtilsAlert.showToast("${valueBody['message']}");
+        //  UtilsAlert.showToast("${valueBody['message']}");
       } else {
-        UtilsAlert.showToast("${res.body}");
+        // UtilsAlert.showToast("${res.body}");
       }
     });
   }
