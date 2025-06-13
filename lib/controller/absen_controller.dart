@@ -649,6 +649,7 @@ class AbsenController extends GetxController {
               aksiEmployeeBelumAbsen(tanggal);
             }
           }
+       
         }
       }
     });
@@ -2597,7 +2598,7 @@ class AbsenController extends GetxController {
     print("long validasi" + langUser.value.toString());
     // var from = Point(-6.1716917, 106.7305503);
     print("place cordinate value ${placeCoordinate[0]}");
-    var getPlaceTerpilih = placeCoordinate[0]
+    var getPlaceTerpilih = placeCoordinate
         .firstWhere((element) => element['place'] == selectedType.value);
 
     var stringLatLang = "${getPlaceTerpilih['place_longlat']}";

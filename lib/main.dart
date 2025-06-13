@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:siscom_operasional/controller/absen_controller.dart';
 import 'package:siscom_operasional/controller/global_controller.dart';
 import 'package:siscom_operasional/controller/pesan_controller.dart';
 import 'package:siscom_operasional/controller/tab_controller.dart';
@@ -47,43 +48,43 @@ Future<void> main() async {
 
   LocalStorage.prefs = await SharedPreferences.getInstance();
 
-  if (Platform.isIOS) {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.ios);
-  } else {
-    await Firebase.initializeApp(
-      // options: DefaultFirebaseOptions.android,
-    );
-  }
+  // if (Platform.isIOS) {
+  //   await Firebase.initializeApp(options: DefaultFirebaseOptions.ios);
+  // } else {
+  //   await Firebase.initializeApp(
+  //     // options: DefaultFirebaseOptions.android,
+  //   );
+  // }
 
-  FirebaseMessaging.instance.requestPermission();
+  // FirebaseMessaging.instance.requestPermission();
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+  //   alert: true,
+  //   badge: true,
+  //   sound: true,
+  // );
 
-  setupInteractedMessage();
+  // setupInteractedMessage();
 
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  // FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: true,
-      criticalAlert: false,
-      provisional: true,
-      sound: true);
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('User granted permission');
-  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-    print('User granted provisional permission');
-  } else {
-    print(
-        'User declined or has not accepted permission ${settings.authorizationStatus}');
-  }
+  // NotificationSettings settings = await messaging.requestPermission(
+  //     alert: true,
+  //     announcement: false,
+  //     badge: true,
+  //     carPlay: true,
+  //     criticalAlert: false,
+  //     provisional: true,
+  //     sound: true);
+  // if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+  //   print('User granted permission');
+  // } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+  //   print('User granted provisional permission');
+  // } else {
+  //   print(
+  //       'User declined or has not accepted permission ${settings.authorizationStatus}');
+  // }
 
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -181,17 +182,16 @@ void _handleMessage(RemoteMessage message) async {
   UtilsAlert.showToast("handle: $messageData");
   switch (route) {
     case 'pesan':
-      Get.to(
-        ChatPage(
-          webSocketChannel:
-              IOWebSocketChannel.connect(Uri.parse(Api.webSocket)),
-          fullNamePenerima: messageData['full_name'],
-          emIdPengirim: AppData.informasiUser![0].em_id,
-          emIdPenerima: messageData['em_id_pengirim'],
-          imageProfil: messageData['em_image'],
-          title: messageData['job_title'],
-        ),
-      );
+      // Get.to(
+      //   ChatPage(
+      //     webSocketChannel:
+      //         IOWebSocketChannel.connect(Uri.parse(Api.webSocket)),
+      //     fullNamePenerima: messageData['full_name'],
+      //     emIdPengirim: AppData.informasiUser![0].em_id,
+      //     imageProfil: messageData['em_image'],
+      //     title: messageData['job_title'],
+      //   ),
+      // );
       break;
     case 'Lembur':
     case 'Cuti':
@@ -423,6 +423,7 @@ final globalController=Get.put(GlobalController());
    final controller =  Get.put(InitController());
    final approval =Get.put(ApprovalController());
  final pesanController = Get.put(PesanController());
+  final absenController = Get.put(AbsenController());
   
    
 
