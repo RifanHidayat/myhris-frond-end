@@ -1257,7 +1257,6 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
   }
 
   Widget tampilan2(AbsenModel index) {
-
     var startTime;
     var endTime;
     var startDate;
@@ -1280,13 +1279,12 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
     int totalMinutes1 = waktu1.hour * 60 + waktu1.minute;
     int totalMinutes2 = waktu2.hour * 60 + waktu2.minute;
 
-
     if (totalMinutes1 < totalMinutes2) {
 // Menggabungkan tanggal hari ini dengan waktu dari string
       startTime = DateTime.parse(
-          '${index.atten_date} ${AppData.informasiUser![0].startTime}:00');
+          '${index.atten_date == '' || index.atten_date == null ? DateFormat('yyyy-mm-dd').format(DateTime.now()) : index.atten_date} ${AppData.informasiUser![0].startTime}:00');
       endTime = DateTime.parse(
-          '${index.atten_date} ${AppData.informasiUser![0].endTime}:00');
+          '${index.atten_date == '' || index.atten_date == null ? DateFormat('yyyy-mm-dd').format(DateTime.now()) : index.atten_date} ${AppData.informasiUser![0].endTime}:00');
 
       //alur beda hari
     } else if (totalMinutes1 > totalMinutes2) {
@@ -1781,28 +1779,7 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                           ),
                                         ],
                                       ))
-                                  
-                              : index.namaHariLibur != null
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(top: 12),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Iconsax.info_circle,
-                                            size: 15,
-                                            color: Constanst.infoLight,
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          TextLabell(
-                                            text: index.namaHariLibur,
-                                            weight: FontWeight.w400,
-                                            size: 11.0,
-                                          ),
-                                        ],
-                                      ))
-                                  : index.namaTugasLuar != null
+                                  : index.namaHariLibur != null
                                       ? Padding(
                                           padding:
                                               const EdgeInsets.only(top: 12),
@@ -1817,13 +1794,13 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                 width: 10,
                                               ),
                                               TextLabell(
-                                                text: index.namaTugasLuar,
+                                                text: index.namaHariLibur,
                                                 weight: FontWeight.w400,
                                                 size: 11.0,
                                               ),
                                             ],
                                           ))
-                                      : index.namaDinasLuar != null
+                                      : index.namaTugasLuar != null
                                           ? Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 12),
@@ -1838,16 +1815,17 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                     width: 10,
                                                   ),
                                                   TextLabell(
-                                                    text: index.namaDinasLuar,
+                                                    text: index.namaTugasLuar,
                                                     weight: FontWeight.w400,
                                                     size: 11.0,
                                                   ),
                                                 ],
                                               ))
-                                          : index.namaCuti != null
+                                          : index.namaDinasLuar != null
                                               ? Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      top: 12),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 12),
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -1860,13 +1838,14 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                         width: 10,
                                                       ),
                                                       TextLabell(
-                                                        text: index.namaCuti,
+                                                        text:
+                                                            index.namaDinasLuar,
                                                         weight: FontWeight.w400,
                                                         size: 11.0,
                                                       ),
                                                     ],
                                                   ))
-                                              : index.namaSakit != null
+                                              : index.namaCuti != null
                                                   ? Padding(
                                                       padding:
                                                           const EdgeInsets.only(
@@ -1884,19 +1863,17 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                           ),
                                                           TextLabell(
                                                             text:
-                                                                index.namaSakit,
+                                                                index.namaCuti,
                                                             weight:
                                                                 FontWeight.w400,
                                                             size: 11.0,
                                                           ),
                                                         ],
                                                       ))
-                                                  : index.offDay.toString() ==
-                                                          '0'
+                                                  : index.namaSakit != null
                                                       ? Padding(
                                                           padding:
-                                                              const EdgeInsets
-                                                                  .only(
+                                                              const EdgeInsets.only(
                                                                   top: 12),
                                                           child: Row(
                                                             children: [
@@ -1910,9 +1887,9 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                               const SizedBox(
                                                                 width: 10,
                                                               ),
-                                                              const TextLabell(
-                                                                text:
-                                                                    "Hari Libur Kerja",
+                                                              TextLabell(
+                                                                text: index
+                                                                    .namaSakit,
                                                                 weight:
                                                                     FontWeight
                                                                         .w400,
@@ -1920,15 +1897,13 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                               ),
                                                             ],
                                                           ))
-                                                      : (index.jamKerja.toString() !=
-                                                                  "null") &&
-                                                              DateTime.parse(
-                                                                      waktuMasuk)
-                                                                  .isAfter(DateTime.parse(
-                                                                          batasWaktu)
-                                                                      .add(const Duration(minutes: 1)))
+                                                      : index.offDay
+                                                                  .toString() ==
+                                                              '0'
                                                           ? Padding(
-                                                              padding: const EdgeInsets.only(top: 12),
+                                                              padding:
+                                                                  const EdgeInsets.only(
+                                                                      top: 12),
                                                               child: Row(
                                                                 children: [
                                                                   Icon(
@@ -1943,7 +1918,7 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                                   ),
                                                                   const TextLabell(
                                                                     text:
-                                                                        "Terlambat",
+                                                                        "Hari Libur Kerja",
                                                                     weight:
                                                                         FontWeight
                                                                             .w400,
@@ -1951,7 +1926,40 @@ class _LaporanAbsenKaryawanState extends State<LaporanAbsenKaryawan> {
                                                                   ),
                                                                 ],
                                                               ))
-                                                          : const SizedBox()
+                                                          : (index.jamKerja
+                                                                          .toString() !=
+                                                                      "null") &&
+                                                                  DateTime.parse(
+                                                                          waktuMasuk)
+                                                                      .isAfter(
+                                                                          DateTime.parse(batasWaktu).add(const Duration(minutes: 1)))
+                                                              ? Padding(
+                                                                  padding: const EdgeInsets.only(top: 12),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Icon(
+                                                                        Iconsax
+                                                                            .info_circle,
+                                                                        size:
+                                                                            15,
+                                                                        color: Constanst
+                                                                            .infoLight,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      const TextLabell(
+                                                                        text:
+                                                                            "Terlambat",
+                                                                        weight:
+                                                                            FontWeight.w400,
+                                                                        size:
+                                                                            11.0,
+                                                                      ),
+                                                                    ],
+                                                                  ))
+                                                              : const SizedBox()
                               : const SizedBox(),
                           Padding(
                             padding: const EdgeInsets.only(top: 12, bottom: 1),

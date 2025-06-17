@@ -1597,7 +1597,7 @@ class TrackingController extends GetxController {
       //  // var isRunning = await service.isRunning();
 
       // service.invoke("stopService");
-      stopService();
+      //stopService();
 
       print("dapatttt is_tracking ${AppData.informasiUser![0].is_tracking}");
       print(

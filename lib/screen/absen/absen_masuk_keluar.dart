@@ -168,7 +168,7 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Refresh",
+                      "Ref",
                       style: TextStyle(color: Constanst.colorText4),
                     ),
                     Icon(Icons.refresh, color: Constanst.colorText4)
@@ -378,7 +378,7 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              "Lokasi kamu saat ini",
+                              "Lokasi kamu saat ini ASD",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
@@ -778,7 +778,8 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                                     .widgetButtomSheetLanjutkanOffline(
                                                         type: 'offlineAbsensi');
                                           });
-                                        }else if (controller.coordinate.value ==
+                                        } else if (controller
+                                                .coordinate.value ==
                                             true) {
                                           print('ini skenario ke 1');
                                           UtilsAlert
@@ -796,24 +797,24 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                                     .widgetButtomSheetLanjutkanOffline(
                                                         type: 'offlineAbsensi');
                                           });
-                                        }  else {
-                                        final packageInfo =
-                                            await PackageInfo.fromPlatform();
-                                        //for (var package in packageInfo) {
-                                        print('tes');
+                                        } else {
+                                          final packageInfo =
+                                              await PackageInfo.fromPlatform();
+                                          //for (var package in packageInfo) {
+                                          print('tes');
 
-                                        print(controller.selectedType.value);
-                                        // controller.selectedType.value = "WFH";
-                                        controller.selectedType.value
-                                                        .toString() ==
-                                                    "WFH" &&
-                                                widget.status == "Absen Masuk"
-                                            ? controllerDashboard
-                                                .widgetButtomSheetWfh()
-                                            : controllerDashboard
-                                                .widgetButtomSheetAktifCamera(
-                                                    type: 'checkTracking');
-                                          }
+                                          print(controller.selectedType.value);
+                                          // controller.selectedType.value = "WFH";
+                                          controller.selectedType.value
+                                                          .toString() ==
+                                                      "WFH" &&
+                                                  widget.status == "Absen Masuk"
+                                              ? controllerDashboard
+                                                  .widgetButtomSheetWfh()
+                                              : controllerDashboard
+                                                  .widgetButtomSheetAktifCamera(
+                                                      type: 'checkTracking');
+                                        }
                                         // Mendapatkan informasi paket aplikasi pihak ketiga
                                       },
                                       child: const Padding(

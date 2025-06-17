@@ -228,25 +228,16 @@ class DashboardController extends GetxController {
     absenMasukKeluarOffline.value = await SqliteDatabaseHelper().getAbsensi();
     print("check absen masuk keluar :${absenMasukKeluarOffline.value}");
     print('ini status dari absen ${controllerAbsensi.absenStatus.value}');
-    // SqliteDatabaseHelper().deleteAbsensi();
-    // AppData.signoutTime = "";
-    // AppData.signingTime = "";
-    // if (authController.isConnected.value) {
-    // AppData.temp = false;
+
     pendingSignoutApr.value = false;
     pendingSigninApr.value = false;
     dashboardStatusAbsen.value = AppData.statusAbsen;
-    // absenOfflineStatus.value = false;
-    // DateTime startDate = await NTP.now();
 
     DateTime startDate = DateTime.now();
 
-    // if (AppData.informasiUser != null && AppData.informasiUser!.isNotEmpty) {
     var emId = AppData.informasiUser![0].em_id.toString();
+    //UtilsAlert.showToast(emId);
     checkAbsenUser(DateFormat('yyyy-MM-dd').format(DateTime.now()), emId);
-    // } else {
-    //   print("Informasi user tidak tersedia.");
-    // }
 
     updateWorkTime();
     getBannerDashboard();

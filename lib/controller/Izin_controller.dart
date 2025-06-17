@@ -301,11 +301,9 @@ class IzinController extends GetxController {
         if (valueBody['data'].isNotEmpty) {
           var totalDay =
               int.parse(valueBody['data'][0]['total_day'].toString());
-          var terpakai =
-              int.parse(valueBody['data'][0]['terpakai'].toString());
+          var terpakai = int.parse(valueBody['data'][0]['terpakai'].toString());
           print("ini data cuti user ${valueBody['data']}");
           if (totalDay == 0) {
-            
           } else {
             jumlahIzin.value = totalDay;
             izinTerpakai.value = terpakai;
@@ -313,9 +311,7 @@ class IzinController extends GetxController {
             this.izinTerpakai.refresh();
             hitungCuti(totalDay, terpakai);
           }
-        } else {
-          
-        }
+        } else {}
       }
     });
   }
@@ -920,15 +916,15 @@ class IzinController extends GetxController {
   void validasiKirimPengajuan(status) {
     if (namaFileUpload.value.isEmpty) {
       if (uploadFile.value == false && isRequiredFile.value == '1') {
-       UtilsAlert.showToast("Form unggah file harus diisi");
-      return;
+        UtilsAlert.showToast("Form unggah file harus diisi");
+        return;
       }
     }
-    if(selectedDropdownFormTidakMasukKerjaTipe.value.isEmpty){
+    if (selectedDropdownFormTidakMasukKerjaTipe.value.isEmpty) {
       UtilsAlert.showToast("Tipe absensi harus diisi");
       return;
     }
-    
+
     print("tanggal selecetd ${tanggalSelected.value.isEmpty}");
     print(viewFormWaktu.value);
     if (viewFormWaktu.value == true) {
@@ -1342,7 +1338,8 @@ class IzinController extends GetxController {
               UtilsAlert.showToast(valueBody['error']);
             } else {
               Navigator.pop(Get.context!);
-              messageApi.value = "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD";
+              messageApi.value =
+                  "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD";
               // UtilsAlert.showToast(
               //     "Data periode $convertTanggalBikinPengajuan belum tersedia, harap hubungi HRD");
             }
