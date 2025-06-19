@@ -23,7 +23,7 @@ class PersetujuanSuratPeringatan extends StatefulWidget {
 
 class _PersetujuanSuratPeringatanState extends State<PersetujuanSuratPeringatan>
     with SingleTickerProviderStateMixin {
-  var controller = Get.put(ApprovalController());
+  var controller = Get.find<ApprovalController>();
 
   @override
   void initState() {

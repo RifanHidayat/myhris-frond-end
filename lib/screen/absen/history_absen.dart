@@ -30,8 +30,8 @@ class HistoryAbsen extends StatefulWidget {
 }
 
 class _HistoryAbsenState extends State<HistoryAbsen> {
-  var controller = Get.put(AbsenController());
-  var controllerGlobal = Get.put(GlobalController());
+  var controller = Get.find<AbsenController>();
+  var controllerGlobal = Get.find<GlobalController>();
   final dashboardController = Get.put(DashboardController());
 
   @override
@@ -3154,10 +3154,14 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                                 ),
                                 InkWell(
                                   onTap: () {
-                                    viewLampiranAjuan(data['req_file']);
+                                    viewLampiranAjuan(data['req_file'] == null 
+                                    ? data['signin_pict'] == null || data['signin_pict'] == '' 
+                                    ? data['signout_pict'] : data['signin_pict'] : data['req_file']);
                                   },
                                   child: TextLabell(
-                                    text: data['req_file'],
+                                    text: data['req_file'] == null 
+                                    ? data['signin_pict'] == null || data['signin_pict'] == ''
+                                    ? data['signout_pict'] : data['signin_pict'] : data['req_file'],
                                     color: Constanst.fgPrimary,
                                     size: 16,
                                     weight: FontWeight.w500,

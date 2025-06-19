@@ -17,7 +17,6 @@ import 'package:siscom_operasional/utils/widget_utils.dart';
 class InitController extends GetxController {
   void loadDashboard() async {
     getSettingApp();
-    validasiLastAbsensi();
   }
 
   void getSettingApp() {

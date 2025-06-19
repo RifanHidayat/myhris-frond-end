@@ -1,3 +1,5 @@
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +45,7 @@ import 'package:siscom_operasional/screen/absen/laporan/laporan_dinas_luar.dart'
 import 'package:siscom_operasional/screen/absen/laporan/laporan_izin.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_klaim.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_lembur.dart';
+import 'package:siscom_operasional/screen/absen/laporan/laporan_shift.dart';
 import 'package:siscom_operasional/screen/absen/laporan/laporan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/absen/loading_absen.dart';
 import 'package:siscom_operasional/screen/absen/pengajuan%20absen_berhasil.dart';
@@ -61,11 +64,10 @@ import 'package:http_parser/http_parser.dart';
 import 'package:siscom_operasional/screen/absen/absen_masuk_keluar.dart';
 
 import 'package:flutter/services.dart';
-import 'package:android_intent/android_intent.dart';
-import 'package:android_intent/flag.dart';
+
 
 class AbsenController extends GetxController {
-  var globalCt = Get.put(GlobalController());
+  var globalCt = Get.find<GlobalController>();
   final controllerTracking = Get.put(TrackingController());
 
   PageController? pageViewFilterAbsen;
@@ -76,6 +78,10 @@ class AbsenController extends GetxController {
   RxBool selengkapnyaKeluar = false.obs;
 
   Rx<DateTime> selectedDate = DateTime.now().obs;
+
+  RxBool isCreateNew = false.obs;
+  var idAjuan = 0.obs;
+  var allDataCheck = [].obs;
 
   var tglAjunan = "".obs;
   var checkinAjuan = "".obs;
@@ -222,14 +228,14 @@ class AbsenController extends GetxController {
   @override
   void onReady() async {
     getTimeNow();
-    getLoadsysData();
+    // getLoadsysData();
     loadHistoryAbsenUser();
     getDepartemen(1, "");
     filterLokasiKoordinate.value = "Lokasi";
     selectedViewFilterAbsen.value = 0;
     pilihTanggalTelatAbsen.value = DateTime.now();
     super.onReady();
-    userShift();
+    // userShift();
   }
 
   void getLoadsysData() {
@@ -346,7 +352,7 @@ class AbsenController extends GetxController {
     placeCoordinateCheckinRest.refresh();
   }
 
-   Future<void> convertLatLongListToAddressesoutRest(latLongList) async {
+  Future<void> convertLatLongListToAddressesoutRest(latLongList) async {
     // absenLongLatMasuk.clear();
     try {
       //  for (var coordinates in latLongList) {
@@ -651,7 +657,7 @@ class AbsenController extends GetxController {
   }
 
   Future<void> getPlaceCoordinate() async {
-    // placeCoordinate.clear();
+    placeCoordinate.clear();
 
     placeCoordinateDropdown.value.clear();
     var connect = Api.connectionApi("get", {}, "places_coordinate",
@@ -665,10 +671,11 @@ class AbsenController extends GetxController {
       } else {
         if (res.statusCode == 200) {
           coordinate.value = false;
-          print("Place cordinate 200" + res.body.toString());
           var valueBody = jsonDecode(res.body);
 
           var temporary = valueBody['data'];
+
+          print('ini placecordinate dari get $temporary');
 
           List<Map<String, dynamic>> tipeLokasi = [];
           for (var element in temporary) {
@@ -679,6 +686,7 @@ class AbsenController extends GetxController {
               'place_radius': element['place_radius'],
             });
           }
+          print('ini data buat masuk offline $tipeLokasi');
           SqliteDatabaseHelper().insertTipeLokasi(tipeLokasi);
 
           controller.checkAbsenUser(
@@ -697,7 +705,7 @@ class AbsenController extends GetxController {
               selectedType.value = valueBody['data'][0]['place'];
             }
           }
-
+          print('ini dropdoen place value ${placeCoordinateDropdown.value}');
           for (var element in valueBody['data']) {
             // placeCoordinateDropdown.value.add(element['place']);
             if (typeAbsen.value == 1) {
@@ -710,6 +718,7 @@ class AbsenController extends GetxController {
               }
             }
           }
+          print('ini dropdoen place value ${placeCoordinateDropdown.value}');
           List filter = [];
           for (var element in valueBody['data']) {
             if (element['isFilterView'] == 1) {
@@ -717,17 +726,18 @@ class AbsenController extends GetxController {
             }
           }
 
-          print("data ${placeCoordinate.value}");
+          print("data plcea ${placeCoordinate}");
+          print('ini data filter ${filter}');
           // placeCoordinate.clear();
-          placeCoordinate.value = filter;
-          placeCoordinate.refresh();
-          placeCoordinate.refresh();
+          placeCoordinate.add(filter);
+          print('ini data place cordinate dari get $placeCoordinate');
         } else {
           print("Place cordinate !=200" + res.body.toString());
           print(res.body.toString());
         }
       }
     }).catchError((error) {
+      print('ini serius lu kemari');
       coordinate.value = true;
       getPlaceCoordinateOffline();
     });
@@ -737,6 +747,7 @@ class AbsenController extends GetxController {
     var body = await SqliteDatabaseHelper().getTipeLokasi();
 
     placeCoordinateDropdown.value.clear();
+    placeCoordinate.clear();
     if (typeAbsen.value == 1) {
       selectedType.value = body[0]['place'];
     } else {
@@ -765,9 +776,7 @@ class AbsenController extends GetxController {
     }
 
     // placeCoordinate.clear();
-    placeCoordinate.value = filter;
-    placeCoordinate.refresh();
-    placeCoordinate.refresh();
+    placeCoordinate.add(filter);
   }
 
   // Future<void> offlineToOnline() async {
@@ -1065,7 +1074,7 @@ class AbsenController extends GetxController {
 
   Future<void> refreshPage() async {
     getPosisition();
-    getPlaceCoordinate1();
+    getPlaceCoordinate();
     mapController?.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: LatLng(latUser.value, langUser.value), zoom: 20)
         //17 is new zoom level
@@ -1687,7 +1696,7 @@ class AbsenController extends GetxController {
                   stringTanggal,
                   typeNotifFcm,
                   pesan,
-                  'Approval WFH');
+                  'Pengajuan WFH');
 
               if (item['token_notif'] != null) {
                 globalCt.kirimNotifikasiFcm(
@@ -2008,7 +2017,7 @@ class AbsenController extends GetxController {
       // TrustLocation.start(1);
       getCheckMock();
       if (!mockLocation.value) {
-        var statusPosisi = await validasiRadius();
+        var statusPosisi = validasiRadius();
         if (statusPosisi == true) {
           var latLangAbsen = "${latUser.value},${langUser.value}";
           var dataUser = AppData.informasiUser;
@@ -2051,7 +2060,7 @@ class AbsenController extends GetxController {
                   stringTanggal,
                   typeNotifFcm,
                   pesan,
-                  'Approval WFH');
+                  'Pengajuan WFH');
 
               if (item['token_notif'] != null) {
                 globalCt.kirimNotifikasiFcm(
@@ -2578,14 +2587,15 @@ class AbsenController extends GetxController {
     this.mockLocation.refresh();
   }
 
-  Future<bool> validasiRadius() async {
+  bool validasiRadius() {
     UtilsAlert.showLoadingIndicator(Get.context!);
+    placeCoordinate.refresh();
     var from = Point(latUser.value, langUser.value);
     print("lat validasi" + latUser.value.toString());
     print("long validasi" + langUser.value.toString());
     // var from = Point(-6.1716917, 106.7305503);
-    print("place cordinate value ${placeCoordinate.value}");
-    var getPlaceTerpilih = placeCoordinate.value
+    print("place cordinate value ${placeCoordinate[0]}");
+    var getPlaceTerpilih = placeCoordinate[0]
         .firstWhere((element) => element['place'] == selectedType.value);
 
     var stringLatLang = "${getPlaceTerpilih['place_longlat']}";
@@ -2797,7 +2807,7 @@ class AbsenController extends GetxController {
           historyAbsen.value = highestIdPerDate.values.toList();
 
           for (var element in historyAbsen) {
-            print("masuk sini: $tempHistoryAbsen");
+            // print("masuk sini: $tempHistoryAbsen");
 
             var data = tempHistoryAbsen
                 .where((p0) => p0.date == element.date)
@@ -2805,14 +2815,14 @@ class AbsenController extends GetxController {
                 .toList()
               ..sort((a, b) => b.id!.compareTo(a.id as num));
 
-            print("data turunan: $data");
+            // print("data turunan: $data");
             if (data.isNotEmpty) {
               element.turunan = data;
             } else {
               element.turunan = [];
             }
 
-            print('data list ${element} tes');
+            // print('data list ${element} tes');
           }
 
           //  historyAbsenShow.toSet().toList();
@@ -3094,7 +3104,7 @@ class AbsenController extends GetxController {
           historyAbsen.value = highestIdPerDate.values.toList();
 
           for (var element in historyAbsen) {
-            print("masuk sini: $tempHistoryAbsen");
+            // print("masuk sini: $tempHistoryAbsen");
 
             var data = tempHistoryAbsen
                 .where((p0) => p0.date == element.date)
@@ -3102,14 +3112,14 @@ class AbsenController extends GetxController {
                 .toList()
               ..sort((a, b) => b.id!.compareTo(a.id as num));
 
-            print("data turunan: $data");
+            // print("data turunan: $data");
             if (data.isNotEmpty) {
               element.turunan = data;
             } else {
               element.turunan = [];
             }
 
-            print('data list ${element} tes');
+            // print('data list ${element} tes');
           }
 
           //  historyAbsenShow.toSet().toList();
@@ -4600,16 +4610,23 @@ class AbsenController extends GetxController {
     };
     print('ini body bos $body}');
     var connect = Api.connectionApi("post", body, "employee-attendance");
+    allDataCheck.clear();
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
         List data = valueBody['data'];
         if (data.isNotEmpty) {
-          checkinAjuan.value = data[0]['signin_time'];
-          checkoutAjuan.value = data[0]['signout_time'];
+          allDataCheck.add(data);
+          var lastData = data[data.length - 1];
+          checkinAjuan.value = lastData['signin_time'];
+          checkoutAjuan.value = lastData['signout_time'];
+          isCreateNew.value = false;
         } else {
+          allDataCheck.clear();
+          isCreateNew.value = true;
           checkinAjuan.value = '';
           checkoutAjuan.value = '';
+          idAjuan.value = 0;
         }
       }
     });
@@ -4747,6 +4764,7 @@ class AbsenController extends GetxController {
           : "",
       "address_masuk_rest": addressMasukRest.value.toString(),
       "address_keluar_rest": addressKeluarRest.value.toString(),
+      'id_absen': idAjuan.value.toString(),
     };
     print('body data ajuan ${body}');
     var connect = Api.connectionApi("post", body, "save-employee-attendance");
@@ -5467,6 +5485,79 @@ class AbsenController extends GetxController {
                     ),
                   ),
                 ),
+              InkWell(
+                  // highlightColor: Colors.white,
+                  onTap: () {
+                    Get.back();
+                    Get.back();
+                    Get.to(LaporanShift(
+                      title: 'shift',
+                    ));
+                    tempNamaLaporan1.value = "shift";
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 12, bottom: 12, left: 16, right: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/4_lembur.svg',
+                              height: 35,
+                              width: 35,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Text(
+                                'Laporan Shift',
+                                style: GoogleFonts.inter(
+                                    color: Constanst.fgPrimary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ],
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Get.back();
+                            Get.back();
+                            Get.to(LaporanShift(
+                              title: 'shift',
+                            ));
+                            tempNamaLaporan1.value = "shift";
+                          },
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: tempNamaLaporan1.value == "shift"
+                                        ? 2
+                                        : 1,
+                                    color: Constanst.onPrimary),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: tempNamaLaporan1.value == "shift"
+                                ? Padding(
+                                    padding: const EdgeInsets.all(3),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Constanst.onPrimary,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                    ),
+                                  )
+                                : Container(),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              
               ],
             ),
           ),

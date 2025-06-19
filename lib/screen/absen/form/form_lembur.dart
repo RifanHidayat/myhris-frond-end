@@ -27,7 +27,7 @@ class _FormLemburState extends State<FormLembur> {
   @override
   void initState() {
     super.initState();
-    print('ini data lembut status ${controller.isFormChanged.value}');
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('ini data lembur ${widget.dataForm![0]}');
       if (widget.dataForm![1] == true) {
@@ -172,7 +172,7 @@ class _FormLemburState extends State<FormLembur> {
               padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
               child: ElevatedButton(
                 onPressed: () {
-                  print("tes ${controller.dariJam.value.text.toString()}");
+                  print("ini dari jam serius uy ${controller.dariJam.value.text.toString()}");
                   // TimeOfDay _startTime = TimeOfDay(
                   //     hour: int.parse(
                   //         controller.dariJam.value.text.toString().split(":")[0]),
@@ -460,11 +460,6 @@ class _FormLemburState extends State<FormLembur> {
   Widget formHariDanTanggal() {
     return InkWell(
       onTap: () async {
-        // DateTime now = DateTime.now();
-        // DateTime firstDateOfMonth =
-        //     DateTime(now.year, now.month + 0, 1);
-        // DateTime lastDayOfMonth =
-        //     DateTime(now.year, now.month + 1, 0);
         var dateSelect = await showDatePicker(
           context: Get.context!,
           firstDate:
@@ -937,7 +932,6 @@ class _FormLemburState extends State<FormLembur> {
   Widget formTugasKepada() {
     return InkWell(
       onTap: () {
-        // controller.cariBerhubungan.value.clear;
         bottomSheetEmploy();
       },
       child: Column(

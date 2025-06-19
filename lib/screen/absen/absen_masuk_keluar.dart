@@ -35,9 +35,10 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
   double _panelHeightOpen = 0;
   double _panelHeightClosed = 250.0;
   final panelController = PanelController();
-  final controller = Get.put(AbsenController());
+  final controller = Get.find<AbsenController>();
   final controllerDashboard = Get.put(DashboardController());
-  final internetController = Get.put(InternetController());
+  final internetController =
+      Get.find<InternetController>(tag: 'AuthController');
   FocusNode myfocus = FocusNode();
 
   Completer<GoogleMapController> _controller = Completer();
@@ -758,9 +759,12 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                                       BorderRadius.circular(
                                                           8.0),
                                                   side: const BorderSide(color: Colors.white)))),
-                                      onPressed: () async {
+                                      onPressed: () {
+                                        // await controller.getPosisition();
                                         // await controller.offlineToOnline();
-                                        // await controller.getPlaceCoordinate1();
+                                        // await controller.getPlaceCoordinate();
+                                        print(
+                                            'ini place cordinate ${controller.placeCoordinate}');
                                         if (!internetController
                                             .isConnected.value) {
                                           print('ini skenario ke 2');
@@ -799,9 +803,10 @@ class _AbsenMasukKeluarState extends State<AbsenMasukKeluar> {
                                           });
                                         } else {
                                           final packageInfo =
-                                              await PackageInfo.fromPlatform();
+                                              PackageInfo.fromPlatform();
                                           //for (var package in packageInfo) {
-                                          print('tes');
+                                          print(
+                                              'ini kirirm absen placecoordinate ${controller.placeCoordinate}');
 
                                           print(controller.selectedType.value);
                                           // controller.selectedType.value = "WFH";

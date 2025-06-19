@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:android_intent/android_intent.dart';
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
@@ -24,7 +24,7 @@ class GlobalController extends GetxController {
 
   @override
   void onReady() async {
-    getLoadsysData();
+    // getLoadsysData();
     super.onReady();
   }
 

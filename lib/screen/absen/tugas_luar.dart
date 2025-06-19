@@ -25,7 +25,7 @@ class TugasLuar extends StatefulWidget {
 
 class _TugasLuarState extends State<TugasLuar> {
   final controller = Get.put(TugasLuarController());
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
   final dashboardController = Get.put(DashboardController());
   var idx = 0;
 

@@ -785,6 +785,11 @@ class _FormDailyTaskState extends State<FormDailyTask> {
                             const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
                         child: ElevatedButton(
                           onPressed: () {
+                            print('ini tanggal selesai ${controller.tempTanggalSelesai.value}');
+                            if(controller.tempStatus.value == 1 && controller.tempTanggalSelesai.value == ''){
+                              UtilsAlert.showToast('Pastikan Anda mengisi tanggal selesai');
+                              return;
+                            }
                             if (controller.tempTask.value.isNotEmpty) {
                               if (editIndex == null) {
                                 controller.listTask.add({

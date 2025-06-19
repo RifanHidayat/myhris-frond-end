@@ -126,6 +126,16 @@ class Constanst {
     );
   }
 
+  static String convertDateAndClock(String dateString) {
+    try {
+      final dateTime = DateTime.parse(dateString);
+      final formatter = DateFormat('yyyy-MM-dd HH:mm');
+      return formatter.format(dateTime);
+    } catch (e) {
+      return '-';
+    }
+  }
+
   static String convertDate(String date) {
     DateTime convert = DateTime.parse(date);
     var hari = DateFormat('EEEE');
@@ -140,7 +150,7 @@ class Constanst {
   static String convertDate1(String date) {
     var inputFormat = DateFormat('yyyy-MM-dd');
     var inputDate = inputFormat.parse(date);
-    var outputFormat = DateFormat('dd-MM-yyyy');
+    var outputFormat = DateFormat('dd-MM-yyyy', 'id_ID');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
@@ -244,6 +254,29 @@ class Constanst {
       print('Error parsing date: $e');
       return '';
     }
+  }
+
+  static String convertDate8(String date) {
+    var inputFormat = DateFormat('yyyy-MM-dd');
+    var inputDate = inputFormat.parse(date);
+    var outputFormat = DateFormat('dd MMM yyyy', 'id');
+    var outputDate = outputFormat.format(inputDate);
+    return outputDate;
+  }
+
+  static String convertDate9(String date) {
+    var inputDate = DateTime.parse(date);
+    var outputFormat = DateFormat('yyyy-MM-dd', 'id_ID');
+    var outputDate = outputFormat.format(inputDate);
+    return outputDate;
+  }
+
+  static String convertTime(String time) {
+    var inputFormat = DateFormat('HH:mm:ss');
+    var inputTime = inputFormat.parse(time);
+    var outputFormat = DateFormat('HH:mm');
+    var outputTime = outputFormat.format(inputTime);
+    return outputTime;
   }
 
   static String convertDateBulanDanTahun(String date) {
