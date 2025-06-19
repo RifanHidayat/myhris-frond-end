@@ -23,7 +23,7 @@ class RiwayatCuti extends StatefulWidget {
 
 class _RiwayatCutiState extends State<RiwayatCuti> {
   final controller = Get.put(CutiController());
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
   final dashboardController = Get.put(DashboardController());
   var idx = 0;
 

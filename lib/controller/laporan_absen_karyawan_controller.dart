@@ -33,7 +33,7 @@ class LaporanAbsenKaryawanController extends GetxController {
     loadHistoryAbsenEmployee();
   }
 
-  var controller = Get.put(AbsenController());
+  var controller = Get.find<AbsenController>();
 
   void loadHistoryAbsenEmployee() {
     var listPeriode = bulanSelected.value.split("-");
@@ -157,7 +157,7 @@ class LaporanAbsenKaryawanController extends GetxController {
               element.turunan = [];
             }
 
-            print('data list ${element} tes');
+            // print('data list ${element} tes');
           });
         }
         this.historyAbsen.refresh();

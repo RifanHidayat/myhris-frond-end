@@ -17,11 +17,6 @@ class DetailDailyTask extends StatefulWidget {
 
 class _DetailDailyTaskState extends State<DetailDailyTask> {
   final controller = Get.find<DailyTaskController>();
-  @override
-  // void initState() {
-  //   super.initState();
-  //   // controller.loadTask(widget.id);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +31,7 @@ class _DetailDailyTaskState extends State<DetailDailyTask> {
       ),
       body: widget.id == null || widget.id == 0
           ? Center(child: Text('hari ini gak ada task, yuk kita bikin'))
-          : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: descMasuk(),
-            ),
+          : descMasuk(),
     );
   }
 
@@ -81,21 +73,11 @@ class _DetailDailyTaskState extends State<DetailDailyTask> {
                   "Sulit",
                   "Sangat Sulit"
                 ];
-                List<IconData> difficultyIcons = [
-                  Icons.help_outline,
-                  Icons.star_outline,
-                  Icons.star_outline,
-                  Icons.star,
-                  Icons.whatshot,
-                  Icons.local_fire_department
-                ];
+
 
                 String difficultyLabel = level >= 1 && level <= 5
                     ? difficultyLabels[level]
                     : difficultyLabels[0];
-                Object difficultyIcon = level >= 1 && level <= 5
-                    ? buildStars(level)
-                    : difficultyIcons[0];
 
                 String statusLabel = status == 1 ? "Finished" : "Ongoing";
                 Color statusColor = status == 1 ? Colors.green : Colors.orange;
@@ -140,8 +122,6 @@ class _DetailDailyTaskState extends State<DetailDailyTask> {
                       Text(
                         data['rincian'],
                         style: GoogleFonts.inter(fontSize: 14),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),
                       Row(

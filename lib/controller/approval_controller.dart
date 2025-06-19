@@ -40,7 +40,7 @@ class ApprovalController extends GetxController {
   var statusCari = false.obs;
   var listStatusPengajuan = <Map<String, String>>[].obs;
 
-  var statusPemgajuanIzin = ''.obs;
+  var statusPemgajuanIzin = 'none'.obs;
   var listStatusPengajuanSP = [
             {'name': "None", 'value': "none"},
             {'name': "Potong Cuti", 'value': "potong_cuti"},
@@ -75,7 +75,7 @@ class ApprovalController extends GetxController {
 
   var statusHitungCuti = false.obs;
 
-  var controllerGlobal = Get.put(GlobalController());
+  var controllerGlobal = Get.find<GlobalController>();
 
   var saldo = 0.obs;
   var limitTransaksi = 0.obs;
@@ -137,7 +137,7 @@ class ApprovalController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
-        debugPrint('ini apaan siinin ${valueBody}', wrapWidth: 1000);
+        // debugPrint('ini apaan siinin ${valueBody}', wrapWidth: 1000);
         for (var element in valueBody['data']) {
           if (element['kode'] == "013") {
             valuePolaPersetujuan.value = "${element['name']}";
@@ -172,6 +172,8 @@ class ApprovalController extends GetxController {
               loadSuratPeringatan(status);
             } else if (title == 'Teguran Lisan') {
               loadTeguranLisan(status);
+            } else if (title == 'Shift'){
+              loadShift(status);
             }
           }
         }
@@ -471,6 +473,86 @@ class ApprovalController extends GetxController {
             'lokasi_keluar': element['signout_addr'],
             'foto_masuk': element['signin_pict'],
             'foto_keluar': element['signout_pict'],
+          };
+          listData.value.add(data);
+          listDataAll.value.add(data);
+          print("data body list data ${listData}");
+        }
+        listData.value.sort(
+            (a, b) => b['waktu_pengajuan'].compareTo(a['waktu_pengajuan']));
+        this.listData.refresh();
+        this.listNotModif.refresh();
+      }
+    });
+  }
+
+  void loadShift(status) {
+    print("data shift");
+    var urlLoad = valuePolaPersetujuan.value == "1"
+        ? "spesifik_approval"
+        : "spesifik_approval_multi";
+    listNotModif.value.clear();
+    listData.value.clear();
+    listDataAll.value.clear();
+    var dataUser = AppData.informasiUser;
+    var getEmCode = dataUser![0].em_id;
+    var body = {
+      'em_id': getEmCode,
+      'name_data': 'shift',
+      'bulan': bulanSelected.value,
+      'tahun': tahunSelected.value,
+      'status': status == "riwayat" ? '' : 'pending',
+    };
+    var connect = Api.connectionApi("post", body, urlLoad);
+    connect.then((dynamic res) {
+      if (res.statusCode == 200) {
+        var valueBody = jsonDecode(res.body);
+        print("value body ${valueBody}");
+        if (valueBody['data'].length == 0) {
+          loadingString.value = 'Tidak ada pengajuan';
+        }
+        listNotModif.value = valueBody['data'];
+        for (var element in valueBody['data']) {
+          var fullName = element['full_name'] ?? "";
+          var convertNama = "$fullName";
+              Constanst.convertDate1("${element['atten_date']}");
+          var filterStatus = element['status'];
+          var data = {
+            'id': element['id'],
+            'nama_pengaju': convertNama,
+            'emId_pengaju': element['em_id'],
+            'em_id': element['em_id'],
+            'title_ajuan': 'Pengajuan Shift',
+            'leave_status': filterStatus,
+            'delegasi': element['em_delegation'],
+            'nama_approve1': element['approve_by'],
+            'nama_approve2': element['approve2_by'],
+            'waktu_pengajuan': element['tgl_ajuan'],
+            'atten_date': element['atten_date'],
+            'catatan': element['uraian'],
+            'type': 'Shift',
+            'category': element['category'],
+            'deskripsi': element['uraian'],
+            'nomor_ajuan': element['nomor_ajuan'],
+            'em_report_to': element['em_report_to'],
+            'em_report2_to': element['em_report2_to'],
+            'approve_id': element['approve_id'],
+            'approve_by': element['approve_by'],
+            'approve_date': element['approve_date'],
+            'status': element['status'],
+            'approve_status': element['approve_status'],
+            'approve2_status': element['approve2_status'],
+            'dari_tgl': element['dari_tgl'],
+            'sampai_tgl': element['sampai_tgl'],
+            'name_delegasi': element['replace_name'],
+            'name_old': element['name_old'],
+            'time_in_old': element['time_in_old'],
+            'time_out_old': element['time_out_old'],
+            'work_id_old': element['work_id_old'],
+            'name_new': element['name_new'],
+            'time_in_new': element['time_in_new'],
+            'time_out_new': element['time_out_new'],
+            'work_id_new': element['work_id_new'],
           };
           listData.value.add(data);
           listDataAll.value.add(data);
@@ -1057,6 +1139,30 @@ class ApprovalController extends GetxController {
     });
   }
 
+  void aksiMenyetujuiShift(pilihan) {
+    Map<String, dynamic> body = {
+      'nomor_ajuan': detailData[0]['nomor_ajuan'].toString(),
+      'em_id': AppData.informasiUser![0].em_id,
+      'tanggal': formatDate(detailData[0]['waktu_pengajuan'].toString()),
+      'status': pilihan == 'Tolak' ? 'Rejected' : 'Approve',
+      'id': detailData[0]['id'].toString(),
+      'alasan': alasan1.value.text == '' ? alasan2.value.text : alasan1.value.text
+    };
+    var connect = Api.connectionApi("post", body, "shift/approval");
+    connect.then((dynamic res) {
+      var dt = DateTime.now();
+      if (res.statusCode == 200) {
+        Get.back();
+        Get.back();
+        Get.back();
+        startLoadData(
+            'Shift', "${dt.month}", "${dt.year}", 'persetujuan');
+      } else{
+        UtilsAlert.showToast('gagal approve shift');
+      }
+    });
+  }
+
   void loadDataTugasLuar(status) {
     var urlLoad = valuePolaPersetujuan.value == "1"
         ? "spesifik_approval"
@@ -1307,6 +1413,7 @@ class ApprovalController extends GetxController {
     connect.then((dynamic res) {
       if (res.statusCode == 200) {
         var valueBody = jsonDecode(res.body);
+        print(valueBody);
         fullNameDelegasi.value = valueBody['data'][0]['full_name'];
         this.fullNameDelegasi.refresh();
       }
@@ -2523,6 +2630,10 @@ class ApprovalController extends GetxController {
         ? ", Alasan pengajuan di tolak = ${alasanReject.value.text}"
         : "";
 
+    var listKonsekuensi = '';
+    print(konsekuemsiList);
+    listKonsekuensi =
+        konsekuemsiList.map((item) => item['konsekuensi']).join(',');
     var body = {
       'id': id.toString(),
       'em_id': ajuanEmid.toString(),
@@ -2555,6 +2666,8 @@ class ApprovalController extends GetxController {
       "endTime": endTime.value,
       "startDate": startDate.value,
       "endDate": endDate.value,
+      'konsekuensi': listKonsekuensi,
+      'tipe_surat': statusPemgajuanIzin.value,
     };
     print("body approve new 2 ${body}");
 

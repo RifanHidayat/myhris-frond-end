@@ -54,8 +54,8 @@ class AuthController extends GetxController {
 
   var controllerAbsnsi = Get.put(AbsenController());
   final controllerTracking = Get.put(TrackingController());
-  var globalCtr = Get.put(GlobalController());
-  final internetController = Get.put(InternetController());
+  var globalCtr = Get.find<GlobalController>();
+  final internetController = Get.put(InternetController(), tag: 'AuthController');
   // var isConnected = true.obs;
   // Timer? timer;
   // var ping = 0.obs;
@@ -1578,6 +1578,7 @@ class AuthController extends GetxController {
   // }
 
   Future<bool> dataabse() async {
+    databases.clear();
     tempEmail.value.text = "";
     try {
       UtilsAlert.showLoadingIndicator(Get.context!);
@@ -1587,19 +1588,19 @@ class AuthController extends GetxController {
       var resp = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
+        print('ini baru lagi?');
         tempEmail.value.text = email.value.text;
         databases.value = DatabaseModel.fromJsonToList(resp['data']);
         Get.back();
         return true;
       } else {
         Get.back();
-        databases.value = [];
         return false;
       }
     } catch (e) {
       print(e);
       Get.back();
-      databases.value = [];
+      // databases.value = [];
       return false;
     }
   }

@@ -112,12 +112,12 @@ class IzinController extends GetxController {
     "Rejected",
     "Pending"
   ];
-  var globalCt = Get.put(GlobalController());
-  @override
-  void onReady() async {
-    super.onReady();
-    loadCutiUser();
-  }
+  var globalCt = Get.find<GlobalController>();
+  // @override
+  // void onReady() async {
+  //   super.onReady();
+  //   loadCutiUser();
+  // }
 
   @override
   void onInit() {

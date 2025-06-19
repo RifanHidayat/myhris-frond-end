@@ -32,6 +32,8 @@ import 'package:siscom_operasional/screen/pesan/persetujuan_surat_peringatan.dar
 import 'package:siscom_operasional/screen/pesan/persetujuan_teguran_lisan.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_tugas_luar.dart';
 import 'package:siscom_operasional/screen/pesan/persetujuan_wfh.dart';
+import 'package:siscom_operasional/screen/shift/detail_persetujuan_shift.dart';
+import 'package:siscom_operasional/screen/shift/persetujuan_shift.dart';
 import 'package:siscom_operasional/screen/teguran_lisan.dart';
 import 'package:siscom_operasional/utils/api.dart';
 import 'package:siscom_operasional/utils/app_data.dart';
@@ -42,7 +44,7 @@ import 'package:url_launcher/url_launcher.dart';
 class PesanController extends GetxController {
   PageController menuController = PageController(initialPage: 0);
   RefreshController refreshController = RefreshController(initialRefresh: true);
-  var controllerApproval = Get.put(ApprovalController());
+  var controllerApproval = Get.find<ApprovalController>();
 
   var cari = TextEditingController().obs;
 
@@ -66,6 +68,7 @@ class PesanController extends GetxController {
   var jumlahApproveKasbon = 0.obs;
   var jumlahApproveSuratPeringatan = 0.obs;
   var jumlahApproveTeguranLIsan = 0.obs;
+  var jumlahApproveShift = 0.obs;
   var jumlahNotifikasiBelumDibaca = 0.obs;
   var jumlahNotifikasiBelumDibacaApproval = 0.obs;
   var jumlahCheckin = 0.obs;
@@ -99,18 +102,16 @@ class PesanController extends GetxController {
     "WFH",
     "Kasbon",
     "Surat Peringatan",
-    "Teguran Lisan"
+    "Teguran Lisan",
+    "Shift"
   ];
 
- 
+  // @override
+  // void onReady() async {
+  //   getTimeNow();
 
-  @override
-  void onReady() async {
-    getTimeNow();
-    loadNotifikasi();
-    loadNotifikasiApproval();
-    super.onReady();
-  }
+  //   super.onReady();
+  // }
 
   void routesIcon() {
     selectedView.value = 0;
@@ -179,7 +180,8 @@ class PesanController extends GetxController {
           jumlahApproveKasbon.value = valueBody['jumlah_kasbon'];
           jumlahApproveSuratPeringatan.value =
               valueBody['jumlah_surat_peringatan'];
-           jumlahApproveTeguranLIsan.value = valueBody['jumlah_teguran_lisan']; 
+          jumlahApproveTeguranLIsan.value = valueBody['jumlah_teguran_lisan'];
+          jumlahApproveShift.value = valueBody['jumlah_shift'] == null ? 0 : valueBody['jumlah_shift'];
 
           jumlahPersetujuan.value = jumlahApproveCuti.value +
               jumlahApproveLembur.value +
@@ -190,8 +192,9 @@ class PesanController extends GetxController {
               jumlahCheckin.value +
               jumlahApproveWfh.value +
               jumlahApproveKasbon.value +
-              jumlahApproveSuratPeringatan.value;
-              jumlahApproveTeguranLIsan.value;
+              jumlahApproveSuratPeringatan.value +
+              jumlahApproveTeguranLIsan.value +
+              jumlahApproveShift.value;
 
           this.jumlahApproveCuti.refresh();
           this.jumlahApproveLembur.refresh();
@@ -205,10 +208,9 @@ class PesanController extends GetxController {
           this.jumlahApproveKasbon.refresh();
           this.jumlahApproveSuratPeringatan.refresh();
           this.jumlahApproveTeguranLIsan.refresh();
+          this.jumlahApproveShift.refresh();
           jumlahApprovePayroll.refresh();
 
-          print("Jumlah Approval payroll ${jumlahApprovePayroll}");
-          print("Jumlah Approval payroll ${valueBody}");
           loadScreenPersetujuan();
         } else {
           statusScreenInfoApproval.value = false;
@@ -640,6 +642,14 @@ class PesanController extends GetxController {
 
         dataScreenPersetujuan.value.add(data);
         this.dataScreenPersetujuan.refresh();
+      } else if (element == "Shift") {
+        var data = {
+          'title': element,
+          'jumlah_approve': "${jumlahApproveShift.value}",
+        };
+
+        dataScreenPersetujuan.value.add(data);
+        this.dataScreenPersetujuan.refresh();
       }
     }
     statusScreenInfoApproval.value = false;
@@ -740,15 +750,28 @@ class PesanController extends GetxController {
                                                             tahunSelectedSearchHistory
                                                                 .value,
                                                       ))
-                                                    : Get.to(Approval(
-                                                        title: index['title'],
-                                                        bulan:
-                                                            bulanSelectedSearchHistory
-                                                                .value,
-                                                        tahun:
-                                                            tahunSelectedSearchHistory
-                                                                .value,
-                                                      ));
+                                                    : index['title'] == "Shift"
+                                                        ? Get.to(
+                                                            PersetujuanShift(
+                                                            title:
+                                                                index['title'],
+                                                            bulan:
+                                                                bulanSelectedSearchHistory
+                                                                    .value,
+                                                            tahun:
+                                                                tahunSelectedSearchHistory
+                                                                    .value,
+                                                          ))
+                                                        : Get.to(Approval(
+                                                            title:
+                                                                index['title'],
+                                                            bulan:
+                                                                bulanSelectedSearchHistory
+                                                                    .value,
+                                                            tahun:
+                                                                tahunSelectedSearchHistory
+                                                                    .value,
+                                                          ));
     // }
   }
 
@@ -777,23 +800,23 @@ class PesanController extends GetxController {
             'riwayat');
 
         Future.delayed(const Duration(seconds: 2), () {
-        bool existsInHistory = controllerApproval.listData
-            .any((element) => element['id'].toString() == idx.toString());
+          bool existsInHistory = controllerApproval.listData
+              .any((element) => element['id'].toString() == idx.toString());
 
-        if (!existsInHistory) {
-          print('Data tidak ditemukan di keduanya');
-          Future.delayed(const Duration(seconds: 2), () {
-            Get.back();
-            UtilsAlert.showToast('Data sudah tidak tersedia');
-            return;
-          });
-        } else {
-          print('Data ditemukan di riwayat');
-          Future.delayed(const Duration(seconds: 2), () {
-            Get.back();
-            Get.to(detailPage());
-          });
-        }
+          if (!existsInHistory) {
+            print('Data tidak ditemukan di keduanya');
+            Future.delayed(const Duration(seconds: 2), () {
+              Get.back();
+              UtilsAlert.showToast('Data sudah tidak tersedia');
+              return;
+            });
+          } else {
+            print('Data ditemukan di riwayat');
+            Future.delayed(const Duration(seconds: 2), () {
+              Get.back();
+              Get.to(detailPage());
+            });
+          }
         });
       }
     });
@@ -810,15 +833,17 @@ class PesanController extends GetxController {
       loadAndNavigate(
         'Lembur',
         () => DetailPersetujuanLembur(
-            emId: emIdPengaju,
-            title: 'Lembur',
-            idxDetail: idx,
-            delegasi: delegasi,
-            ),
+          emId: emIdPengaju,
+          title: 'Lembur',
+          idxDetail: idx,
+          delegasi: delegasi,
+        ),
         idx,
       );
       // print('ini idx $idx, $');
     } else if (title == "Approval Cuti" || url == "Cuti") {
+      controllerApproval.searchSuratPeringatan(emIdPengaju);
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Cuti',
         () => DetailPersetujuanCuti(
@@ -833,6 +858,8 @@ class PesanController extends GetxController {
         url == "Izin" ||
         url == "sakit" ||
         url == "TidakHadir") {
+      controllerApproval.searchSuratPeringatan(emIdPengaju);
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Tidak Hadir',
         () => DetailPersetujuanIzin(
@@ -883,6 +910,8 @@ class PesanController extends GetxController {
         idx,
       );
     } else if (title == "Approval Absensi" || url == "Absensi") {
+      controllerApproval.searchSuratPeringatan(emIdPengaju);
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Absensi',
         () => DetailPersetujuanAbsensi(
@@ -914,6 +943,7 @@ class PesanController extends GetxController {
       );
     } else if (title == "Approval Surat Peringatan" ||
         url == 'Surat Peringatan') {
+      controllerApproval.searchTeguranLisan(emIdPengaju);
       loadAndNavigate(
         'Surat Peringatan',
         () => DetailPersetujuanSuratPeringatan(
@@ -923,8 +953,7 @@ class PesanController extends GetxController {
             delegasi: delegasi),
         idx,
       );
-    } else if (title == "Approval Teguran Lisan" ||
-        url == 'Teguran Lisan') {
+    } else if (title == "Approval Teguran Lisan" || url == 'Teguran Lisan') {
       loadAndNavigate(
         'Teguran Lisan',
         () => DetailPersetujuanTeguranLisan(
@@ -934,179 +963,18 @@ class PesanController extends GetxController {
             delegasi: delegasi),
         idx,
       );
-        }
-    else  {}
+    } else if (title == "Approval shift" || url == 'shift') {
+      loadAndNavigate(
+        'Shift',
+        () => DetailPersetujuanShift(
+            emId: emIdPengaju,
+            title: 'Shift',
+            idxDetail: idx,
+            delegasi: delegasi),
+        idx,
+      );
+    } else {}
   }
-
-  // void routeApprovalNotifFCm({
-  //   required String title,
-  //   required String emIdPengaju,
-  //   required String idx,
-  //   required String delegasi,
-  //   required String url,
-  // }) async {
-  //   // print("lalala: $url");
-  //   if (title == "Pengajuan Lembur" || url == "Lembur") {
-  //     await controllerApproval.startLoadData(
-  //         'Lembur',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanLembur(
-  //             emId: emIdPengaju,
-  //             title: 'Lembur',
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else if (title == "Approval Cuti" || url == "Cuti") {
-  //     controllerApproval.startLoadData('Cuti', bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value, 'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanCuti(
-  //             emId: emIdPengaju,
-  //             title: 'Cuti',
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else if (title == "Approval Izin" ||
-  //       url == "Izin" ||
-  //       url == "TidakHadir") {
-  //     controllerApproval.startLoadData(
-  //         'Tidak Hadir',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanIzin(
-  //             emId: emIdPengaju,
-  //             title: 'Tidak Hadir',
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else if (title == "Approval Tugas Luar" || url == "TugasLuar") {
-  //     controllerApproval.startLoadData(
-  //         'Tugas Luar',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       bool exists = controllerApproval.listData
-  //           .any((element) => element['id'].toString() == idx.toString());
-
-  //       if (exists) {
-  //         Get.to(() => DetailPersetujuanTugasLuar(
-  //               emId: emIdPengaju,
-  //               title: 'Tugas Luar',
-  //               idxDetail: idx,
-  //               delegasi: delegasi,
-  //             ));
-  //       } else {
-  //         controllerApproval.startLoadData(
-  //             'Tugas Luar',
-  //             bulanSelectedSearchHistory.value,
-  //             tahunSelectedSearchHistory.value,
-  //             'riwayat');
-  //         Future.delayed(const Duration(seconds: 1), () {
-  //           Get.to(() => DetailPersetujuanTugasLuar(
-  //                 emId: emIdPengaju,
-  //                 title: 'Tugas Luar',
-  //                 idxDetail: idx,
-  //                 delegasi: delegasi,
-  //               ));
-  //         });
-  //       }
-  //     });
-  //   } else if (title == "Pengajuan" || url == "DinasLuar") {
-  //     controllerApproval.startLoadData(
-  //         'Dinas Luar',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanDinasLuar(
-  //             emId: emIdPengaju,
-  //             title: 'Dinas Luar',
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else if (title == "Approval Klaim" || url == "Klaim") {
-  //     controllerApproval.startLoadData(
-  //         'Klaim',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanKlaim(
-  //             emId: emIdPengaju,
-  //             title: 'Klaim',
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else if (title == "Approval Payroll" || url == "Payroll") {
-  //     controllerApproval.startLoadData(
-  //         'Payroll',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanPayroll(
-  //             emId: emIdPengaju,
-  //             title: 'Payroll',
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else if (title == "Approval Absensi" || url == "Absensi") {
-  //     controllerApproval.startLoadData(
-  //         'Absensi',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       for (var element in controllerApproval.listData) {
-  //         print("element['id']: ${element['id']}");
-  //       }
-  //       // Get.to(() => DetailPersetujuanAbsensi(
-  //       //       emId: emIdPengaju,
-  //       //       title: 'Absensi',
-  //       //       idxDetail: idx,
-  //       //       delegasi: delegasi,
-  //       //     ));
-  //     });
-  //   } else if (title == "Approval WFH" || url == "WFH") {
-  //     controllerApproval.startLoadData('WFH', bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value, 'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanWfh(
-  //             emId: emIdPengaju,
-  //             title: "WFH",
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else if (title == "Approval Kasbon" || url == "Kasbon") {
-  //     controllerApproval.startLoadData(
-  //         'Kasbon',
-  //         bulanSelectedSearchHistory.value,
-  //         tahunSelectedSearchHistory.value,
-  //         'persetujuan');
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       Get.to(() => DetailPersetujuanKasbon(
-  //             emId: emIdPengaju,
-  //             title: "Kasbon",
-  //             idxDetail: idx,
-  //             delegasi: delegasi,
-  //           ));
-  //     });
-  //   } else {}
-  // }
 
   void loadNotifikasiApproval() {
     isLoading.value = true;
@@ -1230,6 +1098,7 @@ class PesanController extends GetxController {
     hitungNotifikasiBelumDibaca();
     updateDataNotif(pisahkanData);
   }
+
   void aksilihatNotifApproval(id) {
     var pisahkanData = [];
     listNotifikasiApproval.value.forEach((element) {

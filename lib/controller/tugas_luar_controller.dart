@@ -82,7 +82,7 @@ class TugasLuarController extends GetxController {
     "Pending"
   ];
 
-  GlobalController globalCt = Get.put(GlobalController());
+  GlobalController globalCt = Get.find<GlobalController>();
 
   // @override
   // void onReady() async {
@@ -376,7 +376,6 @@ class TugasLuarController extends GetxController {
         if (res.statusCode == 200) {
           var valueBody = jsonDecode(res.body);
           var data = valueBody['data'];
-          print("data delegasi new ${data}");
           for (var element in data) {
             print("data status ${element['status']}");
             if (element['status'] == 'ACTIVE') {
@@ -388,7 +387,6 @@ class TugasLuarController extends GetxController {
               allEmployee.value.add(element);
             }
           }
-          print("data delegasi setelah di sharing ${allEmployeeDelegasi}");
           if (idpengajuanTugasLuar.value == "") {
             List data = valueBody['data'];
             var listFirst = data
@@ -1025,6 +1023,7 @@ class TugasLuarController extends GetxController {
       typeNotifFcm) {
     var dt = DateTime.now();
     var jamSekarang = DateFormat('HH:mm:ss').format(dt);
+    var tanggalSekarang = DateFormat('yyyy-MM-dd').format(dt);
 
     var title_ct =
         type == 1 ? "Pemberi Tugas Tugas Luar" : "Pemberi Tugas Dinas Luar";
@@ -1036,7 +1035,7 @@ class TugasLuarController extends GetxController {
       'title': title_ct,
       'deskripsi': desk_ct,
       'url': '',
-      'atten_date': convertTanggalBikinPengajuan,
+      'atten_date': tanggalSekarang,
       'jam': jamSekarang,
       'status': '2',
       'view': '0',
@@ -1342,7 +1341,8 @@ class TugasLuarController extends GetxController {
 
   void showDetailRiwayat(tipe, detailData, approve_by, alasanReject) {
     var nomorAjuan = detailData['nomor_ajuan'];
-    var tanggalMasukAjuan = detailData['atten_date'];
+    var tanggalMasukAjuan = detailData['tgl_ajuan'];
+    var tanggalTugas = detailData['atten_date'];
     var namaTypeAjuan = "Dinas Luar";
     var tanggalAjuanDari = detailData['start_date'];
     var tanggalAjuanSampai = detailData['end_date'];

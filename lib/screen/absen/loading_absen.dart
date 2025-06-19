@@ -26,7 +26,7 @@ class LoadingAbsen extends StatefulWidget {
 
 class _LoadingAbsenState extends State<LoadingAbsen>
     with SingleTickerProviderStateMixin {
-  final abseController = Get.put(AbsenController());
+  final abseController = Get.find<AbsenController>();
 
   AnimationController? _animationController;
   bool _animationStopped = false;
